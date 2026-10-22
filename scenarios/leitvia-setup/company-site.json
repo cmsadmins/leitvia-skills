@@ -1,0 +1,123 @@
+{
+	"$schema": "../scenario.schema.json",
+	"title": "Company site from a briefing with the recipe company in package mode",
+	"skill": "leitvia-setup",
+	"briefing": "Set up our live site for Example Consulting GmbH: home, services, about, contact and an imprint. Put everything into one change package for us to review.",
+	"mode": "package",
+	"answers": {
+		"Briefing confirmed": "Yes. Company site with home, services, about, contact and imprint.",
+		"Recipe chosen": "leitvia/company is fine.",
+		"Legal texts supplied by the human": "Imprint: Example Consulting GmbH, Main Street 1, 10115 Berlin. Register court Berlin Charlottenburg, HRB 000000. Managing director: Erika Example. No other site links to our pages yet.",
+		"Package applied": "Applied the packages in the inbox."
+	},
+	"setup": [
+		{
+			"step": "runPHP",
+			"code": "<?php require_once '/wordpress/wp-load.php'; $created = WP_Application_Passwords::create_new_application_password( 1, array( 'name' => 'scenario' ) ); file_put_contents( '/leitvia-run/admin-password.txt', $created[0] . \"\n\" );"
+		}
+	],
+	"steps": [
+		{
+			"ability": "leitvia/list-recipes",
+			"expect": {
+				"length": { "$gte": 5 }
+			}
+		},
+		{
+			"ability": "leitvia/apply-recipe",
+			"input": { "recipe": "leitvia/company", "package": "company-site" },
+			"capture": { "first": "package" },
+			"expect": {
+				"package": { "$gte": 1 },
+				"steps.7.status": "package"
+			}
+		},
+		{
+			"ability": "leitvia/apply-package",
+			"user": "admin",
+			"input": { "id": "{{capture.first}}" },
+			"expect": {
+				"state": "applied",
+				"conflicts.length": 0,
+				"errors.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/apply-recipe",
+			"input": { "recipe": "leitvia/company", "package": "company-site" },
+			"capture": { "imprint": "steps.7.target.post" },
+			"expect": {
+				"package": 0,
+				"steps.7.status": "exists"
+			}
+		},
+		{
+			"ability": "leitvia/get-page-outline",
+			"input": { "post": "{{capture.imprint}}" },
+			"capture": { "hash": "hash" },
+			"expect": {
+				"kind": "imprint"
+			}
+		},
+		{
+			"ability": "leitvia/update-content",
+			"input": {
+				"post": "{{capture.imprint}}",
+				"base_hash": "{{capture.hash}}",
+				"package": "company-site",
+				"blocks": [
+					{ "block": "p:0.0", "text": "Who is responsible for this site" },
+					{ "block": "p:0.2.0.0", "text": "Example Consulting GmbH, Main Street 1, 10115 Berlin." },
+					{ "block": "p:0.2.0.1", "text": "Register court Berlin Charlottenburg, HRB 000000." },
+					{ "block": "p:0.2.1.0", "text": "Managing director: Erika Example." }
+				]
+			},
+			"capture": { "second": "package" },
+			"expect": {
+				"mode": "package",
+				"kinds": [ "legal" ]
+			}
+		},
+		{
+			"ability": "leitvia/apply-package",
+			"user": "admin",
+			"input": { "id": "{{capture.second}}" },
+			"expect": {
+				"state": "applied",
+				"conflicts.length": 0,
+				"errors.length": 0
+			}
+		}
+	],
+	"expect": [
+		{
+			"ability": "leitvia/list-packages",
+			"input": { "state": "open" },
+			"expect": { "length": 0 }
+		},
+		{
+			"ability": "leitvia/list-packages",
+			"input": { "state": "applied" },
+			"expect": { "length": 2 }
+		},
+		{
+			"ability": "leitvia/audit-site",
+			"expect": {
+				"items.length": 7,
+				"items.0.findings.length": 0,
+				"items.1.findings.length": 0,
+				"items.2.findings.length": 0,
+				"items.3.findings.length": 0,
+				"items.4.findings.length": 0,
+				"items.5.findings.length": 0,
+				"items.6.findings.length": 0,
+				"next": null
+			}
+		},
+		{ "url": "/", "status": 200, "h1": 1 },
+		{ "url": "/services/", "status": 200, "h1": 1 },
+		{ "url": "/about/", "status": 200, "h1": 1 },
+		{ "url": "/contact/", "status": 200, "h1": 1 },
+		{ "url": "/imprint/", "status": 200, "h1": 1 }
+	]
+}

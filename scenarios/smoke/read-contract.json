@@ -1,0 +1,42 @@
+{
+	"$schema": "../scenario.schema.json",
+	"title": "Read the design contract and the patterns",
+	"skill": "smoke",
+	"briefing": "Before you change anything, tell me which page frames and patterns this site offers.",
+	"mode": "direct",
+	"steps": [
+		{
+			"ability": "leitvia/get-contract",
+			"expect": {
+				"version": { "$match": "^[0-9]+[.][0-9]+[.][0-9]+$" },
+				"contract.theme": "leitvia",
+				"contract.pageFrames.length": { "$gte": 1 },
+				"contract.pairs.length": { "$gte": 1 }
+			}
+		},
+		{
+			"ability": "leitvia/list-patterns",
+			"input": { "per_page": 5 },
+			"capture": { "pattern": "items.0.slug" },
+			"expect": {
+				"items.length": 5,
+				"total": { "$gte": 20 }
+			}
+		},
+		{
+			"ability": "leitvia/get-pattern",
+			"input": { "slug": "{{capture.pattern}}" },
+			"expect": {
+				"slug": { "$match": "^leitvia/" }
+			}
+		}
+	],
+	"expect": [
+		{
+			"ability": "leitvia/list-packages",
+			"input": { "state": "open" },
+			"expect": { "length": 0 }
+		},
+		{ "url": "/", "status": 200, "h1": 1 }
+	]
+}

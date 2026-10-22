@@ -1,0 +1,121 @@
+{
+	"$schema": "../scenario.schema.json",
+	"title": "A video as Custom HTML block is refused, the skill writes a core embed behind the consent placeholder",
+	"skill": "leitvia-migrate",
+	"briefing": "Move our post with the baking video to blocks. Put the change into a package for review.",
+	"mode": "package",
+	"answers": {
+		"Theme switch": "Leitvia is active.",
+		"Package applied": "Applied the package in the inbox."
+	},
+	"setup": [
+		{
+			"step": "runPHP",
+			"code": "<?php require '/leitvia-fixtures/leitvia-migrate/site.php';"
+		}
+	],
+	"steps": [
+		{
+			"ability": "leitvia/audit-site",
+			"input": {
+				"limit": 20
+			},
+			"capture": {
+				"video": "items.7.post"
+			},
+			"expect": {
+				"items.7.slug": "video-shaping-a-loaf",
+				"items.7.findings.0.check": {
+					"$match": "classic-content$"
+				}
+			}
+		},
+		{
+			"ability": "leitvia/get-block",
+			"input": {
+				"post": "{{capture.video}}",
+				"block": "p:0"
+			},
+			"capture": {
+				"hash": "document_hash"
+			},
+			"expect": {
+				"name": "core/freeform",
+				"inner_html": {
+					"$match": "<iframe title=\"Shaping a round loaf\"[^>]* src=\"https://www\\.youtube-nocookie\\.com/embed/aqz-KE-bpKQ\""
+				}
+			}
+		},
+		{
+			"ability": "leitvia/update-content",
+			"input": {
+				"post": "{{capture.video}}",
+				"content": "<!-- wp:paragraph -->\n<p>Our head baker shows in four minutes how she shapes a round loaf.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:html -->\n<iframe title=\"Shaping a round loaf\" width=\"560\" height=\"315\" src=\"https://www.youtube-nocookie.com/embed/aqz-KE-bpKQ\" allowfullscreen></iframe>\n<!-- /wp:html -->\n\n<!-- wp:paragraph -->\n<p>Watch how little flour she uses on the table.</p>\n<!-- /wp:paragraph -->",
+				"base_hash": "{{capture.hash}}",
+				"package": "migrate-video"
+			},
+			"expectError": "leitvia_unsafe_content"
+		},
+		{
+			"ability": "leitvia/update-content",
+			"input": {
+				"post": "{{capture.video}}",
+				"content": "<!-- wp:paragraph -->\n<p>Our head baker shows in four minutes how she shapes a round loaf.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:embed {\"url\":\"https://www.youtube.com/watch?v=aqz-KE-bpKQ\",\"type\":\"video\",\"providerNameSlug\":\"youtube\",\"responsive\":true,\"className\":\"wp-embed-aspect-16-9 wp-has-aspect-ratio\"} -->\n<figure class=\"wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio\"><div class=\"wp-block-embed__wrapper\">\nhttps://www.youtube.com/watch?v=aqz-KE-bpKQ\n</div></figure>\n<!-- /wp:embed -->\n\n<!-- wp:paragraph -->\n<p>Watch how little flour she uses on the table.</p>\n<!-- /wp:paragraph -->",
+				"base_hash": "{{capture.hash}}",
+				"package": "migrate-video"
+			},
+			"capture": {
+				"package": "package"
+			},
+			"expect": {
+				"mode": "package",
+				"findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/apply-package",
+			"user": "admin",
+			"input": {
+				"id": "{{capture.package}}"
+			},
+			"expect": {
+				"state": "applied",
+				"conflicts.length": 0,
+				"errors.length": 0
+			}
+		}
+	],
+	"expect": [
+		{
+			"ability": "leitvia/get-page-outline",
+			"input": {
+				"post": "{{capture.video}}"
+			},
+			"expect": {
+				"blocks.length": 3,
+				"blocks.0.name": "core/paragraph",
+				"blocks.1.name": "core/embed",
+				"blocks.2.name": "core/paragraph"
+			}
+		},
+		{
+			"ability": "leitvia/audit-site",
+			"input": {
+				"limit": 20
+			},
+			"expect": {
+				"items.7.findings.length": 0
+			}
+		},
+		{
+			"url": "/video-shaping-a-loaf/",
+			"status": 200,
+			"h1": 1,
+			"contains": [
+				"Our head baker shows in four minutes how she shapes a round loaf.",
+				"data-leitvia-consent=\"youtube\"",
+				"Watch how little flour she uses on the table."
+			]
+		}
+	]
+}

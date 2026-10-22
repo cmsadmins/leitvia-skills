@@ -1,0 +1,3941 @@
+{
+	"studio": "1.0.0",
+	"abilities": [
+		{
+			"name": "leitvia/activate-token-set",
+			"label": "Activate token set",
+			"description": "Writes the presets of a token set into the global styles of the active theme. The set ID comes from leitvia/create-token-set or the sets of leitvia/get-tokens. The base hash is the hash of the global styles. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash.",
+			"category": "leitvia",
+			"group": "setup",
+			"input_schema": {
+				"properties": {
+					"set": {
+						"type": "integer",
+						"minimum": 1
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"set",
+					"base_hash"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": false
+			}
+		},
+		{
+			"name": "leitvia/add-media",
+			"label": "Add media",
+			"description": "Adds an image to the media library from a URL of this site or as Base64 data up to 5 MB, with alt text or marked as decorative. URLs of other hosts are rejected; nothing is fetched from them. base_hash is empty. Images already in the library are used by their ID in compose-page and update-block.",
+			"category": "leitvia",
+			"group": "build",
+			"input_schema": {
+				"properties": {
+					"url": {
+						"type": "string",
+						"format": "uri"
+					},
+					"data": {
+						"type": "string",
+						"maxLength": 6990512
+					},
+					"filename": {
+						"type": "string",
+						"maxLength": 200
+					},
+					"title": {
+						"type": "string",
+						"maxLength": 200
+					},
+					"alt": {
+						"type": "string",
+						"maxLength": 500
+					},
+					"decorative": {
+						"type": "boolean"
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"base_hash"
+				]
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": false,
+				"idempotent": false
+			}
+		},
+		{
+			"name": "leitvia/apply-package",
+			"label": "Apply change package",
+			"description": "Applies the open operations of a change package, all or the listed ones. Find the package with leitvia/list-packages and check its diff with leitvia/get-package first. Each operation checks its base hash; one whose target changed stays open with a conflict, the others are written with snapshot and audit entry. Agents may only apply operations whose autonomy level is autonomous.",
+			"category": "leitvia",
+			"group": "maintain",
+			"input_schema": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"minimum": 1,
+						"description": "Change package ID."
+					},
+					"operations": {
+						"type": "array",
+						"items": {
+							"type": "integer",
+							"minimum": 1
+						},
+						"description": "Operation IDs to apply; empty or missing for every open operation."
+					}
+				},
+				"required": [
+					"id"
+				],
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object"
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": false,
+				"idempotent": false
+			}
+		},
+		{
+			"name": "leitvia/apply-recipe",
+			"label": "Apply recipe",
+			"description": "Sets up the site from a recipe of leitvia/list-recipes: content model, token set, style variation, header and footer, pages from patterns, navigation, reading settings and options that save data. Each part runs through its own ability with the autonomy level of its area; what may not go live lands in one change package, and with a package key everything does. Settings that point to a page waiting in that package (front page, privacy policy page) are set when the package is applied. Pages that exist and header or footer changed since are kept, so the recipe can run again after the package was applied. Review the package with leitvia/get-package.",
+			"category": "leitvia",
+			"group": "setup",
+			"input_schema": {
+				"type": "object",
+				"properties": {
+					"recipe": {
+						"type": "string",
+						"description": "Name from leitvia/list-recipes, for example leitvia/blog."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: every part goes into the change package of that key, nothing goes live."
+					}
+				},
+				"required": [
+					"recipe"
+				],
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"recipe": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"steps": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": false,
+				"idempotent": true
+			}
+		},
+		{
+			"name": "leitvia/audit-site",
+			"label": "Audit site",
+			"description": "Runs the content checks (headings, alt text, link text, block validity, tokens, contrast, one h1 and landmarks) over published content, at most 20 posts per call in ID order. Also reports classic content without blocks, deprecated patterns, preset slugs missing from the active tokens, internal links that lead to no page or to the old address of a renamed post, and pages that look like legal texts without a page kind. Pass next as after for the following page; next is null at the end.",
+			"category": "leitvia",
+			"group": "read",
+			"input_schema": {
+				"type": "object",
+				"properties": {
+					"after": {
+						"type": "integer",
+						"minimum": 0,
+						"default": 0,
+						"description": "Start after this post ID, the next value of the previous call."
+					},
+					"limit": {
+						"type": "integer",
+						"minimum": 1,
+						"maximum": 20,
+						"default": 10,
+						"description": "Posts per call."
+					}
+				},
+				"additionalProperties": false,
+				"default": []
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"items": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"next": {
+						"type": [
+							"integer",
+							"null"
+						]
+					}
+				}
+			},
+			"annotations": {
+				"readonly": true,
+				"destructive": false,
+				"idempotent": true,
+				"openWorldHint": false
+			}
+		},
+		{
+			"name": "leitvia/check-composition",
+			"label": "Check composition",
+			"description": "Scores a page against the composition rules of the contract: pass pattern slugs in page order (block:<ID> for a Lab pattern; only approved ones count as known), or a post ID to read the sections of a saved page from metadata.patternName. Returns the findings (rule and 0-based section index), the score from 100 down, the minimum score for autonomous writes and per finding up to three patterns that would fix it.",
+			"category": "leitvia",
+			"group": "read",
+			"input_schema": {
+				"type": "object",
+				"properties": {
+					"slugs": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"maxLength": 100
+						},
+						"maxItems": 40
+					},
+					"post": {
+						"type": "integer",
+						"minimum": 1
+					},
+					"template": {
+						"type": "string",
+						"maxLength": 100,
+						"description": "Template slug, for example page-landing; for a post its saved template is used."
+					}
+				},
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"sections": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"issues": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"rule": {
+									"type": "string"
+								},
+								"index": {
+									"type": "integer"
+								},
+								"message": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"score": {
+						"type": "integer"
+					},
+					"min_score": {
+						"type": "integer"
+					},
+					"suggestions": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					}
+				}
+			},
+			"annotations": {
+				"readonly": true,
+				"destructive": false,
+				"idempotent": true,
+				"openWorldHint": false
+			}
+		},
+		{
+			"name": "leitvia/compose-page",
+			"label": "Compose page",
+			"description": "Creates a page from patterns in the order of a page frame of the contract. Plan it with leitvia/plan-page first; base_hash is empty for the new page. Per section only texts (also quote citations and details summaries), links and images at block IDs of the pattern outline can change; a text that would drop a link is refused. Each section keeps metadata.patternName (core/block/<ID> for a Lab pattern). Unknown patterns are rejected with a pointer to leitvia/list-patterns, deprecated ones with their replacement, Lab patterns that are not approved (also through a part) with leitvia_pattern_not_approved. Later changes go through leitvia/update-content and leitvia/update-block.",
+			"category": "leitvia",
+			"group": "build",
+			"input_schema": {
+				"properties": {
+					"title": {
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 200
+					},
+					"frame": {
+						"type": "string",
+						"description": "Type of a page frame from pageFrames in the contract, for example home or service."
+					},
+					"sections": {
+						"type": "array",
+						"minItems": 1,
+						"maxItems": 30,
+						"items": {
+							"type": "object",
+							"properties": {
+								"pattern": {
+									"type": "string",
+									"description": "Pattern slug such as leitvia/hero-split-image, or block:<ID> for a Lab pattern."
+								},
+								"edits": {
+									"type": "array",
+									"maxItems": 50,
+									"items": {
+										"type": "object",
+										"properties": {
+											"block": {
+												"type": "string",
+												"minLength": 1,
+												"maxLength": 200,
+												"description": "Block ID or path ID from the outline."
+											},
+											"text": {
+												"type": "string",
+												"maxLength": 5000,
+												"description": "Plain text of a paragraph, heading, list item or button, the citation of a quote or the summary of a details block."
+											},
+											"link_text": {
+												"type": "string",
+												"minLength": 1,
+												"maxLength": 500,
+												"description": "Part of text that stays linked when the text holds a link, such as the mail address in a contact line. Without it the link stays around its old text, and a text without that is refused unless the link only points to #."
+											},
+											"url": {
+												"type": "string",
+												"maxLength": 2000,
+												"description": "Link of a button, or of the one link in a paragraph, heading or list item (mailto: and tel: work too)."
+											},
+											"image": {
+												"type": "object",
+												"properties": {
+													"id": {
+														"type": "integer",
+														"minimum": 1
+													},
+													"alt": {
+														"type": "string",
+														"maxLength": 500
+													},
+													"decorative": {
+														"type": "boolean"
+													}
+												},
+												"required": [
+													"id"
+												],
+												"additionalProperties": false
+											}
+										},
+										"required": [
+											"block"
+										],
+										"additionalProperties": false
+									}
+								}
+							},
+							"required": [
+								"pattern"
+							],
+							"additionalProperties": false
+						}
+					},
+					"kind": {
+						"type": "string",
+						"enum": [
+							"imprint",
+							"privacy",
+							"terms",
+							"withdrawal",
+							"accessibility",
+							"editorial",
+							"contact",
+							"authors"
+						]
+					},
+					"slug": {
+						"type": "string",
+						"pattern": "^[a-z0-9-]+$"
+					},
+					"parent": {
+						"type": "integer",
+						"minimum": 1,
+						"description": "ID of the parent page."
+					},
+					"template": {
+						"type": "string",
+						"description": "Page template of the contract instead of the one of the frame, for example page-docs."
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"title",
+					"frame",
+					"sections",
+					"base_hash"
+				],
+				"additionalProperties": false,
+				"type": "object"
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": false,
+				"idempotent": false
+			}
+		},
+		{
+			"name": "leitvia/create-pattern",
+			"label": "Create pattern",
+			"description": "Creates a pattern in the Lab as a draft with version 0.1.0 from block markup; base_hash is empty. Blocks and their attributes come from leitvia/list-blocks. The checks run on its markup, design tokens included. To build on an existing pattern use leitvia/vary-pattern.",
+			"category": "leitvia",
+			"group": "build",
+			"input_schema": {
+				"properties": {
+					"title": {
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 200
+					},
+					"content": {
+						"type": "string",
+						"minLength": 1
+					},
+					"synced": {
+						"type": "boolean"
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"title",
+					"content",
+					"base_hash"
+				],
+				"additionalProperties": false,
+				"type": "object"
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": false,
+				"idempotent": false
+			}
+		},
+		{
+			"name": "leitvia/create-token-set",
+			"label": "Create token set",
+			"description": "Creates a token set from a DTCG document. Start from the document leitvia/get-tokens returns; base_hash is empty for the new set. It must compile against the contract and pass every token set check; contrast findings name the failing pair and the ratio it needs. Activate it with leitvia/activate-token-set.",
+			"category": "leitvia",
+			"group": "setup",
+			"input_schema": {
+				"properties": {
+					"title": {
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 200
+					},
+					"document": {
+						"type": "object",
+						"description": "DTCG token document, as leitvia/get-tokens returns it."
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"title",
+					"document",
+					"base_hash"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": false,
+				"idempotent": false
+			}
+		},
+		{
+			"name": "leitvia/define-content-type",
+			"label": "Define content type",
+			"description": "Adds or replaces entries of the content model (postTypes, taxonomies, relations, settings) and keeps the others. Read the declaration with leitvia/get-content-model first. The base hash is the hash of the content model. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash. showInAbilities stays a decision of a person: agents may not set it.",
+			"category": "leitvia",
+			"group": "setup",
+			"input_schema": {
+				"properties": {
+					"declaration": {
+						"type": "object",
+						"description": "Content model declaration with the entries to add or replace, see leitvia/get-content-model."
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"declaration",
+					"base_hash"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": false,
+				"idempotent": false
+			}
+		},
+		{
+			"name": "leitvia/get-block",
+			"label": "Get block",
+			"description": "Returns one block of a post by its ID or path ID with all attributes, its own markup, the attachments of the images in that markup, its hash, the IDs of its children and the document hash. Classic content without blocks is one block p:0 named core/freeform.",
+			"category": "leitvia",
+			"group": "read",
+			"input_schema": {
+				"type": "object",
+				"properties": {
+					"post": {
+						"type": "integer",
+						"minimum": 1,
+						"description": "Post ID."
+					},
+					"block": {
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 200,
+						"description": "Block ID from the page outline."
+					}
+				},
+				"required": [
+					"post",
+					"block"
+				],
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"id_stable": {
+						"type": "boolean"
+					},
+					"name": {
+						"type": "string"
+					},
+					"attributes": {
+						"type": "object"
+					},
+					"inner_html": {
+						"type": "string"
+					},
+					"attachments": {
+						"type": "array",
+						"description": "Images in inner_html that are attachments of this site, in order: attachment ID and the src as written.",
+						"items": {
+							"type": "object",
+							"properties": {
+								"id": {
+									"type": "integer"
+								},
+								"url": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"hash": {
+						"type": "string"
+					},
+					"children": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"document_hash": {
+						"type": "string"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": true,
+				"destructive": false,
+				"idempotent": true,
+				"openWorldHint": false
+			}
+		},
+		{
+			"name": "leitvia/get-content-model",
+			"label": "Get content model",
+			"description": "Returns the content model declaration: post types, taxonomies, fields, relations and site settings with their definitions, never content. valid is false when the declaration fails the schema and nothing of it is registered.",
+			"category": "leitvia",
+			"group": "read",
+			"input_schema": {
+				"type": "object",
+				"properties": [],
+				"additionalProperties": false,
+				"default": []
+			},
+			"output_schema": {
+				"type": "object",
+				"required": [
+					"declaration",
+					"valid",
+					"error"
+				],
+				"properties": {
+					"declaration": {
+						"type": "object"
+					},
+					"valid": {
+						"type": "boolean"
+					},
+					"error": {
+						"type": "string"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": true,
+				"destructive": false,
+				"idempotent": true,
+				"openWorldHint": false
+			}
+		},
+		{
+			"name": "leitvia/get-contract",
+			"label": "Get contract",
+			"description": "Returns the site this connection works on (address, REST base, name, language, whether it is part of a multisite network) and the design contract of the active theme: version, rules, color roles, contrast pairs, composition rules, page frames, template parts, templates, block styles and style variations. Compare site.url with the address of your task before the first write. Patterns come from list-patterns, blocks from list-blocks.",
+			"category": "leitvia",
+			"group": "read",
+			"input_schema": {
+				"type": "object",
+				"properties": [],
+				"additionalProperties": false,
+				"default": []
+			},
+			"output_schema": {
+				"type": "object",
+				"required": [
+					"site",
+					"version",
+					"contract"
+				],
+				"properties": {
+					"site": {
+						"type": "object",
+						"required": [
+							"url",
+							"rest",
+							"name",
+							"language",
+							"multisite"
+						],
+						"properties": {
+							"url": {
+								"type": "string"
+							},
+							"rest": {
+								"type": "string"
+							},
+							"name": {
+								"type": "string"
+							},
+							"language": {
+								"type": "string"
+							},
+							"multisite": {
+								"type": "boolean"
+							}
+						}
+					},
+					"version": {
+						"type": "string"
+					},
+					"contract": {
+						"type": "object",
+						"properties": {
+							"rules": {
+								"type": "array"
+							},
+							"roles": {
+								"type": "object"
+							},
+							"pairs": {
+								"type": "array",
+								"items": {
+									"type": "object"
+								}
+							},
+							"compositionRules": {
+								"type": "object"
+							},
+							"pageFrames": {
+								"type": "array",
+								"items": {
+									"type": "object"
+								}
+							},
+							"templateParts": {
+								"type": "array",
+								"items": {
+									"type": "object"
+								}
+							},
+							"templates": {
+								"type": "array",
+								"items": {
+									"type": "object"
+								}
+							},
+							"blockStyles": {
+								"type": "array",
+								"items": {
+									"type": "object"
+								}
+							},
+							"variations": {
+								"type": "array",
+								"items": {
+									"type": "object"
+								}
+							}
+						}
+					}
+				}
+			},
+			"annotations": {
+				"readonly": true,
+				"destructive": false,
+				"idempotent": true,
+				"openWorldHint": false
+			}
+		},
+		{
+			"name": "leitvia/get-package",
+			"label": "Get change package",
+			"description": "Returns a change package with its operations: status, conflicts and, for open operations, a block diff against the current state (per block added, removed, moved or changed with text before and after and the changed attributes).",
+			"category": "leitvia",
+			"group": "read",
+			"input_schema": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"minimum": 1,
+						"description": "Change package ID."
+					}
+				},
+				"required": [
+					"id"
+				],
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object"
+			},
+			"annotations": {
+				"readonly": true,
+				"destructive": false,
+				"idempotent": true,
+				"openWorldHint": false
+			}
+		},
+		{
+			"name": "leitvia/get-page-outline",
+			"label": "Get page outline",
+			"description": "Returns a post as a compact block tree: per block the ID, name, pattern, the first 80 characters of text, size, hash and children. Blocks without a stable ID have a path ID such as p:0.2.1 until the next save. Use the document hash as base_hash for changes and get-block for full attributes.",
+			"category": "leitvia",
+			"group": "read",
+			"input_schema": {
+				"type": "object",
+				"properties": {
+					"post": {
+						"type": "integer",
+						"minimum": 1,
+						"description": "Post ID."
+					}
+				},
+				"required": [
+					"post"
+				],
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer"
+					},
+					"type": {
+						"type": "string"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"title": {
+						"type": "string"
+					},
+					"status": {
+						"type": "string"
+					},
+					"template": {
+						"type": "string"
+					},
+					"kind": {
+						"type": "string"
+					},
+					"blocks": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					}
+				}
+			},
+			"annotations": {
+				"readonly": true,
+				"destructive": false,
+				"idempotent": true,
+				"openWorldHint": false
+			}
+		},
+		{
+			"name": "leitvia/get-pattern",
+			"label": "Get pattern",
+			"description": "Returns one pattern of the theme or of Leitvia Studio with its markup, metadata and the first 20 posts and templates that use it (more is true when there are further ones).",
+			"category": "leitvia",
+			"group": "read",
+			"input_schema": {
+				"type": "object",
+				"properties": {
+					"slug": {
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 200,
+						"description": "Pattern slug from list-patterns, for example leitvia/hero-split-image, or block:<ID> for a Lab pattern."
+					}
+				},
+				"required": [
+					"slug"
+				],
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"required": [
+					"slug",
+					"content",
+					"usage"
+				],
+				"properties": {
+					"slug": {
+						"type": "string"
+					},
+					"content": {
+						"type": "string"
+					},
+					"usage": {
+						"type": "object",
+						"properties": {
+							"items": {
+								"type": "array",
+								"items": {
+									"type": "object"
+								}
+							},
+							"more": {
+								"type": "boolean"
+							}
+						}
+					}
+				}
+			},
+			"annotations": {
+				"readonly": true,
+				"destructive": false,
+				"idempotent": true,
+				"openWorldHint": false
+			}
+		},
+		{
+			"name": "leitvia/get-product",
+			"label": "Get product",
+			"description": "Returns one product or variation: texts, images with alt text, categories and tags with their hash, attributes, price (read only), tax and shipping class, stock status, merchandising and the hash to use as base_hash. No sales, order or customer figures.",
+			"category": "leitvia",
+			"group": "read",
+			"input_schema": {
+				"type": "object",
+				"properties": {
+					"product": {
+						"type": "integer",
+						"minimum": 1
+					}
+				},
+				"required": [
+					"product"
+				],
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer"
+					},
+					"type": {
+						"type": "string"
+					},
+					"title": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					},
+					"short_description": {
+						"type": "string"
+					},
+					"images": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"categories": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"tags": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"attributes": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"price": {
+						"type": "object"
+					},
+					"stock_status": {
+						"type": "string"
+					},
+					"hash": {
+						"type": "string"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": true,
+				"destructive": false,
+				"idempotent": true,
+				"openWorldHint": false
+			},
+			"requires": [
+				"woocommerce"
+			]
+		},
+		{
+			"name": "leitvia/get-tokens",
+			"label": "Get tokens",
+			"description": "Returns the active design tokens as a DTCG document (of the active token set, else of the current global styles), the token sets with their status, the active style variations, whether the global styles drifted from the active set and the contrast findings of the current palette.",
+			"category": "leitvia",
+			"group": "read",
+			"input_schema": {
+				"type": "object",
+				"properties": [],
+				"additionalProperties": false,
+				"default": []
+			},
+			"output_schema": {
+				"type": "object",
+				"required": [
+					"active",
+					"source",
+					"document",
+					"sets",
+					"variations",
+					"drift",
+					"contrast"
+				],
+				"properties": {
+					"active": {
+						"type": "integer"
+					},
+					"source": {
+						"type": "string",
+						"enum": [
+							"set",
+							"global_styles"
+						]
+					},
+					"document": {
+						"type": "object"
+					},
+					"sets": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"id": {
+									"type": "integer"
+								},
+								"title": {
+									"type": "string"
+								},
+								"status": {
+									"type": "string",
+									"enum": [
+										"active",
+										"inactive"
+									]
+								},
+								"modified": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"variations": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"drift": {
+						"type": "boolean"
+					},
+					"contrast": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					}
+				}
+			},
+			"annotations": {
+				"readonly": true,
+				"destructive": false,
+				"idempotent": true,
+				"openWorldHint": false
+			}
+		},
+		{
+			"name": "leitvia/list-blocks",
+			"label": "List blocks",
+			"description": "Returns the block catalog of Leitvia Studio and its add-ons with attribute schema and usage rules. With post_type only the blocks the editor allows for that post type.",
+			"category": "leitvia",
+			"group": "read",
+			"input_schema": {
+				"type": "object",
+				"properties": {
+					"post_type": {
+						"type": "string",
+						"maxLength": 20,
+						"description": "Limit to the blocks allowed for this post type."
+					}
+				},
+				"additionalProperties": false,
+				"default": []
+			},
+			"output_schema": {
+				"type": "object",
+				"required": [
+					"blocks"
+				],
+				"properties": {
+					"blocks": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"additionalProperties": false,
+							"required": [
+								"name",
+								"title",
+								"description",
+								"category",
+								"parent",
+								"ancestor",
+								"supports",
+								"attributes",
+								"innerBlocks",
+								"usage",
+								"owner"
+							],
+							"properties": {
+								"name": {
+									"description": "Block name.",
+									"type": "string",
+									"pattern": "^[a-z0-9-]+/[a-z0-9-]+$"
+								},
+								"title": {
+									"description": "Translated block title.",
+									"type": "string",
+									"minLength": 1
+								},
+								"description": {
+									"description": "Translated description of what the block does.",
+									"type": "string"
+								},
+								"category": {
+									"description": "Inserter category.",
+									"type": [
+										"string",
+										"null"
+									]
+								},
+								"parent": {
+									"description": "Blocks this block must be a direct child of, null for anywhere.",
+									"type": [
+										"array",
+										"null"
+									],
+									"items": {
+										"type": "string"
+									}
+								},
+								"ancestor": {
+									"description": "Blocks this block must be inside at any depth, null for anywhere.",
+									"type": [
+										"array",
+										"null"
+									],
+									"items": {
+										"type": "string"
+									}
+								},
+								"supports": {
+									"description": "Supports of block.json an agent may use: align, anchor, color, spacing, typography, dimensions, border, shadow, layout, html, multiple, reusable, inserter, interactivity. Their attributes (className, style, backgroundColor and so on) are not listed under attributes.",
+									"type": "object"
+								},
+								"attributes": {
+									"description": "JSON schema of the block attributes from block.json. A property with source is stored in the block markup, not in the block comment; rich-text is a string of HTML.",
+									"type": "object",
+									"additionalProperties": false,
+									"required": [
+										"type",
+										"properties"
+									],
+									"properties": {
+										"type": {
+											"type": "string",
+											"enum": [
+												"object"
+											]
+										},
+										"properties": {
+											"type": "object"
+										}
+									}
+								},
+								"innerBlocks": {
+									"description": "Blocks allowed directly inside: allowedBlocks of block.json, otherwise the catalog blocks that name this block as parent. null when block.json sets no limit.",
+									"type": [
+										"array",
+										"null"
+									],
+									"items": {
+										"type": "string"
+									}
+								},
+								"usage": {
+									"description": "When to use the block. Required for Studio blocks, optional for add-on blocks.",
+									"type": [
+										"object",
+										"null"
+									],
+									"additionalProperties": false,
+									"required": [
+										"useWhen",
+										"avoidWhen",
+										"a11y"
+									],
+									"properties": {
+										"useWhen": {
+											"type": "string",
+											"minLength": 1
+										},
+										"avoidWhen": {
+											"type": "string",
+											"minLength": 1
+										},
+										"a11y": {
+											"type": "string",
+											"minLength": 1
+										}
+									}
+								},
+								"owner": {
+									"description": "Slug of the add-on that registered the block in the Studio blocks registry, core for core blocks.",
+									"type": "string",
+									"pattern": "^[a-z0-9-]+$"
+								},
+								"extension": {
+									"description": "Core blocks only: what Studio changes about the block.",
+									"type": "string",
+									"minLength": 1
+								}
+							}
+						}
+					}
+				}
+			},
+			"annotations": {
+				"readonly": true,
+				"destructive": false,
+				"idempotent": true,
+				"openWorldHint": false
+			}
+		},
+		{
+			"name": "leitvia/list-packages",
+			"label": "List change packages",
+			"description": "Lists your change packages, newest first: ID, title, key, state (open, applied, partial, rejected, rolled_back), operations per status and a preview link.",
+			"category": "leitvia",
+			"group": "read",
+			"input_schema": {
+				"type": "object",
+				"properties": {
+					"state": {
+						"type": "string",
+						"enum": [
+							"open",
+							"applied",
+							"partial",
+							"rejected",
+							"rolled_back"
+						]
+					}
+				},
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "array",
+				"items": {
+					"type": "object"
+				}
+			},
+			"annotations": {
+				"readonly": true,
+				"destructive": false,
+				"idempotent": true,
+				"openWorldHint": false
+			}
+		},
+		{
+			"name": "leitvia/list-patterns",
+			"label": "List patterns",
+			"description": "Lists the patterns of the theme, of Leitvia Studio and of its add-ons (source addon) with composition metadata, image slots, when to use and avoid them, lab status and the replacement of deprecated ones, followed by the Lab patterns (slug block:<ID>, source lab) with their lab status, version and document hash, and the composition of the theme pattern they vary. Only approved Lab patterns count as known in check-composition. Filter by role, tone, layout or category; at most 50 per page. Markup and usage come from get-pattern.",
+			"category": "leitvia",
+			"group": "read",
+			"input_schema": {
+				"type": "object",
+				"properties": {
+					"role": {
+						"type": "string",
+						"maxLength": 100,
+						"description": "Filter by this value of the composition metadata."
+					},
+					"tone": {
+						"type": "string",
+						"maxLength": 100,
+						"description": "Filter by this value of the composition metadata."
+					},
+					"layout": {
+						"type": "string",
+						"maxLength": 100,
+						"description": "Filter by this value of the composition metadata."
+					},
+					"category": {
+						"type": "string",
+						"maxLength": 100,
+						"description": "Filter by pattern category."
+					},
+					"page": {
+						"type": "integer",
+						"minimum": 1,
+						"default": 1
+					},
+					"per_page": {
+						"type": "integer",
+						"minimum": 1,
+						"maximum": 50,
+						"default": 20
+					}
+				},
+				"additionalProperties": false,
+				"default": []
+			},
+			"output_schema": {
+				"type": "object",
+				"required": [
+					"items",
+					"total",
+					"pages"
+				],
+				"properties": {
+					"items": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"total": {
+						"type": "integer"
+					},
+					"pages": {
+						"type": "integer"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": true,
+				"destructive": false,
+				"idempotent": true,
+				"openWorldHint": false
+			}
+		},
+		{
+			"name": "leitvia/list-products",
+			"label": "List products",
+			"description": "Lists the products of the shop, 20 per page, with title, type, status, price (read only), stock status, featured flag and hash, plus all product categories with their hash. Filter by category or search text. Orders, coupons and customers are never listed.",
+			"category": "leitvia",
+			"group": "read",
+			"input_schema": {
+				"type": "object",
+				"properties": {
+					"category": {
+						"type": "integer",
+						"minimum": 1
+					},
+					"search": {
+						"type": "string",
+						"maxLength": 100
+					},
+					"page": {
+						"type": "integer",
+						"minimum": 1
+					}
+				},
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"products": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"total": {
+						"type": "integer"
+					},
+					"pages": {
+						"type": "integer"
+					},
+					"categories": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					}
+				}
+			},
+			"annotations": {
+				"readonly": true,
+				"destructive": false,
+				"idempotent": true,
+				"openWorldHint": false
+			},
+			"requires": [
+				"woocommerce"
+			]
+		},
+		{
+			"name": "leitvia/list-recipes",
+			"label": "List recipes",
+			"description": "Lists the site recipes of Leitvia Studio and its add-ons with owner, pages and whether the plugins they require are active.",
+			"category": "leitvia",
+			"group": "read",
+			"input_schema": [],
+			"output_schema": {
+				"type": "array",
+				"items": {
+					"type": "object",
+					"properties": {
+						"name": {
+							"type": "string"
+						},
+						"owner": {
+							"type": "string"
+						},
+						"label": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"requires": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						},
+						"pages": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						},
+						"available": {
+							"type": "boolean"
+						},
+						"reason": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"annotations": {
+				"readonly": true,
+				"destructive": false,
+				"idempotent": true,
+				"openWorldHint": false
+			}
+		},
+		{
+			"name": "leitvia/plan-page",
+			"label": "Plan page",
+			"description": "Proposes a page for a goal and content points: page frame, template, the patterns in page order with role, slot, text lengths and the points each section carries, and the composition score. Without AI the plan follows the page frames, examples and composition rules of the contract and is the same for the same input. With ai set to true the AI connector the site owner set up in WordPress refines it; the goal, the points and pattern names with their metadata are sent to that provider. Writes nothing; build the page with leitvia/compose-page.",
+			"category": "leitvia",
+			"group": "read",
+			"input_schema": {
+				"type": "object",
+				"properties": {
+					"goal": {
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 500
+					},
+					"points": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"maxLength": 300
+						},
+						"maxItems": 20
+					},
+					"frame": {
+						"type": "string",
+						"enum": [
+							"home",
+							"service",
+							"article",
+							"about",
+							"contact"
+						],
+						"description": "Type of a page frame; without it the frame named in the goal, else home."
+					},
+					"ai": {
+						"type": "boolean",
+						"default": false,
+						"description": "Refine the plan through the AI connector of the site. Sends the goal, the points and pattern names to that provider."
+					}
+				},
+				"required": [
+					"goal"
+				],
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"frame": {
+						"type": "string"
+					},
+					"template": {
+						"type": "string"
+					},
+					"sections": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"score": {
+						"type": "integer"
+					},
+					"issues": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"source": {
+						"type": "string",
+						"enum": [
+							"rules",
+							"ai"
+						]
+					},
+					"dropped": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"annotations": {
+				"readonly": true,
+				"destructive": false,
+				"idempotent": true,
+				"openWorldHint": false
+			}
+		},
+		{
+			"name": "leitvia/repair-links",
+			"label": "Repair links",
+			"description": "Repairs internal links of one post: from pairs of old and new link, or with auto through the old slugs WordPress keeps for redirects. The base hash is the hash of the post from leitvia/get-page-outline. Only links of this site change. External links are never requested, only listed in the report, as are internal links that lead nowhere and cannot be resolved.",
+			"category": "leitvia",
+			"group": "maintain",
+			"input_schema": {
+				"properties": {
+					"post": {
+						"type": "integer",
+						"minimum": 1
+					},
+					"links": {
+						"type": "array",
+						"maxItems": 50,
+						"items": {
+							"type": "object",
+							"properties": {
+								"from": {
+									"type": "string",
+									"minLength": 1,
+									"maxLength": 2000
+								},
+								"to": {
+									"type": "string",
+									"minLength": 1,
+									"maxLength": 2000
+								}
+							},
+							"required": [
+								"from",
+								"to"
+							],
+							"additionalProperties": false
+						}
+					},
+					"auto": {
+						"type": "boolean",
+						"description": "Find links to posts whose slug changed and point them to the current address."
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"post",
+					"base_hash"
+				],
+				"additionalProperties": false,
+				"type": "object"
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": false,
+				"idempotent": false
+			}
+		},
+		{
+			"name": "leitvia/replace-pattern",
+			"label": "Replace deprecated pattern",
+			"description": "Replaces the sections of one post that use a deprecated pattern (metadata.patternName) with the replacement the contract names, all of them or the one section given by block. leitvia/audit-site reports the posts that use deprecated patterns; the base hash is the hash of the post from leitvia/get-page-outline. Texts and button links move over in order per block type. A section without replacement is rejected with leitvia_no_replacement.",
+			"category": "leitvia",
+			"group": "maintain",
+			"input_schema": {
+				"properties": {
+					"post": {
+						"type": "integer",
+						"minimum": 1
+					},
+					"block": {
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 200,
+						"description": "Block ID or path ID of a top-level section from the outline."
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"post",
+					"base_hash"
+				],
+				"additionalProperties": false,
+				"type": "object"
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": false
+			}
+		},
+		{
+			"name": "leitvia/rollback",
+			"label": "Roll back change package",
+			"description": "Rolls back the applied operations of a change package from their snapshots. Package IDs come from leitvia/list-packages. If anyone changed a target since, nothing is rolled back and leitvia_rollback_conflict lists both hashes and the diff. Agents may only roll back operations whose autonomy level is autonomous.",
+			"category": "leitvia",
+			"group": "maintain",
+			"input_schema": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"minimum": 1,
+						"description": "Change package ID."
+					}
+				},
+				"required": [
+					"id"
+				],
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object"
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": false
+			}
+		},
+		{
+			"name": "leitvia/set-alt-text",
+			"label": "Set alt text",
+			"description": "Sets the alt text of an image: without post and block on the attachment in the media library (base_hash of the attachment), with post and block on one image or cover block that shows the image (base_hash of the post). leitvia/get-page-outline returns both hashes, for the attachment with its ID as post. leitvia/audit-site reports missing alt text. Call it once per place, with the same package key. The alt text check applies.",
+			"category": "leitvia",
+			"group": "maintain",
+			"input_schema": {
+				"properties": {
+					"image": {
+						"type": "integer",
+						"minimum": 1,
+						"description": "Attachment ID of the image."
+					},
+					"alt": {
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 500
+					},
+					"post": {
+						"type": "integer",
+						"minimum": 1
+					},
+					"block": {
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 200,
+						"description": "Block ID or path ID of the image or cover block from the outline."
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"image",
+					"alt",
+					"base_hash"
+				],
+				"additionalProperties": false,
+				"type": "object"
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": false,
+				"idempotent": false
+			}
+		},
+		{
+			"name": "leitvia/set-merchandising",
+			"label": "Set merchandising",
+			"description": "Sets the featured flag, the upsells, the cross-sells and the sort order of one product. The lists replace the current ones. Read the product with leitvia/get-product first and send its hash as base_hash; product IDs come from leitvia/list-products.",
+			"category": "leitvia",
+			"group": "maintain",
+			"input_schema": {
+				"properties": {
+					"product": {
+						"type": "integer",
+						"minimum": 1
+					},
+					"featured": {
+						"type": "boolean"
+					},
+					"upsells": {
+						"type": "array",
+						"maxItems": 20,
+						"items": {
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					"cross_sells": {
+						"type": "array",
+						"maxItems": 20,
+						"items": {
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					"menu_order": {
+						"type": "integer"
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"product",
+					"base_hash"
+				],
+				"additionalProperties": false,
+				"type": "object"
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": false
+			},
+			"requires": [
+				"woocommerce"
+			]
+		},
+		{
+			"name": "leitvia/set-variation",
+			"label": "Set style variation",
+			"description": "Applies a style variation of the contract to the global styles of the active theme: a full variation replaces them, a colors or typography variation replaces only its part. Names come from the style variations of leitvia/get-contract. The base hash is the hash of the global styles. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash.",
+			"category": "leitvia",
+			"group": "setup",
+			"input_schema": {
+				"properties": {
+					"variation": {
+						"type": "string",
+						"pattern": "^[a-z0-9-]+$"
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"variation",
+					"base_hash"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": false
+			}
+		},
+		{
+			"name": "leitvia/update-block",
+			"label": "Update block",
+			"description": "Changes one block found by its ID or path ID: attributes from the block catalog and the level of a heading, the text of a paragraph, heading, list item or button, the citation of a quote, the summary of a details block, the link of a button or of the one link in a text (link_text names the linked part), or the image of an image or cover block with alt text. Static markup is rebuilt with the HTML API; changes it cannot rebuild safely are rejected with leitvia_static_markup. Read the post with leitvia/get-page-outline first and send its hash as base_hash; get-block shows the current attributes. For several text changes in one post use leitvia/update-content.",
+			"category": "leitvia",
+			"group": "build",
+			"input_schema": {
+				"type": "object",
+				"properties": {
+					"block": {
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 200,
+						"description": "Block ID or path ID from the outline."
+					},
+					"text": {
+						"type": "string",
+						"maxLength": 5000,
+						"description": "Plain text of a paragraph, heading, list item or button, the citation of a quote or the summary of a details block."
+					},
+					"link_text": {
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 500,
+						"description": "Part of text that stays linked when the text holds a link, such as the mail address in a contact line. Without it the link stays around its old text, and a text without that is refused unless the link only points to #."
+					},
+					"url": {
+						"type": "string",
+						"maxLength": 2000,
+						"description": "Link of a button, or of the one link in a paragraph, heading or list item (mailto: and tel: work too)."
+					},
+					"image": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"type": "integer",
+								"minimum": 1
+							},
+							"alt": {
+								"type": "string",
+								"maxLength": 500
+							},
+							"decorative": {
+								"type": "boolean"
+							}
+						},
+						"required": [
+							"id"
+						],
+						"additionalProperties": false
+					},
+					"attributes": {
+						"type": "object",
+						"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6."
+					},
+					"post": {
+						"type": "integer",
+						"minimum": 1
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"additionalProperties": false,
+				"required": [
+					"post",
+					"block",
+					"base_hash"
+				]
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": false
+			}
+		},
+		{
+			"name": "leitvia/update-content",
+			"label": "Update content",
+			"description": "Updates title, excerpt, slug and the texts and button links of several blocks of one post in one operation, blocks found by their ID from the outline. Instead of blocks, content replaces the whole content with block markup, for example to turn classic content into blocks; the new content may hold no classic block. Read the post with leitvia/get-page-outline first and send its hash as base_hash. A slug change is a URL change and lands at most as a suggestion; after one, leitvia/repair-links with auto points the links of other posts to the new address. For attributes or images of a block use leitvia/update-block.",
+			"category": "leitvia",
+			"group": "maintain",
+			"input_schema": {
+				"properties": {
+					"post": {
+						"type": "integer",
+						"minimum": 1
+					},
+					"title": {
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 200
+					},
+					"excerpt": {
+						"type": "string",
+						"maxLength": 1000
+					},
+					"slug": {
+						"type": "string",
+						"pattern": "^[a-z0-9-]+$"
+					},
+					"blocks": {
+						"type": "array",
+						"maxItems": 50,
+						"items": {
+							"type": "object",
+							"properties": {
+								"block": {
+									"type": "string",
+									"minLength": 1,
+									"maxLength": 200,
+									"description": "Block ID or path ID from the outline."
+								},
+								"text": {
+									"type": "string",
+									"maxLength": 5000,
+									"description": "Plain text of a paragraph, heading, list item or button."
+								},
+								"url": {
+									"type": "string",
+									"maxLength": 2000,
+									"description": "Link of a button."
+								}
+							},
+							"required": [
+								"block"
+							],
+							"additionalProperties": false
+						}
+					},
+					"content": {
+						"type": "string",
+						"minLength": 1,
+						"description": "Block markup that replaces the whole content; not together with blocks."
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"post",
+					"base_hash"
+				],
+				"additionalProperties": false,
+				"type": "object"
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": false
+			}
+		},
+		{
+			"name": "leitvia/update-navigation",
+			"label": "Update navigation",
+			"description": "Replaces the links of a navigation menu, by default the one published last, which headers without a chosen menu show. Send items (with one level of sub items) or block markup of navigation links, submenus, page lists and mega menus. Links point to this site, use https, mailto: or tel:, and need a text that names their target. The base hash is the hash of the menu, empty when the site has none. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash.",
+			"category": "leitvia",
+			"group": "setup",
+			"input_schema": {
+				"properties": {
+					"navigation": {
+						"type": "integer",
+						"minimum": 1
+					},
+					"items": {
+						"type": "array",
+						"minItems": 1,
+						"maxItems": 30,
+						"items": {
+							"type": "object",
+							"properties": {
+								"label": {
+									"type": "string",
+									"minLength": 1,
+									"maxLength": 100
+								},
+								"url": {
+									"type": "string",
+									"minLength": 1,
+									"maxLength": 2000
+								},
+								"items": {
+									"type": "array",
+									"maxItems": 30,
+									"items": {
+										"type": "object",
+										"properties": {
+											"label": {
+												"type": "string",
+												"minLength": 1,
+												"maxLength": 100
+											},
+											"url": {
+												"type": "string",
+												"minLength": 1,
+												"maxLength": 2000
+											}
+										},
+										"required": [
+											"label",
+											"url"
+										],
+										"additionalProperties": false
+									}
+								}
+							},
+							"required": [
+								"label",
+								"url"
+							],
+							"additionalProperties": false
+						}
+					},
+					"content": {
+						"type": "string",
+						"minLength": 1
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"type": "object",
+				"additionalProperties": false,
+				"required": [
+					"base_hash"
+				]
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": false
+			}
+		},
+		{
+			"name": "leitvia/update-product",
+			"label": "Update product",
+			"description": "Updates texts, status, images, categories and tags of one product or variation, and its prices, tax and shipping class. Read the product with leitvia/get-product first and send its hash as base_hash. Images need alt text (set it with leitvia/set-alt-text first). Changes to prices, taxes or shipping land at most as a suggestion unless a person unlocked them.",
+			"category": "leitvia",
+			"group": "maintain",
+			"input_schema": {
+				"properties": {
+					"product": {
+						"type": "integer",
+						"minimum": 1
+					},
+					"title": {
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 200
+					},
+					"description": {
+						"type": "string",
+						"maxLength": 20000
+					},
+					"short_description": {
+						"type": "string",
+						"maxLength": 5000
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"draft",
+							"pending",
+							"publish"
+						]
+					},
+					"image": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Attachment ID of an image with alt text, 0 to remove."
+					},
+					"gallery": {
+						"type": "array",
+						"maxItems": 20,
+						"items": {
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					"categories": {
+						"type": "array",
+						"maxItems": 20,
+						"items": {
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					"tags": {
+						"type": "array",
+						"maxItems": 20,
+						"items": {
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					"regular_price": {
+						"type": "string",
+						"pattern": "^([0-9]+([.][0-9]+)?)?$",
+						"maxLength": 20,
+						"description": "Price as a decimal number with a dot, empty for none. A price change lands at most as a suggestion."
+					},
+					"sale_price": {
+						"type": "string",
+						"pattern": "^([0-9]+([.][0-9]+)?)?$",
+						"maxLength": 20,
+						"description": "Price as a decimal number with a dot, empty for none. A price change lands at most as a suggestion."
+					},
+					"tax_status": {
+						"type": "string",
+						"enum": [
+							"taxable",
+							"shipping",
+							"none"
+						]
+					},
+					"tax_class": {
+						"type": "string",
+						"maxLength": 200
+					},
+					"shipping_class": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Term ID of the shipping class, 0 for none."
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"product",
+					"base_hash"
+				],
+				"additionalProperties": false,
+				"type": "object"
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": false
+			},
+			"requires": [
+				"woocommerce"
+			]
+		},
+		{
+			"name": "leitvia/update-product-category",
+			"label": "Update product category",
+			"description": "Updates name, description, parent and image of a product category, or name and description of a product tag. Use the hash of the term from list-products or get-product as base_hash. The image needs alt text.",
+			"category": "leitvia",
+			"group": "maintain",
+			"input_schema": {
+				"properties": {
+					"term": {
+						"type": "integer",
+						"minimum": 1
+					},
+					"name": {
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 200
+					},
+					"description": {
+						"type": "string",
+						"maxLength": 5000
+					},
+					"parent": {
+						"type": "integer",
+						"minimum": 0
+					},
+					"image": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Attachment ID of an image with alt text, 0 to remove."
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"term",
+					"base_hash"
+				],
+				"additionalProperties": false,
+				"type": "object"
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": false
+			},
+			"requires": [
+				"woocommerce"
+			]
+		},
+		{
+			"name": "leitvia/update-template-part",
+			"label": "Update template part",
+			"description": "Replaces a template part of the contract, such as header, footer or sidebar, with a pattern made for its area or with changed block markup. Part names come from leitvia/get-contract, patterns from leitvia/list-patterns. The base hash is the hash of the template part. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash.",
+			"category": "leitvia",
+			"group": "setup",
+			"input_schema": {
+				"properties": {
+					"part": {
+						"type": "string",
+						"pattern": "^[a-z0-9-]+$"
+					},
+					"pattern": {
+						"type": "string"
+					},
+					"content": {
+						"type": "string",
+						"minLength": 1
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"part",
+					"base_hash"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": false
+			}
+		},
+		{
+			"name": "leitvia/vary-pattern",
+			"label": "Vary pattern",
+			"description": "Creates a variant of a Lab pattern (block:<ID>) or a theme pattern (slug) as a draft in the Lab, from new markup or from the original with edits at block IDs; base_hash is empty. Originals come from leitvia/list-patterns, block IDs for edits from leitvia/get-pattern.",
+			"category": "leitvia",
+			"group": "build",
+			"input_schema": {
+				"properties": {
+					"original": {
+						"type": "string"
+					},
+					"title": {
+						"type": "string",
+						"maxLength": 200
+					},
+					"content": {
+						"type": "string",
+						"minLength": 1
+					},
+					"edits": {
+						"type": "array",
+						"maxItems": 50,
+						"items": {
+							"type": "object",
+							"properties": {
+								"block": {
+									"type": "string",
+									"minLength": 1,
+									"maxLength": 200,
+									"description": "Block ID or path ID from the outline."
+								},
+								"text": {
+									"type": "string",
+									"maxLength": 5000,
+									"description": "Plain text of a paragraph, heading, list item or button, the citation of a quote or the summary of a details block."
+								},
+								"link_text": {
+									"type": "string",
+									"minLength": 1,
+									"maxLength": 500,
+									"description": "Part of text that stays linked when the text holds a link, such as the mail address in a contact line. Without it the link stays around its old text, and a text without that is refused unless the link only points to #."
+								},
+								"url": {
+									"type": "string",
+									"maxLength": 2000,
+									"description": "Link of a button, or of the one link in a paragraph, heading or list item (mailto: and tel: work too)."
+								},
+								"image": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "integer",
+											"minimum": 1
+										},
+										"alt": {
+											"type": "string",
+											"maxLength": 500
+										},
+										"decorative": {
+											"type": "boolean"
+										}
+									},
+									"required": [
+										"id"
+									],
+									"additionalProperties": false
+								}
+							},
+							"required": [
+								"block"
+							],
+							"additionalProperties": false
+						}
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"original",
+					"base_hash"
+				],
+				"additionalProperties": false,
+				"type": "object"
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": false,
+				"idempotent": false
+			}
+		}
+	],
+	"rejections": {
+		"codes": [
+			"leitvia_ai_failed",
+			"leitvia_ai_invalid_response",
+			"leitvia_ai_not_approved",
+			"leitvia_ai_timeout",
+			"leitvia_ai_unavailable",
+			"leitvia_check_failed",
+			"leitvia_cli_no_user",
+			"leitvia_deprecated_pattern",
+			"leitvia_execution_failed",
+			"leitvia_forbidden",
+			"leitvia_forbidden_field",
+			"leitvia_foreign_host",
+			"leitvia_import_conflict",
+			"leitvia_invalid_input",
+			"leitvia_invalid_package",
+			"leitvia_locked",
+			"leitvia_media_missing",
+			"leitvia_needs_human",
+			"leitvia_no_contract",
+			"leitvia_no_replacement",
+			"leitvia_not_found",
+			"leitvia_out_of_scope",
+			"leitvia_package_closed",
+			"leitvia_page_missing",
+			"leitvia_pattern_not_approved",
+			"leitvia_rate_limited",
+			"leitvia_recipe_unavailable",
+			"leitvia_rollback_conflict",
+			"leitvia_stale_hash",
+			"leitvia_static_markup",
+			"leitvia_too_large",
+			"leitvia_unknown_package",
+			"leitvia_unknown_pattern",
+			"leitvia_unknown_recipe",
+			"leitvia_unsafe_content"
+		],
+		"retry": [
+			"once",
+			"never",
+			"after:<seconds>"
+		],
+		"cases": [
+			{
+				"code": "leitvia_ai_failed",
+				"status": 502,
+				"reason": "ai",
+				"message": "The AI provider refused or failed the request. An administrator checks the connector under Settings, Connectors; until then, call again with ai set to false.",
+				"next_ability": [],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_ai_invalid_response",
+				"status": 502,
+				"reason": "ai",
+				"message": "The AI model answered with data that does not match the expected format. Try once more, or call again with ai set to false.",
+				"next_ability": [],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_ai_invalid_response",
+				"status": 502,
+				"reason": "ai",
+				"message": "The AI model named no pattern of this site. Try once more, or call again with ai set to false.",
+				"next_ability": [],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_ai_not_approved",
+				"status": 503,
+				"reason": "ai",
+				"message": "The AI provider could not be reached, or an administrator has not approved this request for the connector yet. When the AI plugin is active, an administrator approves pending connector requests in its settings; until then, call again with ai set to false.",
+				"next_ability": [],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_ai_timeout",
+				"status": 504,
+				"reason": "ai",
+				"message": "The AI provider did not answer within %d seconds. Try once more, or call again with ai set to false.",
+				"next_ability": [],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_ai_unavailable",
+				"status": 424,
+				"reason": "ai",
+				"message": "AI is not available on this site: it needs WordPress with the AI client, AI switched on and a connector with a text model set up by an administrator under Settings, Connectors. Call again with ai set to false for a plan without AI.",
+				"next_ability": [],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_check_failed",
+				"status": 422,
+				"reason": "checks",
+				"message": "A product image needs alt text that describes it. Set it with leitvia/set-alt-text and try again.",
+				"next_ability": [
+					"leitvia/set-alt-text"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_check_failed",
+				"status": 422,
+				"reason": "checks",
+				"message": "Checks found problems. Fix them as each finding suggests and try again.",
+				"next_ability": [],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_check_failed",
+				"status": 422,
+				"reason": "checks",
+				"message": "Checks found problems. Fix them as each finding suggests and try again.",
+				"next_ability": [
+					""
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_check_failed",
+				"status": 422,
+				"reason": "checks",
+				"message": "The image needs alt text that describes it, or mark it as decorative.",
+				"next_ability": [
+					""
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_cli_no_user",
+				"status": 401,
+				"reason": "identity",
+				"message": "This command acts as a user; run with --user=<agent or admin>.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_deprecated_pattern",
+				"status": 422,
+				"reason": "deprecated",
+				"message": "The pattern is deprecated. Use its replacement instead.",
+				"next_ability": [
+					"leitvia/get-pattern"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_execution_failed",
+				"status": 500,
+				"reason": "execution",
+				"message": "The change could not be saved; nothing was changed. Try again later.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_execution_failed",
+				"status": 500,
+				"reason": "execution",
+				"message": "The file could not be saved; nothing was changed. Try again later.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_forbidden",
+				"status": 403,
+				"reason": "identity",
+				"message": "Agents change the site through the %s abilities only.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_forbidden",
+				"status": 403,
+				"reason": "identity",
+				"message": "Sign in as a user who may edit content.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_forbidden",
+				"status": 403,
+				"reason": "capability",
+				"message": "This change package belongs to someone else.",
+				"next_ability": [
+					"leitvia/list-packages"
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_forbidden",
+				"status": 403,
+				"reason": "capability",
+				"message": "Your user may not change this object.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_forbidden",
+				"status": 403,
+				"reason": "capability",
+				"message": "Your user may not create change packages.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_forbidden",
+				"status": 403,
+				"reason": "capability",
+				"message": "Your user may not publish this.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_forbidden",
+				"status": 403,
+				"reason": "capability",
+				"message": "Your user may not read this token set.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_forbidden_field",
+				"status": 403,
+				"reason": "show_in_abilities",
+				"message": "Agents may not set showInAbilities. Whether content is open to AI abilities is the decision of a person; remove the field and try again.",
+				"next_ability": [
+					""
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_foreign_host",
+				"status": 422,
+				"reason": "foreign_host",
+				"message": "Media from other hosts is not fetched. Send the file as Base64 data instead.",
+				"next_ability": [
+					""
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_import_conflict",
+				"status": 409,
+				"reason": "stale_hash",
+				"message": "Targets changed on this site since the package was made. Nothing was imported; compare and export again.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_invalid_input",
+				"status": 422,
+				"reason": null,
+				"message": null,
+				"next_ability": [],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_invalid_input",
+				"status": 422,
+				"reason": "nothing_to_repair",
+				"message": "No link needs or allows a repair. The report lists external links and internal links that could not be resolved.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_invalid_input",
+				"status": 400,
+				"reason": "input",
+				"message": "Pass pattern slugs, or a post whose sections come from patterns.",
+				"next_ability": [
+					"leitvia/list-patterns"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_invalid_input",
+				"status": 400,
+				"reason": "input",
+				"message": "The contract has no page frame of this type.",
+				"next_ability": [
+					"leitvia/get-contract"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_invalid_package",
+				"status": 400,
+				"reason": "package",
+				"message": null,
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_locked",
+				"status": 403,
+				"reason": "autonomy",
+				"message": "Agents may not change this area. A person can change the autonomy settings.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_media_missing",
+				"status": 422,
+				"reason": "media",
+				"message": "The file of a new image is not on this site any more. Add the image again with leitvia/add-media, then export.",
+				"next_ability": [
+					"leitvia/add-media"
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_needs_human",
+				"status": 403,
+				"reason": "autonomy",
+				"message": "A person has to decide on these operations in the inbox. Apply only operations whose area is autonomous for you.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_no_contract",
+				"status": 409,
+				"reason": "contract",
+				"message": "The active theme has no valid Leitvia contract. Activate the Leitvia theme or fix its contract file.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_no_replacement",
+				"status": 422,
+				"reason": "no_replacement",
+				"message": "There is no deprecated pattern with an available replacement here. Choose a pattern and change the section by hand or with leitvia/compose-page.",
+				"next_ability": [
+					"leitvia/list-patterns"
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_not_found",
+				"status": 404,
+				"reason": "block",
+				"message": "The page has no block with this ID. Read the page outline for the current IDs.",
+				"next_ability": [
+					"leitvia/get-page-outline"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_not_found",
+				"status": 404,
+				"reason": "block",
+				"message": "There is no block with this ID. Read the outline for the current IDs.",
+				"next_ability": [
+					"leitvia/get-page-outline"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_not_found",
+				"status": 404,
+				"reason": "pattern",
+				"message": "There is no pattern with this slug. List the patterns for the current slugs.",
+				"next_ability": [
+					"leitvia/list-patterns"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_not_found",
+				"status": 404,
+				"reason": "block",
+				"message": "There is no top-level section with this ID. Read the outline for the current IDs.",
+				"next_ability": [
+					"leitvia/get-page-outline"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_out_of_scope",
+				"status": 403,
+				"reason": "scope",
+				"message": "Agents may not change this object. Only published or draft content of the allowed post types is open to them.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_out_of_scope",
+				"status": 403,
+				"reason": "scope",
+				"message": "Agents may not read this object. Only published or draft content of the allowed post types is open to them.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_out_of_scope",
+				"status": 403,
+				"reason": "scope",
+				"message": "Agents may not see or change this object. Only products, product categories and tags are open to them, never orders, refunds, coupons or customers.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_out_of_scope",
+				"status": 403,
+				"reason": "status",
+				"message": "Agents may not set this status. Use draft, pending or publish.",
+				"next_ability": [
+					""
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_package_closed",
+				"status": 409,
+				"reason": "package_state",
+				"message": "The change package is %s; this step is not possible in that state.",
+				"next_ability": [
+					"leitvia/get-package"
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_page_missing",
+				"status": 409,
+				"reason": "page_missing",
+				"message": "The page this setting points to is not applied yet. Apply the page first.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_pattern_not_approved",
+				"status": 422,
+				"reason": "lab_status",
+				"message": "The Lab pattern is not approved yet. Use an approved pattern, or ask a person to approve this one in the Lab.",
+				"next_ability": [
+					"leitvia/list-patterns"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_rate_limited",
+				"status": 429,
+				"reason": "rate_limit",
+				"message": "Too many calls. Try again in %d seconds.",
+				"next_ability": [
+					""
+				],
+				"retry": "after:<seconds>"
+			},
+			{
+				"code": "leitvia_recipe_unavailable",
+				"status": 422,
+				"reason": "requires",
+				"message": null,
+				"next_ability": [
+					"leitvia/list-recipes"
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_rollback_conflict",
+				"status": 409,
+				"reason": "rollback_conflict",
+				"message": "Someone changed the content after the package was applied. Nothing was rolled back; compare the changes and decide by hand.",
+				"next_ability": [
+					"leitvia/get-package"
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_stale_hash",
+				"status": 409,
+				"reason": "stale_hash",
+				"message": "The target changed since it was read. Read it again and repeat the change on the current state.",
+				"next_ability": [
+					"",
+					"leitvia/get-page-outline"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_static_markup",
+				"status": 422,
+				"reason": "static_markup",
+				"message": "This change needs markup that cannot be rebuilt safely. Insert the pattern again with leitvia/compose-page, or change a block that supports it.",
+				"next_ability": [
+					"leitvia/compose-page"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_too_large",
+				"status": 413,
+				"reason": "size",
+				"message": "The change is too large to compare (more than %d KB). Split it into smaller changes.",
+				"next_ability": [
+					""
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_unknown_package",
+				"status": 404,
+				"reason": "package",
+				"message": "There is no change package with this ID. List the packages and use one of them.",
+				"next_ability": [
+					"leitvia/list-packages"
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_unknown_pattern",
+				"status": 404,
+				"reason": "pattern",
+				"message": "There is no pattern with this name for this template part. List the patterns of its area and use one of them.",
+				"next_ability": [
+					"leitvia/list-patterns"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_unknown_pattern",
+				"status": 404,
+				"reason": "pattern",
+				"message": "There is no pattern with this name. List the patterns and use one of them.",
+				"next_ability": [
+					"leitvia/list-patterns"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_unknown_recipe",
+				"status": 404,
+				"reason": "recipe",
+				"message": "There is no recipe with this name. List the recipes and use one of them.",
+				"next_ability": [
+					"leitvia/list-recipes"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_unsafe_content",
+				"status": 422,
+				"reason": null,
+				"message": "The content holds markup agents may not write: scripts, event attributes, Custom HTML blocks, classic blocks or Base64 data. Use registered blocks and media from the library.",
+				"next_ability": [
+					"leitvia/list-blocks"
+				],
+				"retry": "once"
+			}
+		]
+	},
+	"autonomy": {
+		"levels": [
+			"locked",
+			"suggest",
+			"draft",
+			"autonomous"
+		],
+		"defaults": {
+			"content": "draft",
+			"corrections": "autonomous",
+			"structure": "draft",
+			"design": "suggest",
+			"admin": "locked",
+			"products": "draft"
+		},
+		"kinds": [
+			"prices",
+			"legal",
+			"slugs",
+			"organization",
+			"tax",
+			"shipping"
+		]
+	}
+}

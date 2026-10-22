@@ -1,0 +1,152 @@
+{
+	"$schema": "../scenario.schema.json",
+	"title": "Shop from a briefing with the recipe shop: shop pages, legal placeholders, no data sharing",
+	"skill": "leitvia-setup",
+	"tags": [
+		"commerce"
+	],
+	"briefing": "Set up a small online shop for Northfold, quiet objects for desk and kitchen. WooCommerce is installed. We need the shop pages, the legal pages and no tracking or data sharing. Put everything into one change package for us to review.",
+	"mode": "package",
+	"answers": {
+		"Briefing confirmed": "Yes. Shop with home, about, contact and the legal pages.",
+		"Recipe chosen": "leitvia/shop is fine.",
+		"Legal texts supplied by the human": "Our lawyer delivers imprint, privacy policy, terms and the cancellation policy next week. Keep the placeholders until then.",
+		"Package applied": "Applied the package in the inbox."
+	},
+	"setup": [
+		{
+			"step": "installPlugin",
+			"pluginData": {
+				"resource": "url",
+				"url": "https://downloads.wordpress.org/plugin/woocommerce.11.2.1.zip"
+			},
+			"options": {
+				"activate": true
+			}
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php require_once '/wordpress/wp-load.php'; $created = WP_Application_Passwords::create_new_application_password( 1, array( 'name' => 'scenario' ) ); file_put_contents( '/leitvia-run/admin-password.txt', $created[0] . \"\n\" ); update_option( 'leitvia_studio_gateway', array( 'verify' => false ) );"
+		}
+	],
+	"steps": [
+		{
+			"ability": "leitvia/list-recipes",
+			"expect": {
+				"length": {
+					"$gte": 5
+				}
+			}
+		},
+		{
+			"ability": "leitvia/apply-recipe",
+			"input": {
+				"recipe": "leitvia/shop",
+				"package": "shop-site"
+			},
+			"capture": {
+				"first": "package"
+			},
+			"expect": {
+				"package": {
+					"$gte": 1
+				},
+				"steps.14.status": "package",
+				"steps.15.status": "package"
+			}
+		},
+		{
+			"ability": "leitvia/apply-package",
+			"user": "admin",
+			"input": {
+				"id": "{{capture.first}}"
+			},
+			"expect": {
+				"state": "applied",
+				"conflicts.length": 0,
+				"errors.length": 0
+			}
+		}
+	],
+	"expect": [
+		{
+			"ability": "leitvia/apply-recipe",
+			"input": {
+				"recipe": "leitvia/shop",
+				"package": "shop-site"
+			},
+			"expect": {
+				"package": 0,
+				"steps.14.status": "exists",
+				"steps.15.status": "exists",
+				"steps.19.target.option": "woocommerce_feature_order_attribution_enabled",
+				"steps.19.status": "exists",
+				"steps.20.target.option": "woocommerce_allow_tracking",
+				"steps.20.status": "exists"
+			}
+		},
+		{
+			"ability": "leitvia/list-packages",
+			"input": {
+				"state": "open"
+			},
+			"expect": {
+				"length": 0
+			}
+		},
+		{
+			"ability": "leitvia/audit-site",
+			"input": {
+				"limit": 20
+			},
+			"expect": {
+				"items.length": 14,
+				"next": null,
+				"items.0.findings.length": 0,
+				"items.1.findings.length": 0,
+				"items.2.findings.length": 0,
+				"items.3.findings.length": 0,
+				"items.4.findings.length": 0,
+				"items.5.findings.length": 0,
+				"items.6.findings.length": 0,
+				"items.7.findings.length": 0,
+				"items.8.findings.length": 0,
+				"items.9.findings.length": 0,
+				"items.10.findings.length": 0,
+				"items.11.findings.length": 0,
+				"items.12.findings.length": 0,
+				"items.13.findings.length": 0
+			}
+		},
+		{
+			"url": "/",
+			"status": 200,
+			"h1": 1
+		},
+		{
+			"url": "/shop/",
+			"status": 200,
+			"h1": 1
+		},
+		{
+			"url": "/cart/",
+			"status": 200,
+			"h1": 1
+		},
+		{
+			"url": "/checkout/",
+			"status": 200,
+			"h1": 1
+		},
+		{
+			"url": "/my-account/",
+			"status": 200,
+			"h1": 1
+		},
+		{
+			"url": "/privacy/",
+			"status": 200,
+			"h1": 1
+		}
+	]
+}

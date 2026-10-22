@@ -1,0 +1,152 @@
+{
+	"$schema": "../scenario.schema.json",
+	"title": "Workflow new-site in mode package: one open package, nothing live before it is applied, then the company site",
+	"skill": "new-site",
+	"briefing": "Set up our site for Example Consulting GmbH: home, services, about, contact and an imprint. The site is live, so put everything into one change package for us to review. We have no brand guide yet.",
+	"mode": "package",
+	"answers": {
+		"Briefing confirmed": "Yes. Company site with home, services, about, contact and imprint, mode package, no fixed URLs.",
+		"Recipe chosen": "leitvia/company is fine.",
+		"Package applied": "Applied the package in the inbox.",
+		"Legal texts supplied by the human": "Imprint: Example Consulting GmbH, Main Street 1, 10115 Berlin. Register court Berlin Charlottenburg, HRB 000000. Managing director: Erika Example."
+	},
+	"setup": [
+		{
+			"step": "runPHP",
+			"code": "<?php require_once '/wordpress/wp-load.php'; $created = WP_Application_Passwords::create_new_application_password( 1, array( 'name' => 'scenario' ) ); file_put_contents( '/leitvia-run/admin-password.txt', $created[0] . \"\n\" );"
+		}
+	],
+	"steps": [
+		{
+			"ability": "leitvia/get-contract",
+			"expect": {
+				"site.url": { "$exists": true }
+			}
+		},
+		{
+			"ability": "leitvia/list-recipes",
+			"expect": {
+				"length": { "$gte": 5 }
+			}
+		},
+		{
+			"ability": "leitvia/apply-recipe",
+			"input": { "recipe": "leitvia/company", "package": "new-site-2026-10" },
+			"capture": { "first": "package" },
+			"expect": {
+				"package": { "$gte": 1 },
+				"steps.3.status": "package",
+				"steps.7.status": "package",
+				"steps.10.target.option": "page_on_front",
+				"steps.10.status": "package"
+			}
+		},
+		{
+			"ability": "leitvia/list-packages",
+			"input": { "state": "open" },
+			"expect": {
+				"length": 1,
+				"0.key": "new-site-2026-10"
+			}
+		},
+		{
+			"ability": "leitvia/list-packages",
+			"input": { "state": "applied" },
+			"expect": { "length": 0 }
+		},
+		{
+			"ability": "leitvia/audit-site",
+			"expect": {
+				"items.length": 2,
+				"next": null
+			}
+		},
+		{
+			"ability": "leitvia/apply-package",
+			"user": "admin",
+			"input": { "id": "{{capture.first}}" },
+			"expect": {
+				"state": "applied",
+				"conflicts.length": 0,
+				"errors.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/apply-recipe",
+			"input": { "recipe": "leitvia/company", "package": "new-site-2026-10" },
+			"capture": { "imprint": "steps.7.target.post" },
+			"expect": {
+				"package": 0,
+				"steps.7.status": "exists",
+				"steps.10.status": "exists"
+			}
+		},
+		{
+			"ability": "leitvia/get-page-outline",
+			"input": { "post": "{{capture.imprint}}" },
+			"capture": { "hash": "hash" },
+			"expect": {
+				"kind": "imprint"
+			}
+		},
+		{
+			"ability": "leitvia/update-content",
+			"input": {
+				"post": "{{capture.imprint}}",
+				"base_hash": "{{capture.hash}}",
+				"package": "new-site-2026-10",
+				"blocks": [
+					{ "block": "p:0.2.0.0", "text": "Example Consulting GmbH, Main Street 1, 10115 Berlin." },
+					{ "block": "p:0.2.0.1", "text": "Register court Berlin Charlottenburg, HRB 000000." },
+					{ "block": "p:0.2.1.0", "text": "Managing director: Erika Example." }
+				]
+			},
+			"capture": { "second": "package" },
+			"expect": {
+				"mode": "package",
+				"kinds": [ "legal" ]
+			}
+		},
+		{
+			"ability": "leitvia/apply-package",
+			"user": "admin",
+			"input": { "id": "{{capture.second}}" },
+			"expect": {
+				"state": "applied",
+				"conflicts.length": 0,
+				"errors.length": 0
+			}
+		}
+	],
+	"expect": [
+		{
+			"ability": "leitvia/list-packages",
+			"input": { "state": "open" },
+			"expect": { "length": 0 }
+		},
+		{
+			"ability": "leitvia/list-packages",
+			"input": { "state": "applied" },
+			"expect": { "length": 2 }
+		},
+		{
+			"ability": "leitvia/audit-site",
+			"expect": {
+				"items.length": 7,
+				"items.0.findings.length": 0,
+				"items.1.findings.length": 0,
+				"items.2.findings.length": 0,
+				"items.3.findings.length": 0,
+				"items.4.findings.length": 0,
+				"items.5.findings.length": 0,
+				"items.6.findings.length": 0,
+				"next": null
+			}
+		},
+		{ "url": "/", "status": 200, "h1": 1, "contains": [ "page-template-page-landing" ] },
+		{ "url": "/services/", "status": 200, "h1": 1 },
+		{ "url": "/about/", "status": 200, "h1": 1 },
+		{ "url": "/contact/", "status": 200, "h1": 1 },
+		{ "url": "/imprint/", "status": 200, "h1": 1, "contains": [ "Managing director: Erika Example." ] }
+	]
+}

@@ -1,0 +1,36 @@
+{
+	"$schema": "../scenario.schema.json",
+	"title": "A write with a stale base hash is rejected, the retry with the current hash passes",
+	"skill": "smoke",
+	"briefing": "Rename the sample page to About us. Work directly, our autonomy settings decide; keep its address.",
+	"mode": "direct",
+	"steps": [
+		{
+			"ability": "leitvia/update-content",
+			"input": { "post": 2, "title": "About us", "base_hash": "0000000000000000" },
+			"capture": { "current": "data.current_hash" },
+			"expectError": "leitvia_stale_hash"
+		},
+		{
+			"ability": "leitvia/update-content",
+			"input": { "post": 2, "title": "About us", "base_hash": "{{capture.current}}" },
+			"expect": {
+				"mode": "package",
+				"target.post": 2,
+				"findings.length": 0
+			}
+		}
+	],
+	"expect": [
+		{
+			"ability": "leitvia/list-packages",
+			"input": { "state": "open" },
+			"expect": {
+				"length": 1,
+				"0.title": "leitvia/update-content",
+				"0.operations.open": 1
+			}
+		},
+		{ "url": "/sample-page/", "status": 200, "h1": 1 }
+	]
+}

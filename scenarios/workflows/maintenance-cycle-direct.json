@@ -1,0 +1,267 @@
+{
+	"$schema": "../scenario.schema.json",
+	"title": "Workflow maintenance-cycle in mode direct at level draft: corrections go live, a text change waits in a package",
+	"skill": "maintenance-cycle",
+	"briefing": "Please run the monthly maintenance and accessibility check on our bike workshop site. Work directly, our autonomy settings decide. We now open on Saturdays too: Monday to Saturday, 8:00 to 18:00. The photo on the workshop page shows bicycles on repair stands; its alt text is \"Bicycles on repair stands in a bright workshop\".",
+	"mode": "direct",
+	"answers": {
+		"Link targets": "The old prices page is now /prices/.",
+		"AI for alt text": "No, write the alt text yourself.",
+		"Package applied": "Applied the package in the inbox."
+	},
+	"setup": [
+		{
+			"step": "runPHP",
+			"code": "<?php require_once '/wordpress/wp-load.php';\n$created = WP_Application_Passwords::create_new_application_password( 1, array( 'name' => 'scenario' ) );\nfile_put_contents( '/leitvia-run/admin-password.txt', $created[0] . \"\\n\" );\nupdate_option( 'leitvia_studio_gateway', array( 'overrides' => array( 'areas' => array( 'content' => 'draft', 'corrections' => 'autonomous' ), 'kinds' => array() ) ) );\n$p = static fn( string $html ): string => \"<!-- wp:paragraph -->\\n<p>{$html}</p>\\n<!-- /wp:paragraph -->\";\n$page = static fn( string $title, string $slug, string $content ): int => wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => $title, 'post_name' => $slug, 'post_content' => $content ) );\n$hours = wp_insert_post( array( 'post_status' => 'publish', 'post_title' => 'Opening hours', 'post_name' => 'opening-times', 'post_content' => $p( 'Monday to Friday, 8:00 to 18:00.' ) ) );\nwp_update_post( array( 'ID' => $hours, 'post_name' => 'opening-hours' ) );\n$page( 'Prices', 'prices', $p( 'A repair starts at 40 euros.' ) );\n$page( 'Visit us', 'visit', $p( 'We are in Main Street 1. See our <a href=\"/opening-times/\">opening hours</a> and our <a href=\"/old-prices/\">repair prices</a> before you come.' ) );\n$upload = wp_upload_bits( 'workshop.webp', null, file_get_contents( '/leitvia-fixtures/leitvia-maintain/workshop.webp' ) );\n$image = wp_insert_attachment( array( 'post_title' => 'Workshop photo', 'post_mime_type' => 'image/webp', 'post_status' => 'inherit' ), $upload['file'] );\n$page( 'Workshop', 'workshop', $p( 'Our workshop has room for six bikes at a time.' ) . \"\\n\\n<!-- wp:image {\\\"id\\\":{$image},\\\"sizeSlug\\\":\\\"full\\\"} -->\\n<figure class=\\\"wp-block-image size-full\\\"><img src=\\\"{$upload['url']}\\\" class=\\\"wp-image-{$image}\\\"/></figure>\\n<!-- /wp:image -->\" );"
+		}
+	],
+	"steps": [
+		{
+			"ability": "leitvia/audit-site",
+			"input": {
+				"limit": 20
+			},
+			"capture": {
+				"hours": "items.2.post",
+				"visit": "items.4.post",
+				"workshop": "items.5.post",
+				"image": "items.5.findings.0.block"
+			},
+			"expect": {
+				"items.length": 6,
+				"items.2.slug": "opening-hours",
+				"items.4.slug": "visit",
+				"items.4.findings.length": 2,
+				"items.5.slug": "workshop",
+				"items.5.findings.length": 1,
+				"items.5.findings.0.check": {
+					"$match": "/alt-text$"
+				},
+				"next": null
+			}
+		},
+		{
+			"ability": "leitvia/get-page-outline",
+			"input": {
+				"post": "{{capture.visit}}"
+			},
+			"capture": {
+				"hash": "hash",
+				"text": "blocks.0.id"
+			},
+			"expect": {
+				"hash": {
+					"$exists": true
+				}
+			}
+		},
+		{
+			"ability": "leitvia/repair-links",
+			"input": {
+				"post": "{{capture.visit}}",
+				"auto": true,
+				"links": [
+					{
+						"from": "/old-prices/",
+						"to": "/prices/"
+					}
+				],
+				"base_hash": "{{capture.hash}}"
+			},
+			"expect": {
+				"mode": "live",
+				"package": {
+					"$gte": 1
+				},
+				"report.repaired.length": 2,
+				"report.unresolved.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/get-page-outline",
+			"input": {
+				"post": "{{capture.workshop}}"
+			},
+			"capture": {
+				"hash": "hash"
+			},
+			"expect": {
+				"hash": {
+					"$exists": true
+				}
+			}
+		},
+		{
+			"ability": "leitvia/get-block",
+			"input": {
+				"post": "{{capture.workshop}}",
+				"block": "{{capture.image}}"
+			},
+			"capture": {
+				"attachment": "attributes.id"
+			},
+			"expect": {
+				"name": "core/image"
+			}
+		},
+		{
+			"ability": "leitvia/set-alt-text",
+			"input": {
+				"image": "{{capture.attachment}}",
+				"alt": "Bicycles on repair stands in a bright workshop",
+				"post": "{{capture.workshop}}",
+				"block": "{{capture.image}}",
+				"base_hash": "{{capture.hash}}"
+			},
+			"expect": {
+				"mode": "live",
+				"package": {
+					"$gte": 1
+				},
+				"findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/get-page-outline",
+			"input": {
+				"post": "{{capture.hours}}"
+			},
+			"capture": {
+				"hash": "hash",
+				"hours_text": "blocks.0.id"
+			},
+			"expect": {
+				"hash": {
+					"$exists": true
+				}
+			}
+		},
+		{
+			"ability": "leitvia/update-content",
+			"input": {
+				"post": "{{capture.hours}}",
+				"base_hash": "{{capture.hash}}",
+				"blocks": [
+					{
+						"block": "{{capture.hours_text}}",
+						"text": "Monday to Saturday, 8:00 to 18:00."
+					}
+				]
+			},
+			"capture": {
+				"package": "package"
+			},
+			"expect": {
+				"mode": "package",
+				"package": {
+					"$gte": 1
+				}
+			}
+		},
+		{
+			"ability": "leitvia/list-packages",
+			"input": {
+				"state": "open"
+			},
+			"expect": {
+				"length": 1,
+				"0.operations.open": 1
+			}
+		},
+		{
+			"ability": "leitvia/list-packages",
+			"input": {
+				"state": "applied"
+			},
+			"expect": {
+				"length": 2
+			}
+		},
+		{
+			"ability": "leitvia/audit-site",
+			"input": {
+				"limit": 20
+			},
+			"expect": {
+				"items.length": 6,
+				"items.4.findings.length": 0,
+				"items.5.findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/apply-package",
+			"input": {
+				"id": "{{capture.package}}"
+			},
+			"expectError": "leitvia_needs_human"
+		},
+		{
+			"ability": "leitvia/apply-package",
+			"user": "admin",
+			"input": {
+				"id": "{{capture.package}}"
+			},
+			"expect": {
+				"state": "applied",
+				"applied.length": 1,
+				"conflicts.length": 0,
+				"errors.length": 0
+			}
+		}
+	],
+	"expect": [
+		{
+			"ability": "leitvia/list-packages",
+			"input": {
+				"state": "open"
+			},
+			"expect": {
+				"length": 0
+			}
+		},
+		{
+			"ability": "leitvia/audit-site",
+			"input": {
+				"limit": 20
+			},
+			"expect": {
+				"items.length": 6,
+				"items.2.findings.length": 0,
+				"items.4.findings.length": 0,
+				"items.5.findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/get-block",
+			"input": {
+				"post": "{{capture.visit}}",
+				"block": "{{capture.text}}"
+			},
+			"expect": {
+				"inner_html": {
+					"$match": "^(?![\\s\\S]*(opening-times|old-prices))"
+				}
+			}
+		},
+		{
+			"url": "/visit/",
+			"status": 200,
+			"h1": 1
+		},
+		{
+			"url": "/workshop/",
+			"status": 200,
+			"h1": 1,
+			"contains": [
+				"alt=\"Bicycles on repair stands in a bright workshop\""
+			]
+		},
+		{
+			"url": "/opening-hours/",
+			"status": 200,
+			"contains": [
+				"Monday to Saturday, 8:00 to 18:00."
+			]
+		}
+	]
+}

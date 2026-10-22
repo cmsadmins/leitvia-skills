@@ -1,0 +1,190 @@
+{
+	"$schema": "../scenario.schema.json",
+	"title": "Service landing page from a goal and bullet points scores at least 80 and goes live",
+	"skill": "leitvia-page",
+	"briefing": "Build and publish a landing page at /bike-repair/ for Speiche, a bike repair workshop at Karl-Liebknecht-Strasse 12, 04107 Leipzig. Goal: people book a repair. Points: repairs within 24 hours, pick-up and delivery in the city, fixed prices with no surprises, certified mechanics. Contact: workshop@example.org, +49 341 555 0123, open Monday to Saturday, 8:00 to 18:00. Use the attached picture of the workshop (speiche-workshop.png). Do not publish prices or customer quotes; we have none yet.",
+	"mode": "direct",
+	"attachments": [ "leitvia-page/speiche-workshop.png" ],
+	"answers": {
+		"outline": "Yes, build it with those six sections. Work directly, the content area of this site goes live on its own.",
+		"facts": "Address, phone, e-mail and opening hours in the briefing are correct; there are no prices or quotes to publish."
+	},
+	"setup": [
+		{
+			"step": "runPHP",
+			"code": "<?php require_once '/wordpress/wp-load.php'; update_option( 'leitvia_studio_gateway', array( 'overrides' => array( 'areas' => array( 'content' => 'autonomous' ), 'kinds' => array() ) ) );"
+		}
+	],
+	"steps": [
+		{
+			"ability": "leitvia/plan-page",
+			"input": {
+				"goal": "Service page for a bike repair workshop in Leipzig that gets visitors to book a repair",
+				"frame": "service",
+				"points": [ "Repairs within 24 hours", "Pick-up and delivery in the city", "Fixed prices, no surprises", "Certified mechanics" ]
+			},
+			"expect": {
+				"frame": "service",
+				"template": "page-landing",
+				"source": "rules",
+				"score": { "$gte": 80 },
+				"sections.0.pattern": "leitvia/hero-centered",
+				"sections.4.pattern": "leitvia/content-quote",
+				"sections.5.pattern": "leitvia/offer-pricing-3"
+			}
+		},
+		{
+			"ability": "leitvia/list-patterns",
+			"input": { "role": "proof", "tone": "accent" },
+			"expect": {
+				"items.0.slug": "leitvia/content-statement",
+				"items.0.composition.layout": "asymmetric"
+			}
+		},
+		{
+			"ability": "leitvia/check-composition",
+			"input": {
+				"slugs": [ "leitvia/hero-centered", "leitvia/proof-trust-strip", "leitvia/content-text-media", "leitvia/content-steps", "leitvia/content-statement", "leitvia/cta-contact" ],
+				"template": "page-landing"
+			},
+			"expect": {
+				"score": 100,
+				"issues.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/add-media",
+			"input": {
+				"data": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAFklEQVR4nGPQiLIhCTGMahjVMHw1AADwDr4BjlAQsAAAAABJRU5ErkJggg==",
+				"filename": "speiche-workshop.png",
+				"title": "Speiche workshop",
+				"alt": "Mechanic adjusting the gears of a city bike on a repair stand",
+				"base_hash": ""
+			},
+			"capture": { "image": "target.post" },
+			"expect": {
+				"mode": "live",
+				"findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/compose-page",
+			"input": {
+				"title": "Bike repair in Leipzig",
+				"frame": "service",
+				"slug": "bike-repair",
+				"base_hash": "",
+				"sections": [
+					{
+						"pattern": "leitvia/hero-centered",
+						"edits": [
+							{ "block": "p:0.0", "text": "Speiche bike workshop, Leipzig" },
+							{ "block": "p:0.1", "text": "Your bike back on the road within 24 hours." },
+							{ "block": "p:0.2", "text": "We collect your bike anywhere in the city, repair it at a fixed price and bring it back the next day." },
+							{ "block": "p:0.3.0", "text": "Book a repair by e-mail", "url": "mailto:workshop@example.org" },
+							{ "block": "p:0.3.1", "text": "Call the workshop", "url": "tel:+493415550123" }
+						]
+					},
+					{
+						"pattern": "leitvia/proof-trust-strip",
+						"edits": [
+							{ "block": "p:0.0.0.0", "text": "Repairs within 24 hours" },
+							{ "block": "p:0.0.0.1", "text": "Pick-up and delivery in Leipzig" },
+							{ "block": "p:0.0.0.2", "text": "Fixed prices, no surprises" },
+							{ "block": "p:0.0.0.3", "text": "Certified mechanics" },
+							{ "block": "p:0.0.0.4", "text": "Open Monday to Saturday" }
+						]
+					},
+					{
+						"pattern": "leitvia/content-text-media",
+						"edits": [
+							{ "block": "p:0.0.0.0", "image": { "id": "{{capture.image}}", "alt": "Mechanic adjusting the gears of a city bike on a repair stand" } },
+							{ "block": "p:0.0.1.0", "text": "Our workshop" },
+							{ "block": "p:0.0.1.1", "text": "Certified mechanics who fix the cause, not only the symptom." },
+							{ "block": "p:0.0.1.2", "text": "Every bike gets a full check before we touch a single part, so the price we name before the repair is the price you pay." },
+							{ "block": "p:0.0.1.3", "text": "Most repairs are done the same day; larger jobs take at most 24 hours." },
+							{ "block": "p:0.0.1.4", "text": "Workshop at Karl-Liebknecht-Strasse 12, 04107 Leipzig." }
+						]
+					},
+					{
+						"pattern": "leitvia/content-steps",
+						"edits": [
+							{ "block": "p:0.0", "text": "How a repair works, in four steps" },
+							{ "block": "p:0.1.0.0.0", "text": "01" },
+							{ "block": "p:0.1.0.0.1", "text": "Book" },
+							{ "block": "p:0.1.0.0.2", "text": "Write or call us with a short description of the problem and the address for pick-up." },
+							{ "block": "p:0.1.0.1.0", "text": "02" },
+							{ "block": "p:0.1.0.1.1", "text": "Pick-up" },
+							{ "block": "p:0.1.0.1.2", "text": "We collect the bike at the agreed time anywhere in Leipzig and take it to the workshop." },
+							{ "block": "p:0.1.1.0.0", "text": "03" },
+							{ "block": "p:0.1.1.0.1", "text": "Check and repair" },
+							{ "block": "p:0.1.1.0.2", "text": "A mechanic checks the bike, names the fixed price and repairs it once you agree." },
+							{ "block": "p:0.1.1.1.0", "text": "04" },
+							{ "block": "p:0.1.1.1.1", "text": "Delivery" },
+							{ "block": "p:0.1.1.1.2", "text": "Within 24 hours the bike is back at your door, checked and ready to ride." }
+						]
+					},
+					{
+						"pattern": "leitvia/content-statement",
+						"edits": [
+							{ "block": "p:0.0", "text": "The price we name before the repair is the price you pay." },
+							{ "block": "p:0.1.0.0", "text": "If a repair turns out to need more work, we call you first. Nothing is added without your yes." },
+							{ "block": "p:0.1.1.0", "text": "Fixed prices for every repair." }
+						]
+					},
+					{
+						"pattern": "leitvia/cta-contact",
+						"edits": [
+							{ "block": "p:0.0.0.0", "text": "Contact" },
+							{ "block": "p:0.0.0.1", "text": "Book your repair today." },
+							{ "block": "p:0.0.0.2", "text": "Write or call and a mechanic answers. Tell us what is wrong and where we can collect the bike." },
+							{ "block": "p:0.0.1.0.0", "text": "Write to workshop@example.org", "link_text": "workshop@example.org", "url": "mailto:workshop@example.org" },
+							{ "block": "p:0.0.1.0.1", "text": "Call +49 341 555 0123", "link_text": "+49 341 555 0123", "url": "tel:+493415550123" },
+							{ "block": "p:0.0.1.0.2", "text": "Visit us at Karl-Liebknecht-Strasse 12, 04107 Leipzig" },
+							{ "block": "p:0.0.1.1", "text": "Open Monday to Saturday, 8:00 to 18:00." }
+						]
+					}
+				]
+			},
+			"capture": { "page": "target.post" },
+			"expect": {
+				"mode": "live",
+				"findings.length": 0
+			}
+		}
+	],
+	"expect": [
+		{
+			"ability": "leitvia/check-composition",
+			"input": { "post": "{{capture.page}}" },
+			"expect": {
+				"score": 100,
+				"issues.length": 0,
+				"sections.length": 6
+			}
+		},
+		{
+			"ability": "leitvia/get-page-outline",
+			"input": { "post": "{{capture.page}}" },
+			"expect": {
+				"status": "publish",
+				"template": "page-landing",
+				"blocks.length": 6
+			}
+		},
+		{
+			"ability": "leitvia/audit-site",
+			"input": { "after": "{{capture.image}}", "limit": 1 },
+			"expect": {
+				"items.0.slug": "bike-repair",
+				"items.0.findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/list-packages",
+			"input": { "state": "open" },
+			"expect": { "length": 0 }
+		},
+		{ "url": "/bike-repair/", "status": 200, "h1": 1 }
+	]
+}

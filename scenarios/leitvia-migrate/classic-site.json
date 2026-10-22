@@ -1,0 +1,516 @@
+{
+	"$schema": "../scenario.schema.json",
+	"title": "A classic bakery site moves to blocks: every text, image, table and video stays, the menu keeps its submenu",
+	"skill": "leitvia-migrate",
+	"briefing": "We switched our bakery site from the old classic theme to Leitvia. Move all pages and posts to blocks without losing anything, take over the main menu and put everything into one package for review.",
+	"mode": "package",
+	"answers": {
+		"Inventory confirmed": "Yes, three pages, four posts and the main menu. Leave the brand colors for later.",
+		"Theme switch": "Leitvia is active.",
+		"Sample of three": "The three posts look right, go on with the rest. For the oven photo use the alt text: The stone oven of the bakery.",
+		"Package applied": "Applied the package in the inbox."
+	},
+	"setup": [
+		{
+			"step": "runPHP",
+			"code": "<?php require '/leitvia-fixtures/leitvia-migrate/site.php';"
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php require_once '/wordpress/wp-load.php';\nWP_Navigation_Fallback::get_fallback();"
+		}
+	],
+	"steps": [
+		{
+			"ability": "leitvia/audit-site",
+			"input": {
+				"limit": 20
+			},
+			"capture": {
+				"about-us": "items.2.post",
+				"opening-hours": "items.3.post",
+				"contact": "items.4.post",
+				"our-new-sourdough": "items.5.post",
+				"a-night-at-the-oven": "items.6.post",
+				"video-shaping-a-loaf": "items.7.post",
+				"the-flour-we-use": "items.8.post"
+			},
+			"expect": {
+				"items.length": 9,
+				"items.2.slug": "about-us",
+				"items.2.findings.length": {
+					"$gte": 1
+				},
+				"items.3.slug": "opening-hours",
+				"items.3.findings.length": {
+					"$gte": 1
+				},
+				"items.4.slug": "contact",
+				"items.4.findings.length": {
+					"$gte": 1
+				},
+				"items.5.slug": "our-new-sourdough",
+				"items.5.findings.length": {
+					"$gte": 1
+				},
+				"items.6.slug": "a-night-at-the-oven",
+				"items.6.findings.length": {
+					"$gte": 1
+				},
+				"items.7.slug": "video-shaping-a-loaf",
+				"items.7.findings.length": {
+					"$gte": 1
+				},
+				"items.8.slug": "the-flour-we-use",
+				"items.8.findings.length": {
+					"$gte": 1
+				}
+			}
+		},
+		{
+			"ability": "leitvia/get-block",
+			"input": {
+				"post": "{{capture.about-us}}",
+				"block": "p:0"
+			},
+			"capture": {
+				"hash": "document_hash",
+				"image": "attachments.0.id"
+			},
+			"expect": {
+				"name": "core/freeform",
+				"attachments.length": 1,
+				"children": [],
+				"inner_html": {
+					"$match": "^Harbour Bakery opened in 2009 in a former net shed at the old harbour\\.[\\s\\S]*The harbour market for fruit in summer"
+				}
+			}
+		},
+		{
+			"ability": "leitvia/update-content",
+			"input": {
+				"post": "{{capture.about-us}}",
+				"content": "<!-- wp:paragraph -->\n<p>Harbour Bakery opened in 2009 in a former net shed at the old harbour. Today six bakers work here, three of them since the first winter.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2 class=\"wp-block-heading\">What we bake</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>We bake bread, rolls and a few cakes every night. Everything is made on site from flour, water, salt and time.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:image {\"id\":{{capture.image}},\"sizeSlug\":\"large\",\"linkDestination\":\"none\"} -->\n<figure class=\"wp-block-image size-large\"><img src=\"/wp-content/uploads/flour-sacks.png\" alt=\"Three paper sacks of flour stacked by the bakery door\" class=\"wp-image-{{capture.image}}\"/></figure>\n<!-- /wp:image -->\n\n<!-- wp:heading -->\n<h2 class=\"wp-block-heading\">Who we work with</h2>\n<!-- /wp:heading -->\n\n<!-- wp:list -->\n<ul class=\"wp-block-list\"><!-- wp:list-item -->\n<li>Two mills within 80 kilometres</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li>A dairy farm for butter and milk</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li>The harbour market for fruit in summer</li>\n<!-- /wp:list-item --></ul>\n<!-- /wp:list -->",
+				"base_hash": "{{capture.hash}}",
+				"package": "migrate-2026-10"
+			},
+			"capture": {
+				"package": "package"
+			},
+			"expect": {
+				"mode": "package",
+				"findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/get-block",
+			"input": {
+				"post": "{{capture.opening-hours}}",
+				"block": "p:0"
+			},
+			"capture": {
+				"hash": "document_hash"
+			},
+			"expect": {
+				"name": "core/freeform",
+				"children": [],
+				"inner_html": {
+					"$match": "^The shop opens early, the bread is ready from the first hour\\.[\\s\\S]*On public holidays we open as on Saturday\\."
+				}
+			}
+		},
+		{
+			"ability": "leitvia/update-content",
+			"input": {
+				"post": "{{capture.opening-hours}}",
+				"content": "<!-- wp:paragraph -->\n<p>The shop opens early, the bread is ready from the first hour.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:table -->\n<figure class=\"wp-block-table\"><table class=\"has-fixed-layout\"><thead><tr><th>Day</th><th>Shop</th><th>Cafe</th></tr></thead><tbody><tr><td>Monday to Friday</td><td>6:30 to 18:00</td><td>8:00 to 17:00</td></tr><tr><td>Saturday</td><td>7:00 to 14:00</td><td>8:00 to 13:00</td></tr><tr><td>Sunday</td><td>closed</td><td>closed</td></tr></tbody></table></figure>\n<!-- /wp:table -->\n\n<!-- wp:paragraph -->\n<p>On public holidays we open as on Saturday.</p>\n<!-- /wp:paragraph -->",
+				"base_hash": "{{capture.hash}}",
+				"package": "migrate-2026-10"
+			},
+			"capture": {
+				"package": "package"
+			},
+			"expect": {
+				"mode": "package",
+				"findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/get-block",
+			"input": {
+				"post": "{{capture.contact}}",
+				"block": "p:0"
+			},
+			"capture": {
+				"hash": "document_hash"
+			},
+			"expect": {
+				"name": "core/freeform",
+				"children": [],
+				"inner_html": {
+					"$match": "^You find us at Harbour Street 4, right next to the ferry pier\\.[\\s\\S]*a phone number for questions\\."
+				}
+			}
+		},
+		{
+			"ability": "leitvia/update-content",
+			"input": {
+				"post": "{{capture.contact}}",
+				"content": "<!-- wp:paragraph -->\n<p>You find us at Harbour Street 4, right next to the ferry pier.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2 class=\"wp-block-heading\">Orders</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>For larger orders write to <a href=\"mailto:orders@example.org\">orders@example.org</a> two days ahead. Please tell us:</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:list {\"ordered\":true} -->\n<ol class=\"wp-block-list\"><!-- wp:list-item -->\n<li>what you need and how many,</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li>the day and hour you want to collect it,</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li>a phone number for questions.</li>\n<!-- /wp:list-item --></ol>\n<!-- /wp:list -->",
+				"base_hash": "{{capture.hash}}",
+				"package": "migrate-2026-10"
+			},
+			"capture": {
+				"package": "package"
+			},
+			"expect": {
+				"mode": "package",
+				"findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/get-block",
+			"input": {
+				"post": "{{capture.our-new-sourdough}}",
+				"block": "p:0"
+			},
+			"capture": {
+				"hash": "document_hash",
+				"image": "attachments.0.id"
+			},
+			"expect": {
+				"name": "core/freeform",
+				"attachments.length": 1,
+				"children": [],
+				"inner_html": {
+					"$match": "^After two years of trials our new sourdough is on the shelf\\. It rises for 36 hours and keeps fresh for a week\\.[\\s\\S]*our starter from 2009"
+				}
+			}
+		},
+		{
+			"ability": "leitvia/update-content",
+			"input": {
+				"post": "{{capture.our-new-sourdough}}",
+				"content": "<!-- wp:paragraph -->\n<p>After two years of trials our new sourdough is on the shelf. It rises for 36 hours and keeps fresh for a week.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:image {\"id\":{{capture.image}},\"sizeSlug\":\"large\",\"linkDestination\":\"none\",\"align\":\"center\"} -->\n<figure class=\"wp-block-image aligncenter size-large\"><img src=\"/wp-content/uploads/sourdough-loaf.png\" alt=\"A round sourdough loaf with a dark crust on a wooden board\" class=\"wp-image-{{capture.image}}\"/></figure>\n<!-- /wp:image -->\n\n<!-- wp:heading -->\n<h2 class=\"wp-block-heading\">Why it takes so long</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>The long rise gives the bread its taste and makes it easier to digest. It needs only four things:</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:list -->\n<ul class=\"wp-block-list\"><!-- wp:list-item -->\n<li>rye and wheat flour</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li>water</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li>salt</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li>our starter from 2009</li>\n<!-- /wp:list-item --></ul>\n<!-- /wp:list -->",
+				"base_hash": "{{capture.hash}}",
+				"package": "migrate-2026-10"
+			},
+			"capture": {
+				"package": "package"
+			},
+			"expect": {
+				"mode": "package",
+				"findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/get-block",
+			"input": {
+				"post": "{{capture.a-night-at-the-oven}}",
+				"block": "p:0"
+			},
+			"capture": {
+				"hash": "document_hash",
+				"image": "attachments.0.id"
+			},
+			"expect": {
+				"name": "core/freeform",
+				"attachments.length": 1,
+				"children": [],
+				"inner_html": {
+					"$match": "^Our day starts at ten in the evening, when the first dough comes out of the fridge\\.[\\s\\S]*The oven tells you when it is ready, not the clock\\."
+				}
+			}
+		},
+		{
+			"ability": "leitvia/update-content",
+			"input": {
+				"post": "{{capture.a-night-at-the-oven}}",
+				"content": "<!-- wp:paragraph -->\n<p>Our day starts at ten in the evening, when the first dough comes out of the fridge.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:image {\"id\":{{capture.image}},\"sizeSlug\":\"large\",\"linkDestination\":\"none\"} -->\n<figure class=\"wp-block-image size-large\"><img src=\"/wp-content/uploads/stone-oven.png\" alt=\"The stone oven of the bakery\" class=\"wp-image-{{capture.image}}\"/><figcaption class=\"wp-element-caption\">The stone oven at four in the morning</figcaption></figure>\n<!-- /wp:image -->\n\n<!-- wp:heading -->\n<h2 class=\"wp-block-heading\">The order of the night</h2>\n<!-- /wp:heading -->\n\n<!-- wp:list {\"ordered\":true} -->\n<ol class=\"wp-block-list\"><!-- wp:list-item -->\n<li>Shape the rye loaves.</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li>Heat the stone oven to 260 degrees.</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li>Bake the rye, then the wheat, then the rolls.</li>\n<!-- /wp:list-item --></ol>\n<!-- /wp:list -->\n\n<!-- wp:quote -->\n<blockquote class=\"wp-block-quote\"><!-- wp:paragraph -->\n<p>The oven tells you when it is ready, not the clock.</p>\n<!-- /wp:paragraph --></blockquote>\n<!-- /wp:quote -->",
+				"base_hash": "{{capture.hash}}",
+				"package": "migrate-2026-10"
+			},
+			"capture": {
+				"package": "package"
+			},
+			"expect": {
+				"mode": "package",
+				"findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/get-block",
+			"input": {
+				"post": "{{capture.video-shaping-a-loaf}}",
+				"block": "p:0"
+			},
+			"capture": {
+				"hash": "document_hash"
+			},
+			"expect": {
+				"name": "core/freeform",
+				"children": [],
+				"inner_html": {
+					"$match": "^Our head baker shows in four minutes how she shapes a round loaf\\.[\\s\\S]*Watch how little flour she uses on the table\\."
+				}
+			}
+		},
+		{
+			"ability": "leitvia/update-content",
+			"input": {
+				"post": "{{capture.video-shaping-a-loaf}}",
+				"content": "<!-- wp:paragraph -->\n<p>Our head baker shows in four minutes how she shapes a round loaf.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:embed {\"url\":\"https://www.youtube.com/watch?v=aqz-KE-bpKQ\",\"type\":\"video\",\"providerNameSlug\":\"youtube\",\"responsive\":true,\"className\":\"wp-embed-aspect-16-9 wp-has-aspect-ratio\"} -->\n<figure class=\"wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio\"><div class=\"wp-block-embed__wrapper\">\nhttps://www.youtube.com/watch?v=aqz-KE-bpKQ\n</div></figure>\n<!-- /wp:embed -->\n\n<!-- wp:paragraph -->\n<p>Watch how little flour she uses on the table.</p>\n<!-- /wp:paragraph -->",
+				"base_hash": "{{capture.hash}}",
+				"package": "migrate-2026-10"
+			},
+			"capture": {
+				"package": "package"
+			},
+			"expect": {
+				"mode": "package",
+				"findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/get-block",
+			"input": {
+				"post": "{{capture.the-flour-we-use}}",
+				"block": "p:0"
+			},
+			"capture": {
+				"hash": "document_hash"
+			},
+			"expect": {
+				"name": "core/freeform",
+				"children": [],
+				"inner_html": {
+					"$match": "^Every flour has its own job in the bakery\\.[\\s\\S]*Both mills grind to order, so the flour is never older than two weeks\\."
+				}
+			}
+		},
+		{
+			"ability": "leitvia/update-content",
+			"input": {
+				"post": "{{capture.the-flour-we-use}}",
+				"content": "<!-- wp:paragraph -->\n<p>Every flour has its own job in the bakery.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:table -->\n<figure class=\"wp-block-table\"><table class=\"has-fixed-layout\"><thead><tr><th>Flour</th><th>Mill</th><th>Used for</th></tr></thead><tbody><tr><td>Rye 1150</td><td>North Mill</td><td>Sourdough and rye loaves</td></tr><tr><td>Wheat 550</td><td>River Mill</td><td>Rolls and white bread</td></tr><tr><td>Spelt 630</td><td>River Mill</td><td>Spelt loaf on Fridays</td></tr></tbody></table></figure>\n<!-- /wp:table -->\n\n<!-- wp:paragraph -->\n<p><em>Both mills grind to order, so the flour is never older than two weeks.</em></p>\n<!-- /wp:paragraph -->",
+				"base_hash": "{{capture.hash}}",
+				"package": "migrate-2026-10"
+			},
+			"capture": {
+				"package": "package"
+			},
+			"expect": {
+				"mode": "package",
+				"findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/update-navigation",
+			"input": {
+				"items": [
+					{
+						"label": "Home",
+						"url": "/"
+					},
+					{
+						"label": "About us",
+						"url": "/about-us/",
+						"items": [
+							{
+								"label": "Opening hours",
+								"url": "/opening-hours/"
+							},
+							{
+								"label": "Contact",
+								"url": "/contact/"
+							}
+						]
+					},
+					{
+						"label": "Our new sourdough",
+						"url": "/our-new-sourdough/"
+					}
+				],
+				"base_hash": "",
+				"package": "migrate-2026-10"
+			},
+			"capture": {
+				"menu": "data.current_hash"
+			},
+			"expectError": "leitvia_stale_hash"
+		},
+		{
+			"ability": "leitvia/update-navigation",
+			"input": {
+				"items": [
+					{
+						"label": "Home",
+						"url": "/"
+					},
+					{
+						"label": "About us",
+						"url": "/about-us/",
+						"items": [
+							{
+								"label": "Opening hours",
+								"url": "/opening-hours/"
+							},
+							{
+								"label": "Contact",
+								"url": "/contact/"
+							}
+						]
+					},
+					{
+						"label": "Our new sourdough",
+						"url": "/our-new-sourdough/"
+					}
+				],
+				"base_hash": "{{capture.menu}}",
+				"package": "migrate-2026-10"
+			},
+			"expect": {
+				"mode": "package",
+				"findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/apply-package",
+			"user": "admin",
+			"input": {
+				"id": "{{capture.package}}"
+			},
+			"expect": {
+				"state": "applied",
+				"applied.length": 8,
+				"conflicts.length": 0,
+				"errors.length": 0
+			}
+		}
+	],
+	"expect": [
+		{
+			"ability": "leitvia/audit-site",
+			"input": {
+				"limit": 20
+			},
+			"expect": {
+				"items.length": 9,
+				"items.2.findings.length": 0,
+				"items.3.findings.length": 0,
+				"items.4.findings.length": 0,
+				"items.5.findings.length": 0,
+				"items.6.findings.length": 0,
+				"items.7.findings.length": 0,
+				"items.8.findings.length": 0
+			}
+		},
+		{
+			"url": "/about-us/",
+			"status": 200,
+			"h1": 1,
+			"contains": [
+				"Harbour Bakery opened in 2009 in a former net shed at the old harbour.",
+				"Today six bakers work here, three of them since the first winter.",
+				"What we bake",
+				"We bake bread, rolls and a few cakes every night.",
+				"Everything is made on site from flour, water, salt and time.",
+				"/wp-content/uploads/flour-sacks.png\" alt=\"Three paper sacks of flour stacked by the bakery door\"",
+				"Who we work with",
+				"Two mills within 80 kilometres",
+				"A dairy farm for butter and milk",
+				"The harbour market for fruit in summer"
+			]
+		},
+		{
+			"url": "/opening-hours/",
+			"status": 200,
+			"h1": 1,
+			"contains": [
+				"The shop opens early, the bread is ready from the first hour.",
+				"<th>Day</th><th>Shop</th><th>Cafe</th>",
+				"<td>Monday to Friday</td><td>6:30 to 18:00</td><td>8:00 to 17:00</td>",
+				"<td>Saturday</td><td>7:00 to 14:00</td><td>8:00 to 13:00</td>",
+				"<td>Sunday</td><td>closed</td><td>closed</td>",
+				"On public holidays we open as on Saturday."
+			]
+		},
+		{
+			"url": "/contact/",
+			"status": 200,
+			"h1": 1,
+			"contains": [
+				"You find us at Harbour Street 4, right next to the ferry pier.",
+				"Orders",
+				"For larger orders write to <a href=\"mailto:orders@example.org\">orders@example.org</a> two days ahead. Please tell us:",
+				"what you need and how many,",
+				"the day and hour you want to collect it,",
+				"a phone number for questions."
+			]
+		},
+		{
+			"url": "/our-new-sourdough/",
+			"status": 200,
+			"h1": 1,
+			"contains": [
+				"After two years of trials our new sourdough is on the shelf. It rises for 36 hours and keeps fresh for a week.",
+				"/wp-content/uploads/sourdough-loaf.png\" alt=\"A round sourdough loaf with a dark crust on a wooden board\"",
+				"Why it takes so long",
+				"The long rise gives the bread its taste and makes it easier to digest. It needs only four things:",
+				"rye and wheat flour",
+				"water",
+				"salt",
+				"our starter from 2009"
+			]
+		},
+		{
+			"url": "/a-night-at-the-oven/",
+			"status": 200,
+			"h1": 1,
+			"contains": [
+				"Our day starts at ten in the evening, when the first dough comes out of the fridge.",
+				"/wp-content/uploads/stone-oven.png\" alt=\"The stone oven of the bakery\"",
+				"The stone oven at four in the morning",
+				"The order of the night",
+				"Shape the rye loaves.",
+				"Heat the stone oven to 260 degrees.",
+				"Bake the rye, then the wheat, then the rolls.",
+				"The oven tells you when it is ready, not the clock."
+			]
+		},
+		{
+			"url": "/video-shaping-a-loaf/",
+			"status": 200,
+			"h1": 1,
+			"contains": [
+				"Our head baker shows in four minutes how she shapes a round loaf.",
+				"data-leitvia-consent=\"youtube\"",
+				"Watch how little flour she uses on the table."
+			]
+		},
+		{
+			"url": "/the-flour-we-use/",
+			"status": 200,
+			"h1": 1,
+			"contains": [
+				"Every flour has its own job in the bakery.",
+				"<th>Flour</th><th>Mill</th><th>Used for</th>",
+				"<td>Rye 1150</td><td>North Mill</td><td>Sourdough and rye loaves</td>",
+				"<td>Wheat 550</td><td>River Mill</td><td>Rolls and white bread</td>",
+				"<td>Spelt 630</td><td>River Mill</td><td>Spelt loaf on Fridays</td>",
+				"<em>Both mills grind to order, so the flour is never older than two weeks.</em>"
+			]
+		},
+		{
+			"url": "/",
+			"status": 200,
+			"contains": [
+				"wp-block-navigation__submenu-container",
+				"href=\"/about-us/\"",
+				"href=\"/opening-hours/\"",
+				"href=\"/contact/\"",
+				"href=\"/our-new-sourdough/\""
+			]
+		}
+	]
+}

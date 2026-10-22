@@ -1,0 +1,196 @@
+{
+	"$schema": "../scenario.schema.json",
+	"title": "Two vague link texts and a skipped heading level are fixed in one package, two writes to one page included",
+	"skill": "leitvia-a11y",
+	"briefing": "Check our site for accessibility problems and fix what you can. Put your changes into one package for review.",
+	"mode": "package",
+	"answers": {
+		"Scope": "All published pages.",
+		"Package applied": "Applied the package in the inbox."
+	},
+	"setup": [
+		{
+			"step": "runPHP",
+			"code": "<?php require_once '/wordpress/wp-load.php';\n$created = WP_Application_Passwords::create_new_application_password( 1, array( 'name' => 'scenario' ) );\nfile_put_contents( '/leitvia-run/admin-password.txt', $created[0] . \"\\n\" );\n$page = static fn( string $title, string $slug, string $content ): int => wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => $title, 'post_name' => $slug, 'post_content' => $content ) );\n$page( 'Prices', 'prices', \"<!-- wp:paragraph -->\\n<p>A repair starts at 40 euros.</p>\\n<!-- /wp:paragraph -->\" );\n$page( 'Booking', 'booking', \"<!-- wp:paragraph -->\\n<p>Book a repair by phone. Our repair prices are online, <a href=\\\"/prices/\\\">click here</a>.</p>\\n<!-- /wp:paragraph -->\" );\n$page( 'Repair guide', 'repair-guide', \"<!-- wp:heading {\\\"level\\\":3} -->\\n<h3 class=\\\"wp-block-heading\\\">Before you bring your bike</h3>\\n<!-- /wp:heading -->\\n\\n<!-- wp:paragraph -->\\n<p>Clean the chain and note what you heard. Prices: <a href=\\\"/prices/\\\">read more</a>.</p>\\n<!-- /wp:paragraph -->\" );"
+		}
+	],
+	"steps": [
+		{
+			"ability": "leitvia/audit-site",
+			"input": {
+				"limit": 20
+			},
+			"capture": {
+				"booking": "items.3.post",
+				"link": "items.3.findings.0.block",
+				"guide": "items.4.post",
+				"heading": "items.4.findings.0.block",
+				"vague": "items.4.findings.1.block"
+			},
+			"expect": {
+				"items.length": 5,
+				"items.3.slug": "booking",
+				"items.3.findings.length": 1,
+				"items.3.findings.0.check": {
+					"$match": "/link-text$"
+				},
+				"items.4.findings.length": 2,
+				"items.4.findings.0.check": {
+					"$match": "/headings$"
+				},
+				"items.4.findings.1.check": {
+					"$match": "/link-text$"
+				}
+			}
+		},
+		{
+			"ability": "leitvia/get-tokens",
+			"expect": {
+				"contrast.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/get-page-outline",
+			"input": {
+				"post": "{{capture.booking}}"
+			},
+			"capture": {
+				"hash": "hash"
+			},
+			"expect": {
+				"blocks.length": 1
+			}
+		},
+		{
+			"ability": "leitvia/update-block",
+			"input": {
+				"post": "{{capture.booking}}",
+				"block": "{{capture.link}}",
+				"text": "Book a repair by phone. See our repair prices before you come.",
+				"link_text": "repair prices",
+				"base_hash": "{{capture.hash}}",
+				"package": "a11y-2026-10"
+			},
+			"capture": {
+				"package": "package"
+			},
+			"expect": {
+				"mode": "package",
+				"findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/get-page-outline",
+			"input": {
+				"post": "{{capture.guide}}"
+			},
+			"capture": {
+				"hash": "hash"
+			},
+			"expect": {
+				"blocks.length": 2
+			}
+		},
+		{
+			"ability": "leitvia/update-block",
+			"input": {
+				"post": "{{capture.guide}}",
+				"block": "{{capture.heading}}",
+				"attributes": {
+					"level": 2
+				},
+				"base_hash": "{{capture.hash}}",
+				"package": "a11y-2026-10"
+			},
+			"expect": {
+				"mode": "package",
+				"findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/update-block",
+			"input": {
+				"post": "{{capture.guide}}",
+				"block": "{{capture.vague}}",
+				"text": "Clean the chain and note what you heard. See our repair prices.",
+				"link_text": "repair prices",
+				"base_hash": "{{capture.hash}}",
+				"package": "a11y-2026-10"
+			},
+			"expect": {
+				"mode": "package",
+				"findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/apply-package",
+			"user": "admin",
+			"input": {
+				"id": "{{capture.package}}"
+			},
+			"expect": {
+				"state": "applied",
+				"conflicts.length": 0,
+				"errors.length": 0
+			}
+		}
+	],
+	"expect": [
+		{
+			"ability": "leitvia/audit-site",
+			"input": {
+				"limit": 20
+			},
+			"expect": {
+				"items.3.findings.length": 0,
+				"items.4.findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/get-block",
+			"input": {
+				"post": "{{capture.guide}}",
+				"block": "{{capture.heading}}"
+			},
+			"expect": {
+				"inner_html": {
+					"$match": "<h2 class=\"wp-block-heading\">Before you bring your bike</h2>"
+				}
+			}
+		},
+		{
+			"ability": "leitvia/get-block",
+			"input": {
+				"post": "{{capture.guide}}",
+				"block": "{{capture.vague}}"
+			},
+			"expect": {
+				"inner_html": {
+					"$match": "href=\"/prices/\">repair prices</a>"
+				}
+			}
+		},
+		{
+			"ability": "leitvia/get-block",
+			"input": {
+				"post": "{{capture.booking}}",
+				"block": "{{capture.link}}"
+			},
+			"expect": {
+				"inner_html": {
+					"$match": "href=\"/prices/\">repair prices</a>"
+				}
+			}
+		},
+		{
+			"url": "/booking/",
+			"status": 200,
+			"h1": 1
+		},
+		{
+			"url": "/repair-guide/",
+			"status": 200,
+			"h1": 1
+		}
+	]
+}

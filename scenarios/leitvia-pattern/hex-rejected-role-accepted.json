@@ -1,0 +1,66 @@
+{
+	"$schema": "../scenario.schema.json",
+	"title": "A new pattern with a hex color is rejected, the version with color roles lands in the Lab",
+	"skill": "leitvia-pattern",
+	"briefing": "We need a dark band that shows our opening hours between two sections: Monday to Saturday, 8:00 to 18:00. Make it a reusable pattern, our designer reviews it in the Lab.",
+	"mode": "direct",
+	"answers": {
+		"need": "No existing pattern fits; build a new one and call it Opening hours band. Only the hours from the briefing, no other text we did not give you.",
+		"review": "The designer moves the pattern to review in the Lab."
+	},
+	"steps": [
+		{
+			"ability": "leitvia/list-patterns",
+			"input": { "role": "context", "tone": "ink" },
+			"expect": { "total": 0 }
+		},
+		{
+			"ability": "leitvia/get-contract",
+			"expect": {
+				"contract.roles.color.2.slug": "ink",
+				"contract.roles.color.0.slug": "surface"
+			}
+		},
+		{
+			"ability": "leitvia/create-pattern",
+			"input": {
+				"title": "Opening hours band",
+				"base_hash": "",
+				"content": "<!-- wp:group {\"metadata\":{\"name\":\"Opening hours\"},\"align\":\"full\",\"style\":{\"color\":{\"background\":\"#1a1a1a\",\"text\":\"#ffffff\"},\"spacing\":{\"padding\":{\"top\":\"var:preset|spacing|l\",\"bottom\":\"var:preset|spacing|l\"}}},\"layout\":{\"type\":\"constrained\"}} -->\n<div class=\"wp-block-group alignfull has-text-color has-background\" style=\"color:#ffffff;background-color:#1a1a1a;padding-top:var(--wp--preset--spacing--l);padding-bottom:var(--wp--preset--spacing--l)\"><!-- wp:heading -->\n<h2 class=\"wp-block-heading\">Opening hours</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>Monday to Saturday, 8:00 to 18:00.</p>\n<!-- /wp:paragraph --></div>\n<!-- /wp:group -->"
+			},
+			"expectError": "leitvia_check_failed"
+		},
+		{
+			"ability": "leitvia/create-pattern",
+			"input": {
+				"title": "Opening hours band",
+				"base_hash": "",
+				"content": "<!-- wp:group {\"metadata\":{\"name\":\"Opening hours\"},\"align\":\"full\",\"style\":{\"spacing\":{\"padding\":{\"top\":\"var:preset|spacing|l\",\"bottom\":\"var:preset|spacing|l\"}}},\"backgroundColor\":\"ink\",\"textColor\":\"surface\",\"layout\":{\"type\":\"constrained\"}} -->\n<div class=\"wp-block-group alignfull has-surface-color has-ink-background-color has-text-color has-background\" style=\"padding-top:var(--wp--preset--spacing--l);padding-bottom:var(--wp--preset--spacing--l)\"><!-- wp:heading -->\n<h2 class=\"wp-block-heading\">Opening hours</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>Monday to Saturday, 8:00 to 18:00.</p>\n<!-- /wp:paragraph --></div>\n<!-- /wp:group -->"
+			},
+			"capture": { "pattern": "target.post" },
+			"expect": {
+				"mode": "draft",
+				"target.post": { "$gte": 1 },
+				"findings.length": 0
+			}
+		}
+	],
+	"expect": [
+		{
+			"ability": "leitvia/get-page-outline",
+			"input": { "post": "{{capture.pattern}}" },
+			"expect": {
+				"type": "wp_block",
+				"status": "draft",
+				"title": "Opening hours band",
+				"blocks.length": 1,
+				"blocks.0.name": "core/group"
+			}
+		},
+		{
+			"ability": "leitvia/list-packages",
+			"input": { "state": "open" },
+			"expect": { "length": 0 }
+		}
+	]
+}

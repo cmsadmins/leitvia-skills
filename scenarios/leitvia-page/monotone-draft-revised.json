@@ -1,0 +1,132 @@
+{
+	"$schema": "../scenario.schema.json",
+	"title": "A monotone first outline is revised once after check-composition and built as a draft",
+	"skill": "leitvia-page",
+	"briefing": "Draft a page that explains how Speiche, our bike repair workshop in Leipzig, works: who we are, why we keep the workshop small, how a repair runs and how to reach us (workshop@example.org, +49 341 555 0123, Karl-Liebknecht-Strasse 12, 04107 Leipzig, Monday to Saturday 8:00 to 18:00). I imagine these sections: an opening, who we are in two columns, why we keep the workshop small as text next to a picture of the workshop, how a repair runs in steps, and how to reach us. Leave it as a draft for me to read, in English, at /how-we-work/.",
+	"mode": "direct",
+	"answers": {
+		"outline": "Yes, the revised outline is fine.",
+		"facts": "Founded 2014 by two mechanics; four people work in the workshop. We keep it small so the mechanic who takes your bike in also repairs it. A repair runs: you write or call, bring the bike in, we name the price before we start, you collect it. No photos yet. Contact data in the briefing is correct."
+	},
+	"steps": [
+		{
+			"ability": "leitvia/check-composition",
+			"input": {
+				"slugs": [ "leitvia/hero-centered", "leitvia/content-two-columns", "leitvia/content-text-media", "leitvia/content-steps", "leitvia/cta-contact" ],
+				"template": "page-landing"
+			},
+			"expect": {
+				"score": 75,
+				"issues.0.rule": "noAdjacentRepeat",
+				"issues.0.index": 2,
+				"suggestions.0.replace_with": [ "leitvia/content-break-image", "leitvia/teaser-posts-list", "leitvia-studio/content-story-highlight" ]
+			}
+		},
+		{
+			"ability": "leitvia/check-composition",
+			"input": {
+				"slugs": [ "leitvia/hero-centered", "leitvia/content-two-columns", "leitvia-studio/content-story-highlight", "leitvia/content-steps", "leitvia/cta-contact" ],
+				"template": "page-landing"
+			},
+			"expect": {
+				"score": 90,
+				"issues.length": 1,
+				"issues.0.rule": "breakWithin"
+			}
+		},
+		{
+			"ability": "leitvia/compose-page",
+			"input": {
+				"title": "How our workshop works",
+				"frame": "service",
+				"slug": "how-we-work",
+				"base_hash": "",
+				"sections": [
+					{
+						"pattern": "leitvia/hero-centered",
+						"edits": [
+							{ "block": "p:0.0", "text": "Speiche bike workshop, Leipzig" },
+							{ "block": "p:0.1", "text": "A small workshop that takes every bike seriously." },
+							{ "block": "p:0.2", "text": "Four mechanics, one workshop and a simple promise: we fix the cause and tell you the price first." },
+							{ "block": "p:0.3.0", "text": "Write to the workshop", "url": "mailto:workshop@example.org" },
+							{ "block": "p:0.3.1", "text": "Call the workshop", "url": "tel:+493415550123" }
+						]
+					},
+					{
+						"pattern": "leitvia/content-two-columns",
+						"edits": [
+							{ "block": "p:0.0", "text": "Two mechanics started Speiche in 2014." },
+							{ "block": "p:0.2.0.0", "text": "We opened the workshop because we wanted to repair bikes properly instead of selling new ones." },
+							{ "block": "p:0.2.0.1", "text": "Today four people work at Karl-Liebknecht-Strasse 12, all of them trained mechanics." },
+							{ "block": "p:0.2.1.0", "text": "We keep the workshop small on purpose, so the person who checks your bike is the one who repairs it." },
+							{ "block": "p:0.2.1.1", "text": "That is also why we can promise a repair within 24 hours for most jobs." }
+						]
+					},
+					{
+						"pattern": "leitvia-studio/content-story-highlight",
+						"edits": [
+							{ "block": "p:0.0.0.0", "text": "We find the cause before we change a part." },
+							{ "block": "p:0.0.1.0.0", "text": "A squeaking chain can be a worn chain, a bent derailleur hanger or a loose bottom bracket." },
+							{ "block": "p:0.0.1.0.1", "text": "So every bike gets a full check first, and you hear what we found before we start." },
+							{ "block": "p:0.0.1.0.2", "text": "You agree to a fixed price, and that price does not change." }
+						]
+					},
+					{
+						"pattern": "leitvia/content-steps",
+						"edits": [
+							{ "block": "p:0.0", "text": "How a repair works, in four steps" },
+							{ "block": "p:0.1.0.0.0", "text": "01" },
+							{ "block": "p:0.1.0.0.1", "text": "Book" },
+							{ "block": "p:0.1.0.0.2", "text": "Write or call us with a short description of the problem and the address for pick-up." },
+							{ "block": "p:0.1.0.1.0", "text": "02" },
+							{ "block": "p:0.1.0.1.1", "text": "Pick-up" },
+							{ "block": "p:0.1.0.1.2", "text": "We collect the bike at the agreed time anywhere in Leipzig and take it to the workshop." },
+							{ "block": "p:0.1.1.0.0", "text": "03" },
+							{ "block": "p:0.1.1.0.1", "text": "Check and repair" },
+							{ "block": "p:0.1.1.0.2", "text": "A mechanic checks the bike, names the fixed price and repairs it once you agree." },
+							{ "block": "p:0.1.1.1.0", "text": "04" },
+							{ "block": "p:0.1.1.1.1", "text": "Delivery" },
+							{ "block": "p:0.1.1.1.2", "text": "Within 24 hours the bike is back at your door, checked and ready to ride." }
+						]
+					},
+					{
+						"pattern": "leitvia/cta-contact",
+						"edits": [
+							{ "block": "p:0.0.0.0", "text": "Contact" },
+							{ "block": "p:0.0.0.1", "text": "Talk to the mechanic who will fix your bike." },
+							{ "block": "p:0.0.0.2", "text": "No call centre and no ticket queue. Write or call and a mechanic answers." },
+							{ "block": "p:0.0.1.0.0", "text": "Write to workshop@example.org", "link_text": "workshop@example.org", "url": "mailto:workshop@example.org" },
+							{ "block": "p:0.0.1.0.1", "text": "Call +49 341 555 0123", "link_text": "+49 341 555 0123", "url": "tel:+493415550123" },
+							{ "block": "p:0.0.1.0.2", "text": "Visit us at Karl-Liebknecht-Strasse 12, 04107 Leipzig" },
+							{ "block": "p:0.0.1.1", "text": "Open Monday to Saturday, 8:00 to 18:00." }
+						]
+					}
+				]
+			},
+			"capture": { "page": "target.post" },
+			"expect": {
+				"mode": "draft",
+				"findings.length": 0
+			}
+		}
+	],
+	"expect": [
+		{
+			"ability": "leitvia/check-composition",
+			"input": { "post": "{{capture.page}}" },
+			"expect": {
+				"score": 90,
+				"sections.2": "leitvia-studio/content-story-highlight"
+			}
+		},
+		{
+			"ability": "leitvia/get-page-outline",
+			"input": { "post": "{{capture.page}}" },
+			"expect": {
+				"status": "draft",
+				"template": "page-landing",
+				"blocks.length": 5
+			}
+		}
+	]
+}
