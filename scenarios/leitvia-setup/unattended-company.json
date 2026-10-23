@@ -1,0 +1,66 @@
+{
+	"$schema": "../scenario.schema.json",
+	"title": "Unattended: the company recipe waits in one package, nothing goes live",
+	"skill": "leitvia-setup",
+	"briefing": "Set up a company site for Example Consulting, a two-person consultancy. Legal texts follow later. Nobody answers questions during this run: follow the section Unattended of the skill.",
+	"mode": "package",
+	"unattended": true,
+	"budget": {
+		"tokens": 9700,
+		"files": [
+			"skills/leitvia-setup/references/recipe.md",
+			"handbook/abilities/leitvia-list-recipes.md",
+			"handbook/abilities/leitvia-apply-recipe.md",
+			"handbook/abilities/leitvia-apply-package.md"
+		]
+	},
+	"steps": [
+		{
+			"ability": "leitvia/list-recipes",
+			"expect": {
+				"length": {
+					"$gte": 5
+				}
+			}
+		},
+		{
+			"ability": "leitvia/apply-recipe",
+			"input": {
+				"recipe": "leitvia/company",
+				"package": "setup-unattended"
+			},
+			"capture": {
+				"package": "package"
+			},
+			"expect": {
+				"package": {
+					"$gte": 1
+				},
+				"steps.7.status": "package"
+			}
+		},
+		{
+			"ability": "leitvia/apply-package",
+			"input": {
+				"id": "{{capture.package}}"
+			},
+			"expectError": "leitvia_needs_human"
+		}
+	],
+	"expect": [
+		{
+			"ability": "leitvia/list-packages",
+			"input": {
+				"state": "open"
+			},
+			"expect": {
+				"length": 1,
+				"0.state": "open"
+			}
+		},
+		{
+			"url": "/",
+			"status": 200
+		}
+	]
+}

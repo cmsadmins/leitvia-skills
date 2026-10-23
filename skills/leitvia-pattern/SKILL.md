@@ -6,20 +6,23 @@ compatibility: Needs a site with the theme Leitvia and the plugin Leitvia Studio
 
 # leitvia-pattern
 
-A pattern is a reusable section of block markup. New patterns start in the Lab of Leitvia Studio as a draft; a person reviews and approves them. You build them only through the Leitvia abilities and only from the design contract, so they fit every token set and style variation of the site. The agent handbook (`handbook/README.md` in this package) lists every ability with its input, output and rejections.
+A pattern is a reusable section of block markup. New patterns start in the Lab of Leitvia Studio as a draft; a person reviews and approves them. You build them only through the Leitvia abilities and only from the design contract, so they fit every token set and style variation of the site.
+
+Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [get-contract](../../handbook/abilities/leitvia-get-contract.md), [list-patterns](../../handbook/abilities/leitvia-list-patterns.md), [get-pattern](../../handbook/abilities/leitvia-get-pattern.md), [list-blocks](../../handbook/abilities/leitvia-list-blocks.md), [create-pattern](../../handbook/abilities/leitvia-create-pattern.md), [vary-pattern](../../handbook/abilities/leitvia-vary-pattern.md), [get-page-outline](../../handbook/abilities/leitvia-get-page-outline.md), [replace-pattern](../../handbook/abilities/leitvia-replace-pattern.md). Markup rules and how to replace deprecated patterns: [markup details](references/markup.md).
 
 ## Access
 
-- **MCP:** server `leitvia` at `POST /wp-json/leitvia-studio/v1/mcp`. Call `initialize` first and send its `Mcp-Session-Id` header plus `MCP-Protocol-Version` (for example `2025-06-18`) on every further request, or the server answers 400. Tool names use a hyphen where the ability has a slash: `leitvia-create-pattern` for `leitvia/create-pattern`.
-- **REST:** `/wp-json/wp-abilities/v1/abilities/<name>/run`. Read abilities take GET with `?input[role]=...`, the write abilities of this skill take POST with the body `{"input": {...}}`.
-- Paths start at the address of the site, not at the host: on `https://example.org/club/` the MCP server is `https://example.org/club/wp-json/leitvia-studio/v1/mcp`. Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person.
-- Sign in with HTTP Basic auth as the agent user and its application password. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read: the abilities give you every ID, hash and status you need.
-- On a site where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after each write.
+MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Paths start at the address of the site, not at the host. Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read: the abilities give you every ID, hash and status you need. Where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after each write.
 
 ## Modes
 
 - **direct:** The autonomy levels decide. Lab patterns belong to the area `structure`; with the default level a new pattern is saved as a draft. Send no `package` key: a key always means a package.
 - **package:** send the same `package` key on every write of the task, so a person reviews one change package. With a key nothing goes live, whatever the autonomy levels allow.
+
+## Ground rules
+
+- **Facts are never guessed.** Organization data, prices, legal texts, figures, quotes and people come only from a source you can name: the person, a page of the site or a read ability, with the source in your report. Without one, stop at a checkpoint; never write a placeholder that looks like a fact.
+- Texts and images that stay fixed in a pattern on every page are facts of this kind: they come from the person.
 
 ## Steps
 
@@ -41,19 +44,7 @@ Tell the person which existing patterns you looked at and why they do not fit: c
 
 ### 2. Write new markup
 
-Read `leitvia/get-contract` (`roles.color`, `pairs`, `blockStyles`, `compositionRules.sectionPadding`) and `leitvia/list-blocks` (blocks and attributes you may use). Take the markup of the closest existing pattern from `leitvia/get-pattern` as the starting point, and change structure and texts from there. Rules:
-
-- **Colors only as roles:** `backgroundColor` and `textColor` attributes with role slugs such as `surface`, `surface-alt`, `ink`, `ink-muted`, `accent`, `on-accent`, and the matching classes (`has-ink-background-color`). Text and background must form a pair from `pairs` in the contract or reach 4.5:1 in the active palette; the role descriptions name the usual combinations (a dark band is `ink` with `surface` text). Accent is for one band per page at most. Roles name a job, not a lightness: in a dark palette `ink` is the light text color, so a pair from the contract keeps its contrast in every palette. Judge contrast from `pairs`, `inversePairs` and `leitvia/get-tokens`, not from the names of the roles.
-- **Spacing, sizes and fonts only as presets:** `var:preset|spacing|l` in attributes and `var(--wp--preset--spacing--l)` in the saved style, font sizes by slug (`fontSize: "lead"`). The outer padding follows the density of the section: `compositionRules.sectionPadding` (airy `xxl`, regular `xl`, dense `l`).
-- **Never raw values:** no hex colors, no px values, no `!important`, no numbered presets such as `--wp--preset--font-size--2-xl`. The token check rejects them with `leitvia_check_failed`. No custom CSS and no inline styles beyond what the block editor saves for presets.
-- **Block styles** from `blockStyles` in the contract (for example `is-style-eyebrow` on a paragraph, `is-style-outline` on a button) instead of own classes.
-- **One root block** (usually a group with `align: full`) with a readable `metadata.name`, so the editor and the Lab show what the section is.
-- **Width and edge** (`layout` in the contract): text that is not centered as a whole starts at the wide edge like the page head, so inside a full-width band it sits in a block with `align: wide`. Width only through `align` and the layout of the block, never through `contentSize`, a max width or margins of your own.
-- **Headings** start at h2. Only a hero carries an h1, and a page has one hero at most.
-- **Links** need real targets in reusable patterns too: no `#`. Use a button whose link the page edit sets, or leave the link out.
-- **Images** from the media library only, with an alt text that fits every page the pattern will appear on, or `metadata.leitviaDecorative` with an empty alt. Add them with `leitvia/add-media`.
-- **Never** scripts, event attributes, Custom HTML blocks, classic blocks or Base64 data; they are rejected with `leitvia_unsafe_content`. No HTML comments besides block delimiters: between blocks they turn into classic content, inside a block they break it.
-- Keep every text editable by a page edit: paragraphs, headings, list items, buttons, the `cite` of a quote and the `summary` of a details block, each with at most one link. Captions cannot be changed later through `leitvia/compose-page`.
+Start from the markup of the closest existing pattern and follow every [markup rule](references/markup.md#markup-rules): colors only as roles from `pairs`, spacing and sizes only as presets, never raw values, block styles of the contract, one root block with `metadata.name`, width only through `align`, headings from h2, real link targets, images from the media library, no scripts or Custom HTML, every text editable by a page edit.
 
 Create it with `leitvia/create-pattern`: `title`, `content`, `base_hash: ""`, `package`, and `synced: true` only when every page should show the same content (for example opening hours kept in one place).
 
@@ -80,12 +71,7 @@ Every new pattern and variant starts with Lab status `draft` and version 0.1.0. 
 
 ## Replace deprecated patterns
 
-When a person deprecates a pattern and names its replacement, `leitvia/audit-site` reports the pages that still use it, and `leitvia/compose-page` rejects it with `leitvia_deprecated_pattern` and `replaced_by`.
-
-1. `leitvia/audit-site`, page through with `next`; note the posts with deprecated patterns.
-2. Per post `leitvia/get-page-outline` for the `hash` and the section IDs.
-3. `leitvia/replace-pattern` with `post`, `base_hash` and optionally `block` for one section. Texts and button links move to the replacement in order per block type; check the result with `leitvia/get-page-outline` and fix moved texts with `leitvia/update-content`.
-4. `leitvia_no_replacement` (`retry: never`): the section has no replacement. Stop and ask the person which pattern should take its place; a new page with `leitvia/compose-page` is the way to rebuild it.
+`leitvia/audit-site` reports pages with deprecated patterns; `leitvia/replace-pattern` swaps them per post with the replacement the contract names. Steps and the case without a replacement: [markup details](references/markup.md#replace-deprecated-patterns).
 
 ## Checkpoints
 
@@ -96,3 +82,15 @@ Stop and ask the person, then continue with the answer:
 - **Second rejection** of the same call, or a rejection with `retry: never`.
 - **Review in the Lab:** the person reviews the draft, moves it to review and approves it. Do not use a draft pattern on live pages before that.
 - **Deprecated without replacement:** `leitvia_no_replacement`.
+
+## Unattended
+
+When no person answers (a scheduled or hosted run), do not wait at a checkpoint. Send the `package` key on every write, also in mode `direct`; never apply, roll back or publish anything. Take facts only from a source you name in the report (briefing, a page of the site, a read ability); without one the fact stays out and becomes an open question. A second rejection, or `retry: never`, stops that part. End with the package ID, what it holds and the open questions. Each checkpoint gets this answer:
+
+| Checkpoint | Answer without a person |
+|---|---|
+| Need confirmed | Build only when step 1 found no pattern and no page edit that fits; report the candidates you rejected and why. |
+| Fixed texts and images | Fixed texts only from the briefing; otherwise leave the slot for a page edit, never a sample text. |
+| Second rejection | Stop this pattern; report code, message and findings. |
+| Review in the Lab | Expected: the pattern stays a draft in the package; no page uses it in this run. |
+| Deprecated without replacement | Leave the section as it is; list post and pattern. |

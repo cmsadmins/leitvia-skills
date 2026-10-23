@@ -1,0 +1,207 @@
+{
+	"$schema": "../scenario.schema.json",
+	"title": "Unattended: the sample of three posts waits in the package, the rest stays classic",
+	"skill": "leitvia-migrate",
+	"briefing": "Move the content of this classic site into blocks. Leitvia is already active. Nobody answers questions during this run: follow the section Unattended of the skill.",
+	"mode": "package",
+	"unattended": true,
+	"budget": {
+		"tokens": 11500,
+		"files": [
+			"skills/leitvia-migrate/references/translate.md",
+			"handbook/abilities/leitvia-audit-site.md",
+			"handbook/abilities/leitvia-get-block.md",
+			"handbook/abilities/leitvia-update-content.md",
+			"handbook/abilities/leitvia-apply-package.md"
+		]
+	},
+	"setup": [
+		{
+			"step": "runPHP",
+			"code": "<?php require '/leitvia-fixtures/leitvia-migrate/site.php';"
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php require_once '/wordpress/wp-load.php';\nWP_Navigation_Fallback::get_fallback();"
+		}
+	],
+	"steps": [
+		{
+			"ability": "leitvia/audit-site",
+			"input": {
+				"limit": 20
+			},
+			"capture": {
+				"about-us": "items.2.post",
+				"opening-hours": "items.3.post",
+				"contact": "items.4.post",
+				"our-new-sourdough": "items.5.post",
+				"a-night-at-the-oven": "items.6.post",
+				"video-shaping-a-loaf": "items.7.post",
+				"the-flour-we-use": "items.8.post"
+			},
+			"expect": {
+				"items.length": 9,
+				"items.2.slug": "about-us",
+				"items.2.findings.length": {
+					"$gte": 1
+				},
+				"items.3.slug": "opening-hours",
+				"items.3.findings.length": {
+					"$gte": 1
+				},
+				"items.4.slug": "contact",
+				"items.4.findings.length": {
+					"$gte": 1
+				},
+				"items.5.slug": "our-new-sourdough",
+				"items.5.findings.length": {
+					"$gte": 1
+				},
+				"items.6.slug": "a-night-at-the-oven",
+				"items.6.findings.length": {
+					"$gte": 1
+				},
+				"items.7.slug": "video-shaping-a-loaf",
+				"items.7.findings.length": {
+					"$gte": 1
+				},
+				"items.8.slug": "the-flour-we-use",
+				"items.8.findings.length": {
+					"$gte": 1
+				}
+			}
+		},
+		{
+			"ability": "leitvia/get-block",
+			"input": {
+				"post": "{{capture.about-us}}",
+				"block": "p:0"
+			},
+			"capture": {
+				"hash": "document_hash",
+				"image": "attachments.0.id"
+			},
+			"expect": {
+				"name": "core/freeform",
+				"attachments.length": 1,
+				"children": [],
+				"inner_html": {
+					"$match": "^Harbour Bakery opened in 2009 in a former net shed at the old harbour\\.[\\s\\S]*The harbour market for fruit in summer"
+				}
+			}
+		},
+		{
+			"ability": "leitvia/update-content",
+			"input": {
+				"post": "{{capture.about-us}}",
+				"content": "<!-- wp:paragraph -->\n<p>Harbour Bakery opened in 2009 in a former net shed at the old harbour. Today six bakers work here, three of them since the first winter.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2 class=\"wp-block-heading\">What we bake</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>We bake bread, rolls and a few cakes every night. Everything is made on site from flour, water, salt and time.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:image {\"id\":{{capture.image}},\"sizeSlug\":\"large\",\"linkDestination\":\"none\"} -->\n<figure class=\"wp-block-image size-large\"><img src=\"/wp-content/uploads/flour-sacks.png\" alt=\"Three paper sacks of flour stacked by the bakery door\" class=\"wp-image-{{capture.image}}\"/></figure>\n<!-- /wp:image -->\n\n<!-- wp:heading -->\n<h2 class=\"wp-block-heading\">Who we work with</h2>\n<!-- /wp:heading -->\n\n<!-- wp:list -->\n<ul class=\"wp-block-list\"><!-- wp:list-item -->\n<li>Two mills within 80 kilometres</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li>A dairy farm for butter and milk</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li>The harbour market for fruit in summer</li>\n<!-- /wp:list-item --></ul>\n<!-- /wp:list -->",
+				"base_hash": "{{capture.hash}}",
+				"package": "migrate-unattended"
+			},
+			"capture": {
+				"package": "package"
+			},
+			"expect": {
+				"mode": "package",
+				"findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/get-block",
+			"input": {
+				"post": "{{capture.opening-hours}}",
+				"block": "p:0"
+			},
+			"capture": {
+				"hash": "document_hash"
+			},
+			"expect": {
+				"name": "core/freeform",
+				"children": [],
+				"inner_html": {
+					"$match": "^The shop opens early, the bread is ready from the first hour\\.[\\s\\S]*On public holidays we open as on Saturday\\."
+				}
+			}
+		},
+		{
+			"ability": "leitvia/update-content",
+			"input": {
+				"post": "{{capture.opening-hours}}",
+				"content": "<!-- wp:paragraph -->\n<p>The shop opens early, the bread is ready from the first hour.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:table -->\n<figure class=\"wp-block-table\"><table class=\"has-fixed-layout\"><thead><tr><th>Day</th><th>Shop</th><th>Cafe</th></tr></thead><tbody><tr><td>Monday to Friday</td><td>6:30 to 18:00</td><td>8:00 to 17:00</td></tr><tr><td>Saturday</td><td>7:00 to 14:00</td><td>8:00 to 13:00</td></tr><tr><td>Sunday</td><td>closed</td><td>closed</td></tr></tbody></table></figure>\n<!-- /wp:table -->\n\n<!-- wp:paragraph -->\n<p>On public holidays we open as on Saturday.</p>\n<!-- /wp:paragraph -->",
+				"base_hash": "{{capture.hash}}",
+				"package": "migrate-unattended"
+			},
+			"capture": {
+				"package": "package"
+			},
+			"expect": {
+				"mode": "package",
+				"findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/get-block",
+			"input": {
+				"post": "{{capture.contact}}",
+				"block": "p:0"
+			},
+			"capture": {
+				"hash": "document_hash"
+			},
+			"expect": {
+				"name": "core/freeform",
+				"children": [],
+				"inner_html": {
+					"$match": "^You find us at Harbour Street 4, right next to the ferry pier\\.[\\s\\S]*a phone number for questions\\."
+				}
+			}
+		},
+		{
+			"ability": "leitvia/update-content",
+			"input": {
+				"post": "{{capture.contact}}",
+				"content": "<!-- wp:paragraph -->\n<p>You find us at Harbour Street 4, right next to the ferry pier.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2 class=\"wp-block-heading\">Orders</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>For larger orders write to <a href=\"mailto:orders@example.org\">orders@example.org</a> two days ahead. Please tell us:</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:list {\"ordered\":true} -->\n<ol class=\"wp-block-list\"><!-- wp:list-item -->\n<li>what you need and how many,</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li>the day and hour you want to collect it,</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li>a phone number for questions.</li>\n<!-- /wp:list-item --></ol>\n<!-- /wp:list -->",
+				"base_hash": "{{capture.hash}}",
+				"package": "migrate-unattended"
+			},
+			"capture": {
+				"package": "package"
+			},
+			"expect": {
+				"mode": "package",
+				"findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/apply-package",
+			"input": {
+				"id": "{{capture.package}}"
+			},
+			"expectError": "leitvia_needs_human"
+		}
+	],
+	"expect": [
+		{
+			"ability": "leitvia/list-packages",
+			"input": {
+				"state": "open"
+			},
+			"expect": {
+				"length": 1,
+				"0.state": "open"
+			}
+		},
+		{
+			"ability": "leitvia/audit-site",
+			"input": {
+				"limit": 20
+			},
+			"expect": {
+				"items.5.findings.0.check": {
+					"$match": "classic-content$"
+				}
+			}
+		}
+	]
+}

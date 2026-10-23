@@ -6,15 +6,13 @@ compatibility: Needs a site with the theme Leitvia and the plugin Leitvia Studio
 
 # leitvia-maintain
 
-A maintenance run takes a site that already works and leaves it in a better state: audit, fixes per area, one change package for a person, a report with the findings before and after. You change the site only through the abilities of Leitvia Studio. How to call them, hashes, autonomy levels, change packages and rejections: [agent handbook](../../handbook/README.md). Read its sections "Access over MCP and REST", "Write results" and "Rejections" before the first call.
+A maintenance run takes a site that already works and leaves it in a better state: audit, fixes per area, one change package for a person, a report with the findings before and after. You change the site only through the abilities of Leitvia Studio.
+
+Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [audit-site](../../handbook/abilities/leitvia-audit-site.md), [get-page-outline](../../handbook/abilities/leitvia-get-page-outline.md), [get-block](../../handbook/abilities/leitvia-get-block.md), [repair-links](../../handbook/abilities/leitvia-repair-links.md), [set-alt-text](../../handbook/abilities/leitvia-set-alt-text.md), [update-block](../../handbook/abilities/leitvia-update-block.md), [update-content](../../handbook/abilities/leitvia-update-content.md), [replace-pattern](../../handbook/abilities/leitvia-replace-pattern.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md), [get-package](../../handbook/abilities/leitvia-get-package.md), [rollback](../../handbook/abilities/leitvia-rollback.md). How to fix each area and how to roll back: [fix details](references/fixes.md).
 
 ## Access
 
-- **MCP:** server `leitvia` at `POST /wp-json/leitvia-studio/v1/mcp`. Call `initialize` first and send its `Mcp-Session-Id` header plus `MCP-Protocol-Version` (for example `2025-06-18`) on every further request, or the server answers 400. Tool names use a hyphen where the ability has a slash: `leitvia-audit-site` for `leitvia/audit-site`.
-- **REST:** `/wp-json/wp-abilities/v1/abilities/<name>/run`. Read abilities take GET with `?input[after]=...`, the write abilities of this skill take POST with the body `{"input": {...}}`.
-- Paths start at the address of the site, not at the host: on `https://example.org/club/` the MCP server is `https://example.org/club/wp-json/leitvia-studio/v1/mcp`. Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person.
-- Sign in with HTTP Basic auth as the agent user and its application password. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read: the abilities give you every ID, hash and status you need. Reading public pages of the site is fine.
-- On a site where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after each write.
+MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Paths start at the address of the site, not at the host. Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read: the abilities give you every ID, hash and status you need. Reading public pages of the site is fine. Where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after each write.
 
 ## Modes
 
@@ -29,7 +27,8 @@ Corrections (links, alt text) belong to the area `corrections`, which is `autono
 - **Several writes to one post** in the same package build on each other: each write sends the `hash` of `leitvia/get-page-outline` as usual, changes the post as your earlier writes in the package left it, and the person applies them in order. Combine the changes of one post in one call where the ability allows it anyway (`leitvia/update-content` takes up to 50 blocks; `leitvia/repair-links` repairs all links of a post at once).
 - **Only what a write brings counts.** Every write runs the content checks over the full post, but findings the post already had (a skipped heading level, an image without alt text elsewhere) do not block it. A write that adds a finding or makes one worse is rejected with `leitvia_check_failed` and names it.
 - A rejection is corrected at most once, following `message`, `next_ability` and `retry`. If the second call is rejected too, or `retry` is `never`, stop and tell the person.
-- Never change prices, legal texts or organization data on your own. The pipeline holds the content kinds `prices`, `legal` and `organization` for a person anyway; the facts come from the person.
+- **Facts are never guessed.** Organization data, prices, legal texts, figures, quotes and people come only from a source you can name: the person, a page of the site or a read ability, with the source in your report. Without one, stop at a checkpoint; never write a placeholder that looks like a fact.
+- Never change prices, legal texts or organization data on your own. The pipeline holds the content kinds `prices`, `legal` and `organization` for a person anyway.
 - Never write review notes or HTML comments into content. Open questions go into the report.
 
 ## Steps
@@ -53,25 +52,19 @@ Sort the findings by area. `check` holds the name of the check with the prefix `
 
 ### 2. Broken links
 
-`broken-link` findings name each internal link in the content of a post that leads to no page of the site, or to the old address of a renamed post. The audit requests nothing; external links are not checked, list them in the report as not checked.
-
-Repair them per post with one call of `leitvia/repair-links`: `post`, `base_hash` (the `hash` of `leitvia/get-page-outline`), `auto: true` for links to the old address of a renamed post (WordPress keeps the old slugs of posts, not of pages), and `links` with `from` and `to` pairs for the rest. The `to` of a pair is an address you checked on the public site: it answers 200 and is the page the link text names. When no page fits, ask the person (checkpoint **Link targets**). The result lists `repaired`, `external` and `unresolved`; `leitvia_invalid_input` with reason `nothing_to_repair` means nothing was left to repair.
-
-The audit covers the content of posts, not header, footer or navigation. Open the public pages and check the internal links there once (GET, no external links). Broken links in the header, footer or navigation: report them; they need `leitvia/update-navigation` or `leitvia/update-template-part` in the area `design`, which a person decides.
+One `leitvia/repair-links` call per post, with `auto: true` for renamed posts and `from`/`to` pairs whose `to` you checked on the public site (200, the page the link text names). Header, footer and navigation are not in the audit: check their links on the public pages and report them. Details: [broken links](references/fixes.md#broken-links).
 
 ### 3. Alt text
 
-For each `alt-text` finding read the block with `leitvia/get-block` (`post`, `block`): `attributes.id` is the attachment, `inner_html` holds the image URL. Look at the image and its place on the page and write the alt text yourself: what the image shows that matters here, in one short sentence, in the language of the page, without "image of". An image that only decorates, because the text around it carries the meaning, gets no description: mark it with `leitvia/update-block` and `image: { "id": <attachment>, "decorative": true }`.
-
-Call `leitvia/set-alt-text` with `image`, `alt`, `post`, `block` and the `hash` of the post as `base_hash`. Without `post` and `block` it sets the alt text of the attachment in the media library only, which fixes no page. When the AI plugin of WordPress offers the ability `ai/alt-text-generation` and the person agreed that images go to the AI provider of the site, you may use it for a first draft; read and correct the draft before you send it.
+Look at each image and its place on the page, write one short sentence, and send it with `leitvia/set-alt-text` including `post` and `block`; mark a decorative image with `leitvia/update-block`. Details and the AI draft: [alt text](references/fixes.md#alt-text).
 
 ### 4. Deprecated patterns
 
-For each `deprecated-pattern` finding: `leitvia/get-page-outline` for the `hash`, then `leitvia/replace-pattern` with `post` and `base_hash` (all deprecated sections of the post in one call). Texts and button links move to the replacement in order per block type; plain text only, inline links in paragraphs do not move. Read the outline of the result in the package diff (`leitvia/get-package`) and name in the report what the person should compare. `leitvia_no_replacement` (`retry: never`): the pattern has no replacement; ask the person (checkpoint **Section without replacement**).
+`leitvia/replace-pattern` per post with all deprecated sections in one call; compare the moved texts in the package diff. Details: [deprecated patterns](references/fixes.md#deprecated-patterns).
 
 ### 5. Outdated content
 
-Texts go stale: figures copied from another source (counts, versions, test numbers), dates, opening hours, names of people who left. Compare them only with a source the person named or a read ability of the site (for example `leitvia/get-contract` or `total` of `leitvia/list-patterns` for figures about the theme). Change a text with `leitvia/update-content` (`post`, `base_hash`, `blocks` with `block` and `text`, `url` for buttons); a text that holds a link keeps it only when the new text still contains the old link text, otherwise use `leitvia/update-block` with `link_text`. Markers that a decision is open (`CHECK:`, `TODO`, `Lorem ipsum`, the sample texts of patterns) are no fix for you: list them in the report until a person resolves them.
+Change stale figures, dates and names only against a source the person named or a read ability; open markers (`CHECK:`, `TODO`, sample texts) go into the report. Details: [outdated content](references/fixes.md#outdated-content).
 
 ### 6. The package
 
@@ -92,12 +85,7 @@ The person reviews the package in the inbox of Leitvia Studio: `/wp-admin/admin.
 
 ## Rollback
 
-Roll back only when a person asks for it, never to tidy up your own run.
-
-1. `leitvia/list-packages` with `state: applied`: find the package the person means and confirm it with them.
-2. `leitvia/rollback` with `id`. It restores the snapshots of every applied operation, newest first.
-3. `leitvia_rollback_conflict` (`retry: never`): someone changed a post after the package was applied. Nothing was rolled back. `data.conflicts` lists per operation both hashes and the `diff` (what changed since). Show the person the diff and stop; never overwrite a change of a person, and never rebuild the old state by hand.
-4. `leitvia_needs_human`: the operations belong to an area that is not `autonomous` for you; the person rolls back in the inbox.
+Only when a person asks for it, never to tidy up your own run: confirm the package with them, then `leitvia/rollback`. A `leitvia_rollback_conflict` means a person changed a post since; show the diff and stop. Steps: [rollback](references/fixes.md#rollback).
 
 ## Report
 
@@ -119,3 +107,16 @@ Stop and ask the person, then continue with the answer:
 - **Package applied:** the person reviews and applies the package in the inbox before you audit again.
 - **Rollback confirmed:** the person names the package to roll back.
 - **Second rejection** of the same call, or a rejection with `retry: never`.
+
+## Unattended
+
+When no person answers (a scheduled or hosted run), do not wait at a checkpoint. Send the `package` key on every write, also in mode `direct`; never apply, roll back or publish anything. Take facts only from a source you name in the report (briefing, a page of the site, a read ability); without one the fact stays out and becomes an open question. A second rejection, or `retry: never`, stops that part. End with the package ID, what it holds and the open questions. Each checkpoint gets this answer:
+
+| Checkpoint | Answer without a person |
+|---|---|
+| Link targets | Repair only links whose target is clear; list the others with page and link text. |
+| Section without replacement | Leave the section as it is; list post and pattern. |
+| Facts from the person | Leave the text as it is; list it with the value you could not confirm. |
+| Package applied | Stop after step 6; the audit after belongs to the next run. Report the "before" only. |
+| Rollback confirmed | Never roll back without a person. |
+| Second rejection | Stop that fix; report code and message. |

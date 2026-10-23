@@ -1,12 +1,15 @@
 #!/usr/bin/env node
 /**
- * Builds handbook/README.md, the agent handbook, from handbook/abilities.json, the dump of the abilities of Leitvia
- * Studio (npm run playground -- --dump). Texts of abilities and inputs come from Studio; change them there.
+ * Builds the agent handbook from handbook/abilities.json, the dump of the abilities of Leitvia Studio (npm run
+ * playground -- --dump): handbook/README.md (rules and the index of all abilities), handbook/rejections.md and one
+ * page per ability under handbook/abilities/, so a skill loads only the abilities it calls. Texts of abilities and
+ * inputs come from Studio; change them there.
  *
- *   node packages/leitvia-skills/tools/build-handbook.mjs           writes handbook/README.md
- *   node packages/leitvia-skills/tools/build-handbook.mjs --check   exits with 1 when README.md is out of date
+ *   node packages/leitvia-skills/tools/build-handbook.mjs           writes the handbook
+ *   node packages/leitvia-skills/tools/build-handbook.mjs --check   exits with 1 when a file is out of date or left over
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const GROUPS = {
@@ -124,10 +127,10 @@ function known( texts, values, what ) {
 }
 
 /**
- * The handbook as Markdown.
+ * The handbook as Markdown files.
  *
  * @param {Object} dump Content of handbook/abilities.json.
- * @return {string} Markdown with LF line ends.
+ * @return {Object<string, string>} Markdown with LF line ends by path below handbook/.
  */
 export function handbook( dump ) {
 	const { abilities, rejections, autonomy } = dump;
@@ -156,7 +159,7 @@ export function handbook( dump ) {
 		'',
 		`Generated from Leitvia Studio ${ dump.studio ?? 'unknown' }. Do not edit.`,
 		'',
-		`Everything an agent needs to work on a WordPress site with Leitvia Studio through its ${ abilities.length } abilities: how to call them, how hashes, autonomy and change packages work, what a rejection means and what each ability takes and returns. Agents change the site only through these abilities: no SQL, no write routes of WordPress core, no WP-CLI. Reading public pages of the site is allowed.`,
+		`Everything an agent needs to work on a WordPress site with Leitvia Studio through its ${ abilities.length } abilities: how to call them, how hashes, autonomy and change packages work, what a rejection means and what each ability takes and returns. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call; it holds the rules every skill relies on and the index of all abilities.`,
 		'',
 		'## Access over MCP and REST',
 		'',
@@ -243,61 +246,107 @@ export function handbook( dump ) {
 			'after:<seconds>': 'Wait the given seconds, then repeat the same call.',
 		}[ rule ] ?? '' ) } |` ),
 		'',
-		'Every rejection of Leitvia Studio with its retry rule and next ability. Messages with `%s` or `%d` get a value at run time; codes with several rows come from several places.',
-		'',
-		'| Code | HTTP | Retry | Next ability | Message |',
-		'|---|---|---|---|---|',
-		...( rejections.cases ?? [] ).map( ( item ) => `| \`${ item.code }\` | ${ item.status ?? 'varies' } | ${ item.retry ? `\`${ item.retry }\`` : 'varies' } | ${ item.next_ability.length ? item.next_ability.map( ( name ) => ( name ? `\`${ name }\`` : 'none' ) ).join( ' or ' ) : 'set at run time' } | ${ cell( item.message ?? 'Built at run time; read the message.' ) } |` ),
+		'Every rejection of Leitvia Studio with its code, HTTP status, retry rule, next ability and message: [rejections.md](rejections.md). Read it when a rejection is unclear; the rejection itself already carries all of this.',
 		'',
 		'## Abilities',
 		'',
+		'Each ability has a page of its own with its inputs and output, named after its MCP tool: `abilities/<tool>.md`, for example [`abilities/leitvia-get-contract.md`](abilities/leitvia-get-contract.md). Read the pages of the abilities you call, not all of them.',
+		'',
 	];
 
+	const files = {
+		'rejections.md': [
+			'# Rejections',
+			'',
+			`Generated from Leitvia Studio ${ dump.studio ?? 'unknown' }. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).`,
+			'',
+			'Every rejection of Leitvia Studio with its retry rule and next ability. Messages with `%s` or `%d` get a value at run time; codes with several rows come from several places.',
+			'',
+			'| Code | HTTP | Retry | Next ability | Message |',
+			'|---|---|---|---|---|',
+			...( rejections.cases ?? [] ).map( ( item ) => `| \`${ item.code }\` | ${ item.status ?? 'varies' } | ${ item.retry ? `\`${ item.retry }\`` : 'varies' } | ${ item.next_ability.length ? item.next_ability.map( ( name ) => ( name ? `\`${ name }\`` : 'none' ) ).join( ' or ' ) : 'set at run time' } | ${ cell( item.message ?? 'Built at run time; read the message.' ) } |` ),
+			'',
+		].join( '\n' ),
+	};
 	for ( const [ group, [ title, intro ] ] of Object.entries( GROUPS ) ) {
 		const members = abilities.filter( ( ability ) => group === ability.group );
 		if ( ! members.length ) {
 			continue;
 		}
-		lines.push( `### ${ title }`, '', intro, '', '| Ability | Label | REST |', '|---|---|---|' );
-		lines.push( ...members.map( ( ability ) => `| [\`${ ability.name }\`](#${ ability.name.replace( /[^a-z0-9-]/g, '' ) }) | ${ cell( ability.label ) } | ${ method( ability.annotations ) } |` ), '' );
+		lines.push( `### ${ title }`, '', intro, '', '| Ability | REST | What it does |', '|---|---|---|' );
+		lines.push( ...members.map( ( ability ) => `| [\`${ ability.name }\`](${ page( ability.name ) }) | ${ method( ability.annotations ) } | ${ cell( summary( ability.description ) ) } |` ), '' );
 		for ( const ability of members ) {
 			const { readonly, destructive, idempotent } = ability.annotations;
 			const properties = Object.entries( ability.input_schema?.properties ?? {} );
 			const required = ability.input_schema?.required ?? [];
-			lines.push(
-				`#### ${ ability.name }`,
+			const text = [
+				`# ${ ability.name }`,
+				'',
+				`Generated from Leitvia Studio ${ dump.studio ?? 'unknown' }. Do not edit. Group: ${ title }. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).`,
 				'',
 				`**${ escape( ability.label ) }.** ${ escape( ability.description ) }`,
 				'',
 				`MCP tool \`${ ability.name.replace( '/', '-' ) }\`, REST ${ method( ability.annotations ) }. Annotations: readonly ${ readonly }, destructive ${ destructive }, idempotent ${ idempotent }.${ ability.requires ? ` Only registered while ${ ability.requires.join( ', ' ) } is active.` : '' }`,
-				''
-			);
+				'',
+			];
 			if ( properties.length ) {
-				lines.push( '| Input | Type | Required | Description |', '|---|---|---|---|' );
-				lines.push( ...properties.map( ( [ key, schema ] ) => `| \`${ key }\` | ${ cell( type( schema ) ) } | ${ required.includes( key ) ? 'yes' : '' } | ${ cell( schema.description ) } |` ), '' );
+				text.push( '| Input | Type | Required | Description |', '|---|---|---|---|' );
+				text.push( ...properties.map( ( [ key, schema ] ) => `| \`${ key }\` | ${ cell( type( schema ) ) } | ${ required.includes( key ) ? 'yes' : '' } | ${ cell( schema.description ) } |` ), '' );
 			} else {
-				lines.push( 'No input.', '' );
+				text.push( 'No input.', '' );
 			}
-			lines.push( `Output: ${ escape( output( ability.output_schema ) ) }.`, '' );
+			const shared = JSON.stringify( ability.output_schema ) === result;
+			text.push( `Output: ${ escape( output( ability.output_schema ) ) }.${ shared ? ' Its fields: [Write results](../README.md#write-results).' : '' }`, '' );
+			files[ page( ability.name ) ] = text.join( '\n' );
 		}
 	}
-	return lines.join( '\n' ).replace( /\n+$/, '\n' );
+	files[ 'README.md' ] = lines.join( '\n' ).replace( /\n+$/, '\n' );
+	return files;
+}
+
+/**
+ * Path of the page of an ability below handbook/, named after its MCP tool.
+ *
+ * @param {string} name Ability name.
+ * @return {string} For example abilities/leitvia-get-contract.md.
+ */
+export function page( name ) {
+	return `abilities/${ name.replace( '/', '-' ) }.md`;
+}
+
+/**
+ * First sentence of a description without remarks in parentheses, for the index.
+ *
+ * @param {string} description Description.
+ * @return {string} Sentence.
+ */
+function summary( description ) {
+	const text = String( description ?? '' ).replace( /\s*\([^()]*\)/g, '' );
+	return text.match( /^[\s\S]*?[.!?](?=\s|$)/ )?.[ 0 ] ?? text;
 }
 
 if ( process.argv[ 1 ] === fileURLToPath( import.meta.url ) ) {
-	const dir = new URL( '../handbook/', import.meta.url );
-	const markdown = handbook( JSON.parse( readFileSync( new URL( 'abilities.json', dir ), 'utf8' ) ) );
-	const target = new URL( 'README.md', dir );
+	const dir = fileURLToPath( new URL( '../handbook/', import.meta.url ) );
+	const files = handbook( JSON.parse( readFileSync( join( dir, 'abilities.json' ), 'utf8' ) ) );
+	mkdirSync( join( dir, 'abilities' ), { recursive: true } );
+	const pages = readdirSync( join( dir, 'abilities' ), { withFileTypes: true } ).filter( ( entry ) => entry.isFile() ).map( ( entry ) => `abilities/${ entry.name }` );
 	if ( process.argv.includes( '--check' ) ) {
-		let current = '';
-		try {
-			current = readFileSync( target, 'utf8' );
-		} catch {}
-		if ( current !== markdown ) {
-			console.error( 'packages/leitvia-skills/handbook/README.md is out of date. Run node packages/leitvia-skills/tools/build-handbook.mjs.' );
+		const read = ( path ) => {
+			try {
+				return readFileSync( join( dir, path ), 'utf8' );
+			} catch {
+				return null;
+			}
+		};
+		const stale = [ ...Object.keys( files ).filter( ( path ) => read( path ) !== files[ path ] ), ...pages.filter( ( path ) => ! files[ path ] ) ];
+		if ( stale.length ) {
+			console.error( `Out of date in packages/leitvia-skills/handbook/: ${ stale.join( ', ' ) }. Run node packages/leitvia-skills/tools/build-handbook.mjs.` );
 			process.exit( 1 );
 		}
 	} else {
-		writeFileSync( target, markdown );
+		pages.filter( ( path ) => ! files[ path ] ).forEach( ( path ) => rmSync( join( dir, path ) ) );
+		for ( const [ path, text ] of Object.entries( files ) ) {
+			writeFileSync( join( dir, path ), text );
+		}
 	}
 }

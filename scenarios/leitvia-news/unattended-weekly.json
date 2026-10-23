@@ -1,0 +1,121 @@
+{
+	"$schema": "../scenario.schema.json",
+	"title": "Unattended weekly news: duplicate check with list-content, one AI-marked draft in a package",
+	"skill": "leitvia-news",
+	"briefing": "Weekly news run for the blog of the Speiche bike workshop. News brief: topics \"cycling in Leipzig\" and \"bike care\"; source the feed {{source}}/feed.xml; language en-GB; cadence one post per week; category News. Nobody answers questions during this run: follow the section Unattended of the skill.",
+	"mode": "package",
+	"unattended": true,
+	"budget": {
+		"tokens": 9500,
+		"files": [
+			"skills/leitvia-news/references/brief.md",
+			"handbook/abilities/leitvia-get-contract.md",
+			"handbook/abilities/leitvia-list-content.md",
+			"handbook/abilities/leitvia-create-content.md",
+			"handbook/abilities/leitvia-list-packages.md",
+			"handbook/abilities/leitvia-get-package.md"
+		]
+	},
+	"source": "leitvia-news/sources",
+	"setup": [
+		{
+			"step": "runPHP",
+			"code": "<?php require_once '/wordpress/wp-load.php'; $news = wp_insert_term( 'News', 'category' ); wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'Spring check: what city bikes need after winter', 'post_name' => 'spring-check', 'post_date' => '2026-03-17 09:00:00', 'post_category' => array( $news['term_id'] ), 'post_content' => '<!-- wp:paragraph --><p>Road salt attacks chains and brake cables.</p><!-- /wp:paragraph -->' ) );"
+		}
+	],
+	"steps": [
+		{
+			"ability": "leitvia/get-contract",
+			"expect": {
+				"site.url": {
+					"$match": "^http"
+				}
+			}
+		},
+		{
+			"ability": "leitvia/list-content",
+			"input": {
+				"post_type": "post",
+				"status": "any",
+				"after": "2025-10-01"
+			},
+			"expect": {
+				"items.length": 2,
+				"items.1.title": "Spring check: what city bikes need after winter",
+				"items.1.terms.category.0": "News"
+			}
+		},
+		{
+			"ability": "leitvia/list-packages",
+			"input": {
+				"state": "open"
+			},
+			"expect": {
+				"length": 0
+			}
+		},
+		{
+			"ability": "leitvia/create-content",
+			"input": {
+				"post_type": "post",
+				"title": "New protected cycle lane on Karl-Heine-Strasse",
+				"content": "<!-- wp:paragraph -->\n<p>Since 19 October 2026 a protected cycle lane of 1.2 kilometres runs along Karl-Heine-Strasse, in both directions between the Felsenkeller and the Plagwitz station.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>Kerbs separate the lane from car traffic. The city expects more people to ride to work: \"More people will ride to work when they feel safe,\" said the head of the mobility office.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2 class=\"wp-block-heading\">Sources</h2>\n<!-- /wp:heading -->\n\n<!-- wp:list -->\n<ul class=\"wp-block-list\"><!-- wp:list-item -->\n<li><a href=\"{{source}}/cycle-lane.html\">City opens a new cycle lane on Karl-Heine-Strasse</a>, press office of the city of Leipzig, 19 October 2026</li>\n<!-- /wp:list-item --></ul>\n<!-- /wp:list -->",
+				"excerpt": "Leipzig opened a protected cycle lane of 1.2 kilometres between Felsenkeller and Plagwitz station.",
+				"slug": "cycle-lane-karl-heine-strasse",
+				"terms": {
+					"category": [
+						"News"
+					],
+					"post_tag": [
+						"cycling in Leipzig"
+					]
+				},
+				"status": "draft",
+				"ai_generated": true,
+				"sources": [
+					"{{source}}/cycle-lane.html"
+				],
+				"base_hash": "",
+				"package": "news-2026-43"
+			},
+			"expect": {
+				"mode": "package"
+			},
+			"capture": {
+				"package": "package"
+			}
+		},
+		{
+			"ability": "leitvia/get-package",
+			"input": {
+				"id": "{{capture.package}}"
+			},
+			"expect": {
+				"items.length": 1,
+				"items.0.ability": "leitvia/create-content",
+				"items.0.status": "open"
+			}
+		}
+	],
+	"expect": [
+		{
+			"ability": "leitvia/list-packages",
+			"input": {
+				"state": "open"
+			},
+			"expect": {
+				"length": 1
+			}
+		},
+		{
+			"ability": "leitvia/list-content",
+			"input": {
+				"post_type": "post",
+				"status": "any"
+			},
+			"expect": {
+				"items.length": 2
+			}
+		}
+	]
+}

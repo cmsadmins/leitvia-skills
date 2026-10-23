@@ -1,17 +1,17 @@
 # Leitvia Skills
 
-Agent skills and workflows for WordPress sites with the theme Leitvia and the plugin Leitvia Studio. They teach an AI coding agent (Claude Code, Codex CLI, Gemini CLI, Cursor) how to set up, design, build, maintain, check and migrate such a site. The agent works only through the abilities of Leitvia Studio, so every change passes the same checks, autonomy levels, snapshots and change packages as in the backend.
+Agent skills and workflows for WordPress sites with the theme Leitvia and the plugin Leitvia Studio. They teach an AI coding agent (Claude Code, Codex CLI, Gemini CLI, Cursor) how to set up, design, build, maintain, check and migrate such a site and write its news, with a person at each checkpoint or unattended. The agent works only through the abilities of Leitvia Studio, so every change passes the same checks, autonomy levels, snapshots and change packages as in the backend.
 
 ## What is inside
 
 | Folder | Content |
 |---|---|
-| `skills/` | Seven skills in the Agent Skills format, one folder each with a `SKILL.md`: `leitvia-setup`, `leitvia-design`, `leitvia-page`, `leitvia-pattern`, `leitvia-maintain`, `leitvia-a11y`, `leitvia-migrate`. |
+| `skills/` | Eight skills in the Agent Skills format, one folder each with a short `SKILL.md` and, under `references/`, the details it names when they are needed: `leitvia-setup`, `leitvia-design`, `leitvia-page`, `leitvia-pattern`, `leitvia-maintain`, `leitvia-a11y`, `leitvia-migrate`, `leitvia-news`. |
 | `workflows/` | `new-site`, `maintenance-cycle` and `migrate-site`: several skills in a row with fixed checkpoints and a mode chosen at the start. |
-| `handbook/` | The agent handbook (`README.md`) and the list of all abilities with their schemas (`abilities.json`), generated from Leitvia Studio. |
+| `handbook/` | The agent handbook, generated from Leitvia Studio: `README.md` (rules and an index of all abilities), one page per ability under `abilities/`, every rejection in `rejections.md`, and the abilities with their schemas in `abilities.json`. A skill loads the rules and only the pages of the abilities it calls. |
 | `scenarios/`, `tests/`, `tools/` | Test scenarios, their runner and the handbook generator, for development. Agents do not need them. |
 
-Each skill stops at checkpoints and asks the person: before the first write, before anything goes live, for facts only the person knows (legal texts, prices, organization data), and after a rejection it could not fix in one attempt.
+Each skill stops at checkpoints and asks the person: before the first write, before anything goes live, for facts only the person knows (legal texts, prices, organization data), and after a rejection it could not fix in one attempt. When no person answers (a scheduled or hosted run), the section Unattended of each skill gives every checkpoint its answer: writes only into a change package, facts only from a named source, open questions in the report, nothing live.
 
 ## Requirements
 

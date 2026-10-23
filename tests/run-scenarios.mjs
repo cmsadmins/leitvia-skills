@@ -3,7 +3,7 @@
  * Plays the steps of each skill scenario against a fresh WordPress Playground and checks the end state. No language
  * model: the scenario lists the ability calls a skill would make.
  *
- *   node packages/leitvia-skills/tests/run-scenarios.mjs [--port <n>] [<folder or file> ...]
+ *   node packages/leitvia-skills/tests/run-scenarios.mjs [--port <n>] [--boot-timeout <s>] [--playground-arg <arg> ...] [<folder or file> ...]
  *   node packages/leitvia-skills/tests/run-scenarios.mjs --expect-only --url <url> [--password <p>] [--capture <name>=<value> ...] [<folder or file> ...]
  *
  * Without filters it runs every scenario under packages/leitvia-skills/scenarios/. Each scenario gets its own site from
@@ -14,9 +14,14 @@
  * end state of a site that is already running, for example after an agent run; the password comes from --password,
  * LEITVIA_AGENT_PASSWORD or .cache/playground/agent-password.txt, and --capture gives the values that {{capture.<name>}}
  * in the end state checks would otherwise take from the steps (IDs of the posts and blocks the agent worked on). Exit
- * code 1 when a scenario fails.
+ * code 1 when a scenario fails. A scenario with source gets that folder of tests/fixtures/ served over HTTP while it runs,
+ * at {{source}}; {{fixture:<path>}} is the Base64 of a file under tests/fixtures/. --playground-arg passes an argument
+ * on to dev/playground/start.mjs for every site, for example --playground-arg=--pro to test an add-on with its own
+ * scenarios, which may live outside this package. --boot-timeout gives a site with long setup steps more than the
+ * default 180 seconds to start.
  */
 import { spawn, spawnSync } from 'node:child_process';
+import { createServer } from 'node:http';
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
@@ -25,6 +30,7 @@ import { isDeepStrictEqual, parseArgs } from 'node:util';
 
 const root = resolve( dirname( fileURLToPath( import.meta.url ) ), '../../..' );
 const scenarios = join( root, 'packages/leitvia-skills/scenarios' );
+const fixtures = join( root, 'packages/leitvia-skills/tests/fixtures' );
 const annotations = new Map(
 	JSON.parse( readFileSync( join( root, 'packages/leitvia-skills/handbook/abilities.json' ), 'utf8' ) )
 		.abilities.map( ( ability ) => [ ability.name, ability.annotations ] )
@@ -38,6 +44,8 @@ const { values, positionals } = parseArgs( {
 		url: { type: 'string' },
 		password: { type: 'string' },
 		capture: { type: 'string', multiple: true, default: [] },
+		'playground-arg': { type: 'string', multiple: true, default: [] },
+		'boot-timeout': { type: 'string', default: '180' },
 	},
 } );
 if ( values[ 'expect-only' ] && ! values.url ) {
@@ -58,14 +66,17 @@ for ( const file of files ) {
 	const started = Date.now();
 	const tags = scenario.tags?.length ? ` [${ scenario.tags.join( ', ' ) }]` : '';
 	let site;
+	let source;
 	let errors;
 	try {
+		source = scenario.source ? await serve( join( fixtures, scenario.source ) ) : null;
 		site = values[ 'expect-only' ] ? running() : await boot( scenario.setup ?? [] );
-		errors = await play( site, scenario );
+		errors = await play( site, scenario, source?.url );
 	} catch ( error ) {
 		errors = [ String( error?.stack ?? error ) ];
 	} finally {
 		await site?.stop?.();
+		source?.server.close();
 	}
 	const seconds = ( ( Date.now() - started ) / 1000 ).toFixed( 1 );
 	console.log( `${ errors.length ? 'FAIL' : 'ok  ' } ${ name }${ tags } (${ seconds } s)` );
@@ -118,7 +129,7 @@ async function boot( setup ) {
 	const dir = mkdtempSync( join( tmpdir(), 'leitvia-scenario-' ) );
 	const steps = join( dir, 'steps.json' );
 	writeFileSync( steps, JSON.stringify( setup ) );
-	const child = spawn( process.execPath, [ join( root, 'dev/playground/start.mjs' ), '--port', values.port, '--steps', steps ], { cwd: root, stdio: [ 'ignore', 'pipe', 'pipe' ] } );
+	const child = spawn( process.execPath, [ join( root, 'dev/playground/start.mjs' ), '--port', values.port, '--steps', steps, ...values[ 'playground-arg' ] ], { cwd: root, stdio: [ 'ignore', 'pipe', 'pipe' ] } );
 	let log = '';
 	const stop = () => new Promise( ( done ) => {
 		rmSync( dir, { recursive: true, force: true } );
@@ -134,7 +145,7 @@ async function boot( setup ) {
 		}
 	} );
 	await new Promise( ( done, fail ) => {
-		const timer = setTimeout( () => fail( new Error( `Playground not ready after 180 s:\n${ log.slice( -2000 ) }` ) ), 180000 );
+		const timer = setTimeout( () => fail( new Error( `Playground not ready after ${ values[ 'boot-timeout' ] } s:\n${ log.slice( -2000 ) }` ) ), Number( values[ 'boot-timeout' ] ) * 1000 );
 		const read = ( chunk ) => {
 			log += chunk;
 			if ( log.includes( 'Leitvia Playground ready' ) ) {
@@ -157,19 +168,40 @@ async function boot( setup ) {
 }
 
 /**
+ * Serves a folder of static files on a free port of 127.0.0.1, index.html for a folder.
+ *
+ * @param {string} dir Folder.
+ * @return {Promise<{url: string, server: Object}>} Address and server.
+ */
+async function serve( dir ) {
+	const types = { '.html': 'text/html; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.xml': 'application/xml' };
+	const server = createServer( ( request, response ) => {
+		const path = resolve( dir, `.${ decodeURIComponent( new URL( request.url, 'http://source' ).pathname ) }` );
+		const file = existsSync( path ) && statSync( path ).isDirectory() ? join( path, 'index.html' ) : path;
+		if ( ! file.startsWith( dir ) || ! existsSync( file ) ) {
+			response.writeHead( 404 ).end();
+			return;
+		}
+		response.writeHead( 200, { 'Content-Type': types[ file.slice( file.lastIndexOf( '.' ) ) ] ?? 'application/octet-stream' } ).end( readFileSync( file ) );
+	} );
+	await new Promise( ( done ) => server.listen( 0, '127.0.0.1', done ) );
+	return { url: `http://127.0.0.1:${ server.address().port }`, server };
+}
+
+/**
  * Runs the steps, then the end state checks.
  *
  * @param {{url: string, password: string}} site     Site.
  * @param {Object}                           scenario Scenario.
  * @return {Promise<string[]>} Errors, empty when the scenario passed.
  */
-async function play( site, scenario ) {
+async function play( site, scenario, source ) {
 	// --capture page=12 gives the number 12, --capture link=p:0.1 the string.
-	const capture = Object.fromEntries( values.capture.map( ( pair ) => {
+	const capture = { source, ...Object.fromEntries( values.capture.map( ( pair ) => {
 		const [ key, ...rest ] = pair.split( '=' );
 		const value = rest.join( '=' );
 		return [ key, /^\d+$/.test( value ) ? Number( value ) : value ];
-	} ) );
+	} ) ) };
 	if ( ! values[ 'expect-only' ] ) {
 		for ( const [ index, step ] of scenario.steps.entries() ) {
 			const input = fill( step.input ?? {}, capture );
@@ -204,6 +236,11 @@ async function play( site, scenario ) {
 			for ( const text of check.contains ?? [] ) {
 				if ( ! html.includes( text ) ) {
 					found.push( `contains: ${ JSON.stringify( text ) } is missing` );
+				}
+			}
+			for ( const text of check.absent ?? [] ) {
+				if ( html.includes( text ) ) {
+					found.push( `absent: ${ JSON.stringify( text ) } is on the page` );
 				}
 			}
 			if ( found.length ) {
@@ -291,7 +328,11 @@ function fill( value, capture ) {
 		if ( whole ) {
 			return capture[ whole[ 1 ] ];
 		}
-		return value.replace( /\{\{capture\.([\w-]+)\}\}/g, ( _, key ) => String( capture[ key ] ) );
+		const file = value.match( /^\{\{fixture:([\w./-]+)\}\}$/ );
+		if ( file ) {
+			return readFileSync( join( fixtures, file[ 1 ] ) ).toString( 'base64' );
+		}
+		return value.replace( /\{\{capture\.([\w-]+)\}\}/g, ( _, key ) => String( capture[ key ] ) ).replaceAll( '{{source}}', String( capture.source ) );
 	}
 	if ( Array.isArray( value ) ) {
 		return value.map( ( item ) => fill( item, capture ) );

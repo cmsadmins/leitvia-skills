@@ -1,0 +1,205 @@
+{
+	"$schema": "../scenario.schema.json",
+	"title": "Unattended: the maintenance run ends with one open package and its \"before\" audit",
+	"skill": "leitvia-maintain",
+	"briefing": "Run the weekly maintenance of the site. The workshop photo shows bicycles on repair stands in a bright workshop. Nobody answers questions during this run: follow the section Unattended of the skill.",
+	"mode": "package",
+	"unattended": true,
+	"budget": {
+		"tokens": 11900,
+		"files": [
+			"skills/leitvia-maintain/references/fixes.md",
+			"handbook/abilities/leitvia-audit-site.md",
+			"handbook/abilities/leitvia-get-page-outline.md",
+			"handbook/abilities/leitvia-repair-links.md",
+			"handbook/abilities/leitvia-get-block.md",
+			"handbook/abilities/leitvia-set-alt-text.md",
+			"handbook/abilities/leitvia-replace-pattern.md",
+			"handbook/abilities/leitvia-list-packages.md",
+			"handbook/abilities/leitvia-apply-package.md"
+		]
+	},
+	"setup": [
+		{
+			"step": "runPHP",
+			"code": "<?php require_once '/wordpress/wp-load.php';\n$created = WP_Application_Passwords::create_new_application_password( 1, array( 'name' => 'scenario' ) );\nfile_put_contents( '/leitvia-run/admin-password.txt', $created[0] . \"\\n\" );\nupdate_option( 'leitvia_studio_gateway', array( 'overrides' => array( 'areas' => array( 'content' => 'suggest', 'corrections' => 'suggest', 'structure' => 'suggest' ), 'kinds' => array() ) ) );\n$contract = wp_json_file_decode( get_stylesheet_directory() . '/leitvia-contract.json', array( 'associative' => true ) );\nforeach ( $contract['patterns'] as &$pattern ) {\n\tif ( 'leitvia/cta-banner' === $pattern['slug'] ) {\n\t\t$pattern['docs']['replacedBy'] = 'leitvia/cta-split';\n\t}\n}\nunset( $pattern );\nfile_put_contents( WP_CONTENT_DIR . '/fixture-contract.json', wp_json_encode( $contract ) );\nwp_mkdir_p( WPMU_PLUGIN_DIR );\nfile_put_contents( WPMU_PLUGIN_DIR . '/fixture-contract.php', \"<?php add_filter( 'leitvia_studio_contract_path', static fn() => array( WP_CONTENT_DIR . '/fixture-contract.json' ) );\\n\" );\n$p = static fn( string $html ): string => \"<!-- wp:paragraph -->\\n<p>{$html}</p>\\n<!-- /wp:paragraph -->\";\n$page = static fn( string $title, string $slug, string $content ): int => wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => $title, 'post_name' => $slug, 'post_content' => $content ) );\n$hours = wp_insert_post( array( 'post_status' => 'publish', 'post_title' => 'Opening hours', 'post_name' => 'opening-times', 'post_content' => $p( 'Monday to Saturday, 8:00 to 18:00.' ) ) );\nwp_update_post( array( 'ID' => $hours, 'post_name' => 'opening-hours' ) );\n$page( 'Prices', 'prices', $p( 'A repair starts at 40 euros.' ) );\n$page( 'Visit us', 'visit', $p( 'We are in Main Street 1. See our <a href=\"/opening-times/\">opening hours</a> and our <a href=\"/old-prices/\">repair prices</a> before you come.' ) );\n$upload = wp_upload_bits( 'workshop.webp', null, file_get_contents( '/leitvia-fixtures/leitvia-maintain/workshop.webp' ) );\n$image = wp_insert_attachment( array( 'post_title' => 'Workshop photo', 'post_mime_type' => 'image/webp', 'post_status' => 'inherit' ), $upload['file'] );\n$page( 'Workshop', 'workshop', $p( 'Our workshop has room for six bikes at a time.' ) . \"\\n\\n<!-- wp:image {\\\"id\\\":{$image},\\\"sizeSlug\\\":\\\"full\\\"} -->\\n<figure class=\\\"wp-block-image size-full\\\"><img src=\\\"{$upload['url']}\\\" class=\\\"wp-image-{$image}\\\"/></figure>\\n<!-- /wp:image -->\" );\n$banner = LeitviaStudio\\Gateway\\Abilities\\Build::pattern( 'leitvia/cta-banner' );\n$banner = LeitviaStudio\\Gateway\\Abilities\\Build::edit( $banner['content'], array( array( 'block' => 'p:0.0.0.1', 'text' => 'Book your spring check' ), array( 'block' => 'p:0.0.1.1.0', 'text' => 'Write to the workshop', 'url' => 'mailto:hello@example.com' ) ), array() );\n$page( 'Spring check', 'spring-check', LeitviaStudio\\Gateway\\Abilities\\Build::name_sections( $banner, 'leitvia/cta-banner' ) );"
+		}
+	],
+	"steps": [
+		{
+			"ability": "leitvia/audit-site",
+			"input": {
+				"limit": 20
+			},
+			"capture": {
+				"visit": "items.4.post",
+				"workshop": "items.5.post",
+				"image": "items.5.findings.0.block",
+				"spring": "items.6.post"
+			},
+			"expect": {
+				"items.length": 7,
+				"items.4.slug": "visit",
+				"items.4.findings.length": 2,
+				"items.4.findings.0.check": {
+					"$match": "/broken-link$"
+				},
+				"items.4.findings.0.message": {
+					"$match": "/opening-times/ leads to the old address"
+				},
+				"items.4.findings.1.message": {
+					"$match": "/old-prices/ leads to no page"
+				},
+				"items.5.findings.length": 1,
+				"items.5.findings.0.check": {
+					"$match": "/alt-text$"
+				},
+				"items.6.findings.length": 1,
+				"items.6.findings.0.check": {
+					"$match": "/deprecated-pattern$"
+				},
+				"next": null
+			}
+		},
+		{
+			"ability": "leitvia/get-page-outline",
+			"input": {
+				"post": "{{capture.visit}}"
+			},
+			"capture": {
+				"hash": "hash",
+				"text": "blocks.0.id"
+			},
+			"expect": {
+				"blocks.length": 1
+			}
+		},
+		{
+			"ability": "leitvia/repair-links",
+			"input": {
+				"post": "{{capture.visit}}",
+				"auto": true,
+				"links": [
+					{
+						"from": "/old-prices/",
+						"to": "/prices/"
+					}
+				],
+				"base_hash": "{{capture.hash}}",
+				"package": "maintenance-unattended"
+			},
+			"capture": {
+				"package": "package"
+			},
+			"expect": {
+				"mode": "package",
+				"report.repaired.length": 2,
+				"report.unresolved.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/get-page-outline",
+			"input": {
+				"post": "{{capture.workshop}}"
+			},
+			"capture": {
+				"hash": "hash"
+			},
+			"expect": {
+				"blocks.length": 2
+			}
+		},
+		{
+			"ability": "leitvia/get-block",
+			"input": {
+				"post": "{{capture.workshop}}",
+				"block": "{{capture.image}}"
+			},
+			"capture": {
+				"attachment": "attributes.id"
+			},
+			"expect": {
+				"name": "core/image"
+			}
+		},
+		{
+			"ability": "leitvia/set-alt-text",
+			"input": {
+				"image": "{{capture.attachment}}",
+				"alt": "Bicycles on repair stands in a bright workshop",
+				"post": "{{capture.workshop}}",
+				"block": "{{capture.image}}",
+				"base_hash": "{{capture.hash}}",
+				"package": "maintenance-unattended"
+			},
+			"expect": {
+				"mode": "package",
+				"findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/get-page-outline",
+			"input": {
+				"post": "{{capture.spring}}"
+			},
+			"capture": {
+				"hash": "hash"
+			},
+			"expect": {
+				"blocks.0.pattern": "pattern:leitvia/cta-banner"
+			}
+		},
+		{
+			"ability": "leitvia/replace-pattern",
+			"input": {
+				"post": "{{capture.spring}}",
+				"base_hash": "{{capture.hash}}",
+				"package": "maintenance-unattended"
+			},
+			"expect": {
+				"mode": "package"
+			}
+		},
+		{
+			"ability": "leitvia/list-packages",
+			"input": {
+				"state": "open"
+			},
+			"expect": {
+				"length": 1,
+				"0.key": "maintenance-unattended",
+				"0.operations.open": 3
+			}
+		},
+		{
+			"ability": "leitvia/apply-package",
+			"input": {
+				"id": "{{capture.package}}"
+			},
+			"expectError": "leitvia_needs_human"
+		}
+	],
+	"expect": [
+		{
+			"ability": "leitvia/list-packages",
+			"input": {
+				"state": "open"
+			},
+			"expect": {
+				"length": 1,
+				"0.state": "open"
+			}
+		},
+		{
+			"ability": "leitvia/audit-site",
+			"input": {
+				"limit": 20
+			},
+			"expect": {
+				"items.5.findings.length": {
+					"$gte": 1
+				}
+			}
+		}
+	]
+}

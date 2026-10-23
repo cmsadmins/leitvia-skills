@@ -1,0 +1,243 @@
+{
+	"$schema": "../scenario.schema.json",
+	"title": "Site outside WordPress: images in one package, then every page created with its content and the menu in a second one",
+	"skill": "leitvia-migrate",
+	"briefing": "Move our old site builder site at {{source}} to this Leitvia site: every page with its texts, the workshop photo and the menu. Leave out cookie banners, trackers and fonts of the old site. Put everything into change packages for us.",
+	"mode": "package",
+	"budget": {
+		"tokens": 14700,
+		"files": [
+			"skills/leitvia-migrate/references/external.md",
+			"skills/leitvia-migrate/references/translate.md",
+			"handbook/abilities/leitvia-get-contract.md",
+			"handbook/abilities/leitvia-get-content-model.md",
+			"handbook/abilities/leitvia-add-media.md",
+			"handbook/abilities/leitvia-get-package.md",
+			"handbook/abilities/leitvia-list-media.md",
+			"handbook/abilities/leitvia-create-content.md",
+			"handbook/abilities/leitvia-update-navigation.md",
+			"handbook/abilities/leitvia-apply-package.md",
+			"handbook/abilities/leitvia-list-content.md"
+		]
+	},
+	"source": "leitvia-migrate/external-source",
+	"answers": {
+		"Inventory confirmed": "Yes: the pages About us and Workshop, the photo and the menu. The home page stays as it is.",
+		"Package applied": "Applied in the inbox."
+	},
+	"setup": [
+		{
+			"step": "runPHP",
+			"code": "<?php require_once '/wordpress/wp-load.php'; $created = WP_Application_Passwords::create_new_application_password( 1, array( 'name' => 'scenario' ) ); file_put_contents( '/leitvia-run/admin-password.txt', $created[0] . \"\n\" );"
+		}
+	],
+	"steps": [
+		{
+			"ability": "leitvia/get-contract",
+			"expect": {
+				"contract.theme": "leitvia"
+			}
+		},
+		{
+			"ability": "leitvia/get-content-model",
+			"expect": {}
+		},
+		{
+			"ability": "leitvia/add-media",
+			"input": {
+				"data": "{{fixture:leitvia-migrate/external-source/media/workshop.webp}}",
+				"filename": "workshop-photo.webp",
+				"alt": "Bicycles on repair stands in a bright workshop",
+				"base_hash": "",
+				"package": "migrate-speiche-media"
+			},
+			"expect": {
+				"mode": "package"
+			},
+			"capture": {
+				"media": "package"
+			}
+		},
+		{
+			"ability": "leitvia/apply-package",
+			"input": {
+				"id": "{{capture.media}}"
+			},
+			"expectError": "leitvia_needs_human"
+		},
+		{
+			"ability": "leitvia/apply-package",
+			"user": "admin",
+			"input": {
+				"id": "{{capture.media}}"
+			},
+			"expect": {
+				"state": "applied",
+				"errors.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/get-package",
+			"input": {
+				"id": "{{capture.media}}"
+			},
+			"capture": {
+				"image": "items.0.applied.post"
+			},
+			"expect": {
+				"items.0.status": "applied"
+			}
+		},
+		{
+			"ability": "leitvia/list-media",
+			"input": {
+				"mime": "image",
+				"search": "workshop-photo"
+			},
+			"capture": {
+				"url": "items.0.url"
+			},
+			"expect": {
+				"items.length": 1,
+				"items.0.alt": "Bicycles on repair stands in a bright workshop"
+			}
+		},
+		{
+			"ability": "leitvia/create-content",
+			"input": {
+				"post_type": "page",
+				"title": "About us",
+				"slug": "about-us",
+				"status": "publish",
+				"content": "<!-- wp:paragraph -->\n<p>Speiche opened in 2015 as a two-person workshop in a former print shop.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>Today four mechanics work here, and every one of them rides to work.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:image {\"id\":{{capture.image}},\"sizeSlug\":\"full\"} -->\n<figure class=\"wp-block-image size-full\"><img src=\"{{capture.url}}\" alt=\"Bicycles on repair stands in a bright workshop\" class=\"wp-image-{{capture.image}}\"/></figure>\n<!-- /wp:image -->\n\n<!-- wp:heading -->\n<h2 class=\"wp-block-heading\">What we believe</h2>\n<!-- /wp:heading -->\n\n<!-- wp:list -->\n<ul class=\"wp-block-list\"><!-- wp:list-item -->\n<li>Repair before replace.</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li>Fair prices you know before we start.</li>\n<!-- /wp:list-item --></ul>\n<!-- /wp:list -->",
+				"featured_image": {
+					"id": "{{capture.image}}"
+				},
+				"base_hash": "",
+				"package": "migrate-speiche-content"
+			},
+			"expect": {
+				"mode": "package"
+			},
+			"capture": {
+				"content": "package"
+			}
+		},
+		{
+			"ability": "leitvia/create-content",
+			"input": {
+				"post_type": "page",
+				"title": "Our workshop",
+				"slug": "workshop",
+				"status": "publish",
+				"content": "<!-- wp:paragraph -->\n<p>Bring your bike in the morning and take it home the same evening.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2 class=\"wp-block-heading\">Prices</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>A basic service costs a fixed price that we tell you before we start.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:embed {\"url\":\"https://www.youtube.com/watch?v=aqz-KE-bpKQ\",\"type\":\"video\",\"providerNameSlug\":\"youtube\",\"responsive\":true} -->\n<figure class=\"wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube\"><div class=\"wp-block-embed__wrapper\">\nhttps://www.youtube.com/watch?v=aqz-KE-bpKQ\n</div></figure>\n<!-- /wp:embed -->",
+				"base_hash": "",
+				"package": "migrate-speiche-content"
+			},
+			"expect": {
+				"mode": "package"
+			}
+		},
+		{
+			"ability": "leitvia/update-navigation",
+			"input": {
+				"items": [
+					{
+						"label": "Home",
+						"url": "/"
+					},
+					{
+						"label": "About us",
+						"url": "/about-us/"
+					},
+					{
+						"label": "Workshop",
+						"url": "/workshop/",
+						"items": [
+							{
+								"label": "Prices",
+								"url": "/workshop/#prices"
+							}
+						]
+					}
+				],
+				"base_hash": "",
+				"package": "migrate-speiche-content"
+			},
+			"expect": {
+				"mode": "package"
+			}
+		},
+		{
+			"ability": "leitvia/apply-package",
+			"user": "admin",
+			"input": {
+				"id": "{{capture.content}}"
+			},
+			"expect": {
+				"state": "applied",
+				"errors.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/list-content",
+			"input": {
+				"post_type": "page",
+				"status": "publish",
+				"search": "workshop"
+			},
+			"expect": {
+				"items.0.slug": "workshop",
+				"items.0.package": null
+			}
+		}
+	],
+	"expect": [
+		{
+			"ability": "leitvia/list-packages",
+			"input": {
+				"state": "open"
+			},
+			"expect": {
+				"length": 0
+			}
+		},
+		{
+			"url": "/about-us/",
+			"status": 200,
+			"h1": 1,
+			"contains": [
+				"Speiche opened in 2015 as a two-person workshop in a former print shop.",
+				"Today four mechanics work here, and every one of them rides to work.",
+				"What we believe",
+				"Repair before replace.",
+				"Fair prices you know before we start.",
+				"Bicycles on repair stands in a bright workshop"
+			],
+			"absent": [
+				"parastorage",
+				"dataLayer",
+				"pixel.example",
+				"fonts.example",
+				"We use cookies"
+			]
+		},
+		{
+			"url": "/workshop/",
+			"status": 200,
+			"h1": 1,
+			"contains": [
+				"Bring your bike in the morning and take it home the same evening.",
+				"A basic service costs a fixed price that we tell you before we start.",
+				"consent"
+			],
+			"absent": [
+				"parastorage",
+				"dataLayer",
+				"pixel.example",
+				"fonts.example",
+				"We use cookies"
+			]
+		}
+	]
+}

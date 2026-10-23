@@ -2,7 +2,7 @@
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"$id": "https://leitvia.com/schemas/skill-scenario.json",
 	"title": "Leitvia skill scenario",
-	"description": "One task a human gives an agent, the ability calls that solve it without a language model and the end state they must leave. Run by packages/leitvia-skills/tests/run-scenarios.mjs against a fresh Playground. Placeholders {{capture.<name>}} in inputs take values captured by earlier steps.",
+	"description": "One task a human gives an agent, the ability calls that solve it without a language model and the end state they must leave. Run by packages/leitvia-skills/tests/run-scenarios.mjs against a fresh Playground. Placeholders {{capture.<name>}} in inputs take values captured by earlier steps, {{fixture:<path>}} the Base64 of a file under tests/fixtures/ and {{source}} the address of the served source.",
 	"type": "object",
 	"required": [ "title", "skill", "briefing", "mode", "steps", "expect" ],
 	"additionalProperties": false,
@@ -22,6 +22,31 @@
 		"mode": {
 			"description": "direct: the autonomy of the site applies. package: every write of the task goes into one change package.",
 			"enum": [ "direct", "package" ]
+		},
+		"unattended": {
+			"description": "No person answers: every checkpoint takes the answer of the section Unattended of the skill. Such a scenario has no answers and no step as admin; it ends where the skill stops without a person.",
+			"type": "boolean",
+			"default": false
+		},
+		"budget": {
+			"description": "Upper limit of the context an agent loads for this case, in tokens estimated as characters / 4: the SKILL.md of the skill (or the file of the workflow), handbook/README.md and the files listed. The runner has no language model to count real tokens, so tests/unit/skills.test.mjs checks it statically.",
+			"type": "object",
+			"required": [ "tokens" ],
+			"additionalProperties": false,
+			"properties": {
+				"tokens": { "type": "integer", "minimum": 1 },
+				"files": {
+					"description": "Further files the case needs, relative to the package, for example handbook/abilities/leitvia-apply-recipe.md.",
+					"type": "array",
+					"items": { "type": "string", "pattern": "^(skills|handbook|workflows)/[A-Za-z0-9./-]+\\.md$" },
+					"uniqueItems": true
+				}
+			}
+		},
+		"source": {
+			"description": "Folder under tests/fixtures/ with the static pages of a source site. The runner serves it over HTTP while the scenario runs; {{source}} in inputs and checks is its address.",
+			"type": "string",
+			"pattern": "^[a-z0-9-]+/[a-z0-9-]+$"
 		},
 		"tags": {
 			"description": "Labels to count scenarios apart, for example commerce for scenarios that need WooCommerce.",
@@ -109,12 +134,22 @@
 								"description": "Strings the HTML of the page must contain, for example every sentence of a migrated post.",
 								"type": "array",
 								"items": { "type": "string", "minLength": 1 }
+							},
+							"absent": {
+								"description": "Strings the HTML of the page must not contain, for example the tracker of a migrated source.",
+								"type": "array",
+								"items": { "type": "string", "minLength": 1 }
 							}
 						}
 					}
 				]
 			}
 		}
+	},
+	"if": { "required": [ "unattended" ], "properties": { "unattended": { "const": true } } },
+	"then": {
+		"not": { "required": [ "answers" ] },
+		"properties": { "steps": { "items": { "properties": { "user": { "const": "agent" } } } } }
 	},
 	"definitions": {
 		"ability": { "type": "string", "pattern": "^leitvia/[a-z0-9-]+$" },

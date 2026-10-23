@@ -5,14 +5,17 @@ description: Sets up a WordPress site with the Leitvia theme and Leitvia Studio 
 
 # leitvia-setup
 
-Turn a briefing into a working site: recipe, style variation, header, footer, navigation and the base pages, ready for a person to review. You change the site only through the abilities of Leitvia Studio. How to call them (MCP server `leitvia` or REST), hashes, autonomy levels, change packages and rejections: [agent handbook](../../handbook/README.md). Read its sections "Access over MCP and REST" and "Rejections" before the first call.
+Turn a briefing into a working site: recipe, style variation, header, footer, navigation and the base pages, ready for a person to review. You change the site only through the abilities of Leitvia Studio.
+
+Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [get-contract](../../handbook/abilities/leitvia-get-contract.md), [list-recipes](../../handbook/abilities/leitvia-list-recipes.md), [get-content-model](../../handbook/abilities/leitvia-get-content-model.md), [define-content-type](../../handbook/abilities/leitvia-define-content-type.md), [apply-recipe](../../handbook/abilities/leitvia-apply-recipe.md), [compose-page](../../handbook/abilities/leitvia-compose-page.md), [get-package](../../handbook/abilities/leitvia-get-package.md), [get-page-outline](../../handbook/abilities/leitvia-get-page-outline.md), [update-content](../../handbook/abilities/leitvia-update-content.md), [audit-site](../../handbook/abilities/leitvia-audit-site.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md). Statuses of a recipe run, shop sites and what a recipe does not cover: [recipe details](references/recipe.md).
 
 ## Ground rules
 
 - Write only through `leitvia/*` abilities. No SQL, no WP-CLI, no REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read. Reading public pages of the site and of the operator's other sites is allowed.
 - The site is the one at the address of your task, which in a multisite network can have a path (`https://example.org/club/`); every path starts there, not at the host. Call `leitvia/get-contract` first and compare `site.url` with that address; when they differ, write nothing and ask the person.
 - Mode `package` is the default for a live site: send the same `package` key on every write of the task, for example `setup-2026-10`. Use mode `direct` only when the person says the site is not live yet.
-- Never invent facts about the operator: company name, address, register entries, VAT ID, managing directors, data protection officer, server location, retention periods. Every fact you cannot confirm from a source the person named becomes a visible question to the person, never a placeholder that looks like a fact.
+- **Facts are never guessed.** Organization data, prices, legal texts, figures, quotes and people come only from a source you can name: the person, a page of the site or a read ability, with the source in your report. Without one, stop at a checkpoint; never write a placeholder that looks like a fact.
+- Here that covers company name, address, register entries, VAT ID, managing directors, data protection officer, server location and retention periods.
 - Take numbers about the site (patterns, page frames, variations, template parts) from `leitvia/get-contract` and `leitvia/list-patterns` (`total`), never from prose, marketing pages or memory.
 - A rejection is corrected at most once, following `message`, `next_ability` and `retry`. If the second call is rejected too, stop and ask the person.
 
@@ -36,7 +39,7 @@ Checkpoint "Briefing confirmed".
 
 - `leitvia/get-contract`: page frames, template parts, style variations, contrast pairs.
 - `leitvia/list-recipes`: name, pages, `available` and `reason`. A recipe with `available: false` names the plugin it needs; tell the person, do not install plugins.
-- `leitvia/get-content-model` when the briefing asks for own content types.
+- `leitvia/get-content-model` when the briefing asks for own content types (team, events, references): add them with `leitvia/define-content-type` (post type, fields, taxonomies) in the same package; their entries come later from `leitvia-page`, `leitvia-migrate` or `leitvia-news`.
 
 ### 3. Choose the recipe
 
@@ -56,20 +59,9 @@ Checkpoint "Recipe chosen".
 
 ### 4. Apply the recipe
 
-Call `leitvia/apply-recipe` with `recipe` and your `package` key. With a key nothing goes live: every part lands in that one change package, whatever the autonomy of the site allows. In mode `direct` send no key; then the autonomy levels decide and what they hold back still lands in one package. It runs content model, token set, style variation, header and footer, pages, navigation, reading settings and the options that save data, each through its own ability. Read the `steps` of the result:
+Call `leitvia/apply-recipe` with `recipe` and your `package` key. With a key nothing goes live: every part lands in that one change package, whatever the autonomy of the site allows. In mode `direct` send no key; then the autonomy levels decide and what they hold back still lands in one package. Read the `steps` of the result (statuses: [recipe details](references/recipe.md#status-of-a-step)).
 
-| Status | Meaning |
-|---|---|
-| `live` | Written and visible. |
-| `draft` | Written as a draft; a person publishes it. |
-| `package` | Waits in the change package (ID in `package` of the result). |
-| `exists` | The page or setting is already there; nothing changed. |
-| `waiting` | Needs a page that is neither on the site nor in the package (`page_missing`), or a parent page. |
-| `rejected`, `unavailable` | Read `code` and `message`; report it. |
-
-Recipe pages, header and footer are built from patterns and carry their sample texts: invented names, addresses, phone numbers, prices, figures and quotes. Read the diff of the package (`leitvia/get-package`) and list every such text with its page before the person applies it, so they know what goes live; replacing them is work for `leitvia-page` and the person's facts after the setup, not a reason to rebuild the recipe by hand. On a site that is already live, ask whether the package should wait until those texts are replaced.
-
-Settings that point to recipe pages (front page, privacy policy page, terms page of the shop) wait in the same package and get the ID of their page when the person applies it, so one package covers the whole setup. Review the package with `leitvia/get-package` and tell the person what it contains and that it needs their decision in the inbox of Leitvia Studio. You cannot apply operations of areas that are not autonomous; `leitvia/apply-package` answers `leitvia_needs_human` and that is expected.
+The recipe pages carry the sample texts of their patterns. Read the diff with `leitvia/get-package` and list every sample text with its page before the person applies the package ([recipe details](references/recipe.md#sample-texts-of-the-recipe)). Tell the person what the package contains and that it needs their decision in the inbox of Leitvia Studio.
 
 Checkpoint "Package applied".
 
@@ -92,21 +84,7 @@ Checkpoint "Legal texts supplied by the human".
 - `leitvia/audit-site` (pass `next` as `after` until `next` is null): every item without findings.
 - Fetch the public URL of every page the recipe created and the front page: status 200 and exactly one `h1`. A 404 often means the page waits in a package or stayed a draft.
 - `leitvia/list-packages` with `state` `open`: empty when the person applied everything.
-
-## Shop sites
-
-- WooCommerce must be active before `leitvia/apply-recipe` with `leitvia/shop`; otherwise the recipe is `unavailable` with the reason. Installing plugins is a task for the person.
-- The recipe switches off order attribution, usage tracking, marketplace suggestions and remote logging of WooCommerce (options in the package). Confirm in the final recipe run that these steps report `exists`.
-- The shop, cart, checkout and account pages come from WooCommerce itself. Check that they answer 200 after setup; the recipe adds `shop` to the navigation only when that page is published.
-- Prices, taxes and shipping are not part of setup. Products belong to the person or to later tasks.
-
-## What a recipe does not cover
-
-Tell the person about these points; there is no ability for them:
-
-- Avatars: WordPress loads avatars from Gravatar, a third party, unless the person switches avatars off in Settings, Discussion. Recommend switching them off.
-- A page in another language than the site needs its own document language; core has no per-page setting.
-- Plugins, users, the site title, the logo and the permalink structure are admin settings for the person.
+- For a shop, the WooCommerce pages and the privacy options: [recipe details](references/recipe.md#shop-sites). Tell the person what a recipe does not cover (avatars, page language, admin settings): [recipe details](references/recipe.md#what-a-recipe-does-not-cover).
 
 ## Checkpoints
 
@@ -118,3 +96,15 @@ Stop and wait for the person at each of these points. Report what you did, what 
 4. **Package applied:** the person reviewed and applied the change package in the inbox. Confirm the setup afterwards (step 5); the package of the legal texts is the same checkpoint.
 
 Also stop after the second rejection of the same call, and whenever two sources of the operator contradict each other.
+
+## Unattended
+
+When no person answers (a scheduled or hosted run), do not wait at a checkpoint. Send the `package` key on every write, also in mode `direct`; never apply, roll back or publish anything. Take facts only from a source you name in the report (briefing, a page of the site, a read ability); without one the fact stays out and becomes an open question. A second rejection, or `retry: never`, stops that part. End with the package ID, what it holds and the open questions. Each checkpoint gets this answer:
+
+| Checkpoint | Answer without a person |
+|---|---|
+| Briefing confirmed | Take operator, kind of site and fixed URLs from the briefing only; mode is `package`. When the kind of site is missing, stop. |
+| Recipe chosen | The recipe the table of step 3 names for the kind of site in the briefing; when two fit, stop. |
+| Legal texts supplied by the human | Keep the placeholders; list the legal pages as open. |
+| Package applied | Stop after step 4; the package waits for a person. Steps 5 to 7 belong to the next run. |
+| Contradicting sources | Write neither value; list both with their sources. |

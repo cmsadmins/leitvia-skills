@@ -6,15 +6,13 @@ compatibility: Needs a site with the theme Leitvia and the plugin Leitvia Studio
 
 # leitvia-a11y
 
-You check a site for barriers, remove the ones the abilities can remove and say clearly which ones remain and which ones no tool can judge. You change the site only through the abilities of Leitvia Studio. How to call them, hashes, autonomy levels, change packages and rejections: [agent handbook](../../handbook/README.md). Read its sections "Access over MCP and REST", "Write results" and "Rejections" before the first call.
+You check a site for barriers, remove the ones the abilities can remove and say clearly which ones remain and which ones no tool can judge. You change the site only through the abilities of Leitvia Studio.
+
+Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [audit-site](../../handbook/abilities/leitvia-audit-site.md), [get-tokens](../../handbook/abilities/leitvia-get-tokens.md), [get-page-outline](../../handbook/abilities/leitvia-get-page-outline.md), [get-block](../../handbook/abilities/leitvia-get-block.md), [set-alt-text](../../handbook/abilities/leitvia-set-alt-text.md), [update-block](../../handbook/abilities/leitvia-update-block.md), [update-content](../../handbook/abilities/leitvia-update-content.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md), [get-package](../../handbook/abilities/leitvia-get-package.md). Fixes, manual tests and the accessibility statement: [check details](references/checks.md).
 
 ## Access
 
-- **MCP:** server `leitvia` at `POST /wp-json/leitvia-studio/v1/mcp`. Call `initialize` first and send its `Mcp-Session-Id` header plus `MCP-Protocol-Version` (for example `2025-06-18`) on every further request, or the server answers 400. Tool names use a hyphen where the ability has a slash: `leitvia-audit-site` for `leitvia/audit-site`.
-- **REST:** `/wp-json/wp-abilities/v1/abilities/<name>/run`. Read abilities take GET with `?input[post]=...`, the write abilities of this skill take POST with the body `{"input": {...}}`.
-- Paths start at the address of the site, not at the host: on `https://example.org/club/` the MCP server is `https://example.org/club/wp-json/leitvia-studio/v1/mcp`. Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person.
-- Sign in with HTTP Basic auth as the agent user and its application password. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read: the abilities give you every ID, hash and status you need. Reading public pages of the site is fine and part of the check.
-- On a site where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after each write.
+MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Paths start at the address of the site, not at the host. Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read: the abilities give you every ID, hash and status you need. Reading public pages of the site is fine and part of the check. Where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after each write.
 
 ## Modes
 
@@ -29,6 +27,7 @@ In mode `package` every fix waits in the package, alt text included. In mode `di
 - **Several writes to one post** in the same package build on each other: each write sends the `hash` of `leitvia/get-page-outline` as usual, changes the post as your earlier writes in the package left it, and the person applies them in order. Several text fixes of one post still fit into one `leitvia/update-content` call.
 - **Only what a write brings counts.** Every write runs the content checks over the full post, but findings the post already had do not block it. A write that adds a finding or makes one worse is rejected with `leitvia_check_failed` and names it.
 - A rejection is corrected at most once, following `message`, `next_ability` and `retry`. If the second call is rejected too, or `retry` is `never`, stop and tell the person.
+- **Facts are never guessed.** Organization data, prices, legal texts, figures, quotes and people come only from a source you can name: the person, a page of the site or a read ability, with the source in your report. Without one, stop at a checkpoint; never write a placeholder that looks like a fact.
 - The theme comes with its own test report; it covers the theme, not the content of this site. Judge the site by what you find on the site.
 
 ## Steps
@@ -56,21 +55,11 @@ Keep this list: it is the "before" of your report.
 
 ### 3. Fix through the pipeline
 
-Read the post with `leitvia/get-page-outline` (`hash`, block IDs) and the block with `leitvia/get-block` (attributes, markup). Then:
-
-- **Alt text:** write it yourself from what the image shows and why it is on the page: one short sentence in the language of the page, no "image of", no file names. Text in an image belongs into the alt text. `leitvia/set-alt-text` with `image` (the `attributes.id` of the block), `alt`, `post`, `block` and `base_hash`. When the AI plugin of WordPress offers the ability `ai/alt-text-generation` and the person agreed that images go to the AI provider of the site, use it for a first draft and correct it before you send it.
-- **Decorative images:** an image whose meaning the text around it already carries gets an empty alt and the mark: `leitvia/update-block` with `image: { "id": <attachment>, "decorative": true }`.
-- **Link texts:** the link text names the target. For a text with one link use `leitvia/update-block` with `text` (the whole new text), `link_text` (the part that stays linked) and `url` when the target changes. A link to `#` needs the real target; when you cannot find it on the site, ask (checkpoint **Link targets**).
-- **Empty headings:** give them text with `leitvia/update-content` (`blocks` with `block` and `text`), or ask the person what the section is about.
-- **Heading levels:** a skipped level or a second h1 gets the level that fits the outline: `leitvia/update-block` with `attributes: { "level": <n> }` (1 to 6), for example h3 after h1 becomes h2. Work from the top of the page down, so each fix sees the level before it. A heading that is missing altogether needs its text from the person.
-
-In mode `package`, send every write with the `package` key of the check.
+Alt text, decorative images, link texts, empty headings and heading levels, each with its ability: [fixes](references/checks.md#fixes). In mode `package`, send every write with the `package` key of the check.
 
 ### 4. What the abilities cannot fix
 
-- **Landmarks and the h1 of a template:** template work for a person in the Site Editor.
-- **Classic content, Custom HTML blocks, blocks of other plugins:** report them; agents may not write them.
-- **Palette contrast:** skill `leitvia-design`.
+Landmarks and the h1 of a template, classic content and blocks of other plugins, and the palette: report them ([check details](references/checks.md#what-the-abilities-cannot-fix)).
 
 ### 5. After the person applied the package
 
@@ -78,21 +67,11 @@ In mode `package`, send every write with the `package` key of the check.
 
 ### 6. What only a person can test
 
-No ability and no automated check decides these. List each one that applies to the checked pages, with the page:
-
-- **Screen readers:** reading order, names, roles and states as heard with NVDA and Firefox, VoiceOver and Safari, TalkBack on Android.
-- **Keyboard and focus** across the whole page, including menus, dialogs and widgets of other plugins.
-- **Meaning of alt texts and link texts:** whether your texts say what matters on this page.
-- **Plain language and easy-to-read language** (Leichte Sprache): whether the texts are understandable for the audience, and whether the site needs an easy-to-read version (BITV 2.0 asks public bodies for one).
-- **Language changes** inside a text: passages in another language need `lang` on their element, which no ability sets.
-- **Videos and audio:** captions, audio description, transcripts; media embedded from other hosts also need a consent placeholder.
-- **Forms of other plugins** (contact forms, newsletter, shop checkout): labels, error messages, keyboard use; the checks of Studio do not see them.
-- **Documents:** PDF and office files linked from the pages.
-- **Zoom and reflow:** 200 % text zoom and 400 % zoom at 320 px width on the real content.
+Screen readers, keyboard and focus, the meaning of your texts, plain and easy-to-read language, language changes, media, forms of other plugins, documents, zoom and reflow. List each that applies, with the page: [manual tests](references/checks.md#manual-tests).
 
 ### 7. Accessibility statement
 
-A page with the page kind `accessibility` is a legal text: changes wait for a person, and its content comes from the person. Derive the state of the site from the site: what you found, what stays open, which manual tests are missing. Do not copy the test report of the theme into it. Leave legal statements (enforcement body, contact for feedback) to the person.
+The page kind `accessibility` is a legal text; its content and legal statements come from the person ([accessibility statement](references/checks.md#accessibility-statement)).
 
 ## Report
 
@@ -114,3 +93,16 @@ Stop and ask the person, then continue with the answer:
 - **Package applied:** the person reviews and applies the package in the inbox.
 - **Second rejection** of the same call, or a rejection with `retry: never`.
 - **Accessibility statement:** facts and legal statements come from the person.
+
+## Unattended
+
+When no person answers (a scheduled or hosted run), do not wait at a checkpoint. Send the `package` key on every write, also in mode `direct`; never apply, roll back or publish anything. Take facts only from a source you name in the report (briefing, a page of the site, a read ability); without one the fact stays out and becomes an open question. A second rejection, or `retry: never`, stops that part. End with the package ID, what it holds and the open questions. Each checkpoint gets this answer:
+
+| Checkpoint | Answer without a person |
+|---|---|
+| Scope | Every published page and post. |
+| Link targets | Fix only links whose target is clear on the site; list the others with page and link text. |
+| AI for alt text | No: images go to no AI provider. Write alt texts yourself or list the image as open. |
+| Package applied | Stop after step 4; the audit after belongs to the next run. |
+| Second rejection | Stop that fix; report code and message. |
+| Accessibility statement | Do not change it; list what it should say as a question. |

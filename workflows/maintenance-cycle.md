@@ -13,6 +13,8 @@ Ask the person once, before the first write, and keep the answer for the whole r
 
 Every rejection is corrected at most once (follow `message`, `next_ability` and `retry`); a second rejection of the same call, or `retry: never`, is a checkpoint: stop and show the person the rejection.
 
+When no person answers, the workflow runs in several unattended runs with the same key. Each checkpoint takes the answer of the section Unattended of its skill, and every write carries the key. A run ends at the next checkpoint "Package applied" with its report. The next run starts with `leitvia/list-packages`: while the package of the key is still `open`, it reports that it waits and writes nothing; once a person applied it, the run goes on with the step after that checkpoint. Nothing goes live without a person applying a package.
+
 ## Steps
 
 ### 1. Maintenance

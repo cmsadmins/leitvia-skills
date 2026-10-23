@@ -6,15 +6,13 @@ compatibility: Needs a site with the theme Leitvia and the plugin Leitvia Studio
 
 # leitvia-page
 
-You turn a goal and a few content points into a page that reads as designed: a clear opening, sections that alternate in tone and layout, one accent at most, real texts and real links. You build it only through the Leitvia abilities. The agent handbook (`handbook/README.md` in this package) lists every ability with its input, output and rejections; read its sections on access, hashes, autonomy and rejections once before your first call.
+You turn a goal and a few content points into a page that reads as designed: a clear opening, sections that alternate in tone and layout, one accent at most, real texts and real links. You build it only through the Leitvia abilities.
+
+Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [get-contract](../../handbook/abilities/leitvia-get-contract.md), [list-patterns](../../handbook/abilities/leitvia-list-patterns.md), [plan-page](../../handbook/abilities/leitvia-plan-page.md), [check-composition](../../handbook/abilities/leitvia-check-composition.md), [get-pattern](../../handbook/abilities/leitvia-get-pattern.md), [add-media](../../handbook/abilities/leitvia-add-media.md), [compose-page](../../handbook/abilities/leitvia-compose-page.md), [get-page-outline](../../handbook/abilities/leitvia-get-page-outline.md), [audit-site](../../handbook/abilities/leitvia-audit-site.md). Composition rules, templates, edits and later changes: [composition details](references/composition.md). Texts, links and images: [content rules](references/content.md).
 
 ## Access
 
-- **MCP:** server `leitvia` at `POST /wp-json/leitvia-studio/v1/mcp`. Call `initialize` first and send its `Mcp-Session-Id` header plus `MCP-Protocol-Version` (for example `2025-06-18`) on every further request, or the server answers 400. Tool names use a hyphen where the ability has a slash: `leitvia-plan-page` for `leitvia/plan-page`.
-- **REST:** `/wp-json/wp-abilities/v1/abilities/<name>/run`. Read abilities take GET with `?input[goal]=...`, all abilities this skill writes with take POST with the body `{"input": {...}}`.
-- Paths start at the address of the site, not at the host: on `https://example.org/club/` the MCP server is `https://example.org/club/wp-json/leitvia-studio/v1/mcp`. Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person.
-- Sign in with HTTP Basic auth as the agent user and its application password. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read: the abilities give you every ID, hash and status you need. Reading public pages of the site is fine.
-- On a site where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after each write, so the checks after the write land in the audit log.
+MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Paths start at the address of the site, not at the host. Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read: the abilities give you every ID, hash and status you need. Reading public pages of the site is fine. Where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after each write.
 
 ## Modes
 
@@ -23,11 +21,17 @@ You turn a goal and a few content points into a page that reads as designed: a c
 
 The result of every write says what happened in `mode`: `live`, `draft`, `package` or `unchanged`. Report it as it is; never claim a page is live when the result says `draft` or `package`.
 
+## Ground rules
+
+- **Facts are never guessed.** Organization data, prices, legal texts, figures, quotes and people come only from a source you can name: the person, a page of the site or a read ability, with the source in your report. Without one, stop at a checkpoint; never write a placeholder that looks like a fact.
+- Here that covers prices, legal texts (imprint, privacy, terms, withdrawal, accessibility statement), company name, address, phone, e-mail, register numbers, opening hours, figures, testimonials and team members. Missing facts are a visible question in your report, not a placeholder on the page.
+- Replace every sample text of every pattern you use, and never fill a slot with an assumption about the business ([content rules](references/content.md#texts)).
+
 ## Steps
 
 ### 1. Clarify the brief
 
-Collect, before any call: the goal of the page (what should a visitor do), the content points, the audience, the language of the page, the links the buttons should lead to, and the images you may use. Facts you do not have stay open questions (see Texts). Then read:
+Collect, before any call: the goal of the page (what should a visitor do), the content points, the audience, the language of the page, the links the buttons should lead to, and the images you may use. Facts you do not have stay open questions. Then read:
 
 - `leitvia/get-contract`: `pageFrames` (frame types, their template and slots), `compositionRules`, `templates`, `roles` and `blockStyles`.
 - `leitvia/list-patterns`: filter by `role`, `tone` or `layout`; each item has `composition`, `images`, `useWhen`, `avoidWhen`, `status` and `replacedBy`. Use only patterns with `status` `approved`: `leitvia/compose-page` refuses a Lab pattern (`block:<ID>`) in draft or review with `leitvia_pattern_not_approved`.
@@ -38,50 +42,25 @@ Call `leitvia/plan-page` with `goal`, `points` and `frame` (`home`, `service`, `
 
 The plan gives per section the pattern, its role, its slot, text lengths (`length.heading`, `length.text` in characters) and the points it carries. Treat it as a first outline, not as the answer. Replace a planned section when:
 
-- it needs facts nobody gave you: prices (`leitvia/offer-pricing-3`, `leitvia/content-price-list`), figures (`leitvia/content-stats`), customer quotes and testimonials (`leitvia/content-quote`, `leitvia/proof-testimonial`), logos, team members;
-- it has texts you cannot replace (see Texts), for example a caption;
+- it needs facts nobody gave you ([patterns that need facts](references/composition.md#patterns-that-need-facts));
+- it has texts you cannot replace, for example a caption;
 - its `avoidWhen` matches your content, or it needs an image you do not have.
 
 Pick the replacement with the same `role` from `leitvia/list-patterns`, and prefer the one whose `tone` and `layout` differ from both neighbors. Show the outline (section, pattern, what it says) to the person before you build: checkpoint **Outline confirmed**.
 
 ### 3. Score before you build
 
-Call `leitvia/check-composition` with the pattern slugs in page order and the `template` of the frame. The rules of the contract:
-
-- no two neighbors with the same layout and tone (`noAdjacentRepeat`);
-- a break at least every three sections: an image, accent or ink tone, a full bleed layout or `leitvia/content-quote` (`breakWithin`, `breakWhen`);
-- accent sections at least two sections apart (`accentMinGap`), and in practice one accent band per page;
-- at most two sections of the same density in a row (`maxDensityRun`);
-- a hero only as the first section and only on a template without a printed title (`heroFirstOnly`, `heroTemplate`);
-- at most `maxSections` sections; frames (header, footer) do not count.
-
-The page starts at 100 and loses the points in `compositionRules.scoring` per finding. `min_score` (80 by default) is the score below which a write is held for a person.
+Call `leitvia/check-composition` with the pattern slugs in page order and the `template` of the frame. The rules and the scoring: [composition details](references/composition.md#rules). `min_score` (80 by default) is the score below which a write is held for a person.
 
 Below `min_score`: revise the outline **once**. Use `suggestions`: each names the section index and up to three patterns of the same role that remove the finding (`replace_with`); take the first one whose needs you can meet (an image, facts). Score the revised outline again. Score two outlines, the first and the revision, not a series of variants in search of a higher score; a revision at or above `min_score` is the outline you show. Still below `min_score`: stop and show the person both outlines with their findings. Never pad a page with sections it does not need to raise the score.
 
-The narrative order of the roles is `hook`, `context`, `proof`, `detail`, `offer`, `close` (`compositionRules.narrative`): open with the promise, explain, prove, go into detail, make the offer, close with the next step. Section padding already follows the density of each pattern; do not change spacing.
-
 ### 4. Fill the sections
 
-For each section call `leitvia/get-pattern` and read its markup. Edits address blocks by path ID: `p:0` is the root block of the pattern, `p:0.1` its second child, `p:0.3.0` the first child of the fourth child, counted over blocks only (block comments, not HTML elements). One edit per block, with:
-
-- `text`: plain text of a paragraph, heading, list item or button. Setting the text of a paragraph that holds a link drops the link; write a sentence that stands on its own.
-- `url`: the link of a button.
-- `image`: `{ "id": <attachment>, "alt": "..." }` or `{ "id": <attachment>, "decorative": true }` for an image or cover block.
-
-See Texts, Links and Images below before you write the edits.
+For each section call `leitvia/get-pattern` and read its markup. Write one edit per block by path ID with `text`, `url` or `image` ([edits](references/composition.md#edits)), following the [content rules](references/content.md) for texts, links and images.
 
 ### 5. Build the page
 
-Call `leitvia/compose-page` with `title`, `frame`, `sections` (`pattern` and `edits` each), `base_hash: ""`, an optional `slug`, and `package`. `template` only when the person asked for another page template of the contract (for example `page-docs`); `kind` only for legal, editorial, contact or authors pages. Each section keeps `metadata.patternName`, so the composition can be checked later.
-
-Templates and the h1:
-
-- `page-landing` (frames `home`, `service`, `about`) prints no title: the hero carries the only h1.
-- `page` (frame `contact`) prints the title as h1: start the content with h2 and do not use a hero.
-- `page-docs` prints the title as h1 and a page list.
-- A page needs exactly one h1; the structure check rejects a write with none or several.
-- Width and edge come from the template (`layout` in the contract): head and running text start on one left edge, the wide edge, at most `contentSize` wide. Never center running text and never set `align`, `contentSize` or a max width on a block; `wide` and `full` come with the patterns for media, grids and bands.
+Call `leitvia/compose-page` with `title`, `frame`, `sections` (`pattern` and `edits` each), `base_hash: ""`, an optional `slug`, and `package`. `template` only when the person asked for another page template of the contract (for example `page-docs`); `kind` only for legal, editorial, contact or authors pages. Each section keeps `metadata.patternName`, so the composition can be checked later. Exactly one h1 per page; which template prints the title: [templates and the h1](references/composition.md#templates-and-the-h1).
 
 On a rejection follow its `message` and `next_ability` and correct the call **once** (`retry: once`). A second rejection of the same call, or any `retry: never`, is a checkpoint: stop and tell the person the code and message. `leitvia_rate_limited` means wait `after:<seconds>` and repeat.
 
@@ -93,36 +72,9 @@ On a rejection follow its `message` and `next_ability` and correct the call **on
 - `leitvia/audit-site` for published pages: pass the ID before the page as `after` and `limit: 1`, or page through with `next`. The page needs no findings.
 - When the page is live, open its public URL and check that it answers 200 and has one h1.
 
-Report: page ID, URL, `mode` of the write, score, open findings, the open questions from your texts and the package ID if there is one.
+A post or an entry of a post type of the content model is no page: `leitvia/compose-page` creates pages only. For those, [`leitvia/create-content`](../../handbook/abilities/leitvia-create-content.md) takes `post_type`, the `sections` of the outline (or `content` as block markup), `terms` and `fields`, with the same `package` key.
 
-## Texts
-
-- Replace every sample text of every pattern you use. Sample copy left on a page publishes fiction: invented names, figures, addresses, phone numbers and quotes.
-- Never invent facts. Prices, legal texts (imprint, privacy, terms, withdrawal, accessibility statement), organization data (company name, address, phone, e-mail, register numbers, opening hours), figures, testimonials and team members come from the person. Missing facts are a visible question in your report, not a placeholder on the page.
-- A pattern with more slots than you have facts (a strip of five items for four points, a step the briefing does not describe) gets a pattern with fewer slots, or the slot repeats a fact the person gave you. Never fill it with an assumption about the business, even one you flag in the report.
-- Some blocks hold text you cannot change with an edit: a caption, or a text with more than one link. Use those patterns only when their sample text fits, otherwise choose another pattern of the same role. The attribution of a quote (`cite`) and the question of a details block (`summary`) take a `text` edit at the quote or details block itself.
-- Keep to the text lengths of the plan; a hero heading of 120 characters breaks the layout the pattern was made for.
-- Write in the language of the page. In German headings, compound words longer than about 18 characters need soft hyphens (U+00AD) at the joints, or they overflow at 320 px.
-- A page in another language than the site needs its own document language. Core has no setting per page; tell the person, who decides on a language plugin.
-- Never put review notes or HTML comments into block markup. Open questions go into your report.
-
-## Links
-
-- Every link and button needs a real target: a page of the site, an `https` URL, `mailto:` or `tel:`. A link to `#` is rejected by the link text check; so is link text that does not name its target.
-- Button texts name the action and the target ("Book a repair by e-mail", not "Click here").
-- A text with one link, such as a contact line "Write to hello@example.com", keeps its link: send `text`, `link_text` (the part that stays linked) and `url` in one edit. A text that would drop a link with a real target is rejected with `leitvia_invalid_input`; a sample link to `#` may be replaced by plain text.
-- Only link to pages that exist. When a target page is missing, build it first or ask.
-
-## Images
-
-- Images come from the media library. Add one with `leitvia/add-media` (Base64 data with a file name, or a URL of this site) and an `alt` that describes it, or `decorative: true` when the text around it carries the meaning. URLs of other hosts are rejected and never fetched. A file the person handed you goes over REST: a short script reads it, encodes it and posts `{"input": {"data": ..., "filename": ..., "alt": ...}}`, so the Base64 never passes through your own output. Look at the image before you write its alt text; when it does not show what the briefing says, ask instead of describing the briefing.
-- Use the attachment ID in the `image` edit with the same alt text or `decorative: true` (stored as `metadata.leitviaDecorative`). An image without alt and without that flag is rejected.
-- Sample images of a pattern come with a sample alt text that describes the sample picture. Replace the image, or choose a pattern without an image slot.
-- `images` in `leitvia/list-patterns` gives aspect ratio and recommended size per slot.
-
-## After the page exists
-
-Later changes go through `leitvia/update-content` (texts, title, button links of several blocks), `leitvia/update-block` (attributes, one image) and `leitvia/set-alt-text`, each with the `hash` of `leitvia/get-page-outline` as `base_hash`. To change the order or the set of sections, compose a new page and let the person swap them. New section designs belong to the skill `leitvia-pattern`.
+Report: page ID, URL, `mode` of the write, score, open findings, the open questions from your texts and the package ID if there is one. Later changes to the page: [after the page exists](references/composition.md#after-the-page-exists).
 
 ## Checkpoints
 
@@ -134,3 +86,17 @@ Stop and ask the person, then continue with the answer:
 - **Score still too low:** below `min_score` after the one revision.
 - **Second rejection** of the same call, or a rejection with `retry: never`.
 - **Held for a person:** the result says `package` or `draft` and the person expected a live page. Give the package ID; a person applies it in the inbox.
+
+## Unattended
+
+When no person answers (a scheduled or hosted run), do not wait at a checkpoint. Send the `package` key on every write, also in mode `direct`; never apply, roll back or publish anything. Take facts only from a source you name in the report (briefing, a page of the site, a read ability); without one the fact stays out and becomes an open question. A second rejection, or `retry: never`, stops that part. End with the package ID, what it holds and the open questions. Each checkpoint gets this answer:
+
+| Checkpoint | Answer without a person |
+|---|---|
+| Brief unclear | No goal in the briefing: stop. Missing link targets: leave the button out or link a page of the site the briefing names. Language: the language of the site from `leitvia/get-contract`. |
+| Outline confirmed | Build the outline at or above `min_score` without waiting; list it in the report. |
+| Facts from the person | Choose patterns without the missing facts; list each missing fact as a question. |
+| Score still too low | Build nothing; report both outlines with their findings. |
+| Second rejection | Build nothing for this page; report code and message. |
+| Held for a person | Expected: the page waits in the package; report its ID. |
+| New images | An image added with `leitvia/add-media` waits in the package and has no ID before a person applies it: choose a pattern without an image slot, or leave the page for the next run. |
