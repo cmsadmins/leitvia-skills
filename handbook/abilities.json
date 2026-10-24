@@ -1,5 +1,5 @@
 {
-	"studio": "1.1.0",
+	"studio": "1.1.1",
 	"abilities": [
 		{
 			"name": "leitvia/activate-token-set",
@@ -768,6 +768,14 @@
 							"publish",
 							"future"
 						]
+					},
+					"comment_status": {
+						"type": "string",
+						"enum": [
+							"open",
+							"closed"
+						],
+						"description": "Whether visitors may comment; without it a new post takes the default of the site."
 					},
 					"ai_generated": {
 						"type": "boolean",
@@ -2959,7 +2967,7 @@
 		{
 			"name": "leitvia/update-content",
 			"label": "Update content",
-			"description": "Updates title, excerpt, slug, date, terms, fields, featured image and the texts and button links of several blocks of one post in one operation, blocks found by their ID from the outline. Terms, fields and featured image follow the rules of leitvia/create-content; terms replace those of their taxonomy. Instead of blocks, content replaces the whole content with block markup, for example to turn classic content into blocks; the new content may hold no classic block. Read the post with leitvia/get-page-outline first and send its hash as base_hash. A slug change is a URL change and lands at most as a suggestion; after one, leitvia/repair-links with auto points the links of other posts to the new address. For attributes or images of a block use leitvia/update-block.",
+			"description": "Updates title, excerpt, slug, date, terms, fields, featured image, comment status and the texts and button links of several blocks of one post in one operation, blocks found by their ID from the outline. Terms, fields and featured image follow the rules of leitvia/create-content; terms replace those of their taxonomy. Instead of blocks, content replaces the whole content with block markup, for example to turn classic content into blocks; the new content may hold no classic block. Read the post with leitvia/get-page-outline first and send its hash as base_hash. A slug change is a URL change and lands at most as a suggestion; after one, leitvia/repair-links with auto points the links of other posts to the new address. For attributes or images of a block use leitvia/update-block.",
 			"category": "leitvia",
 			"group": "maintain",
 			"input_schema": {
@@ -3054,6 +3062,14 @@
 							}
 						},
 						"additionalProperties": false
+					},
+					"comment_status": {
+						"type": "string",
+						"enum": [
+							"open",
+							"closed"
+						],
+						"description": "Whether visitors may comment; without it a new post takes the default of the site."
 					},
 					"base_hash": {
 						"type": "string",

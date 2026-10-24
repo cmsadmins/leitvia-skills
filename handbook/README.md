@@ -1,6 +1,6 @@
 # Leitvia agent handbook
 
-Generated from Leitvia Studio 1.1.0. Do not edit.
+Generated from Leitvia Studio 1.1.1. Do not edit.
 
 Everything an agent needs to work on a WordPress site with Leitvia Studio through its 41 abilities: how to call them, how hashes, autonomy and change packages work, what a rejection means and what each ability takes and returns. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call; it holds the rules every skill relies on and the index of all abilities.
 
@@ -171,6 +171,6 @@ Texts, links, alt text, deprecated patterns, products and change packages of exi
 | [`leitvia/rollback`](abilities/leitvia-rollback.md) | POST | Rolls back the applied operations of a change package from their snapshots. |
 | [`leitvia/set-alt-text`](abilities/leitvia-set-alt-text.md) | POST | Sets the alt text of an image: without post and block on the attachment in the media library, with post and block on one image or cover block that shows the image. |
 | [`leitvia/set-merchandising`](abilities/leitvia-set-merchandising.md) | POST | Sets the featured flag, the upsells, the cross-sells and the sort order of one product. |
-| [`leitvia/update-content`](abilities/leitvia-update-content.md) | POST | Updates title, excerpt, slug, date, terms, fields, featured image and the texts and button links of several blocks of one post in one operation, blocks found by their ID from the outline. |
+| [`leitvia/update-content`](abilities/leitvia-update-content.md) | POST | Updates title, excerpt, slug, date, terms, fields, featured image, comment status and the texts and button links of several blocks of one post in one operation, blocks found by their ID from the outline. |
 | [`leitvia/update-product`](abilities/leitvia-update-product.md) | POST | Updates texts, status, images, categories and tags of one product or variation, and its prices, tax and shipping class. |
 | [`leitvia/update-product-category`](abilities/leitvia-update-product-category.md) | POST | Updates name, description, parent and image of a product category, or name and description of a product tag. |

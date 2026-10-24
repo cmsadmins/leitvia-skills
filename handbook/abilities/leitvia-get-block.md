@@ -1,6 +1,6 @@
 # leitvia/get-block
 
-Generated from Leitvia Studio 1.1.0. Do not edit. Group: Read. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.1.1. Do not edit. Group: Read. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **Get block.** Returns one block of a post by its ID or path ID with all attributes, its own markup, the attachments of the images in that markup, its hash, the IDs of its children and the document hash. Classic content without blocks is one block p:0 named core/freeform.
 

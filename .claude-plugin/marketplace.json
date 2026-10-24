@@ -1,0 +1,14 @@
+{
+	"name": "leitvia",
+	"description": "Agent skills for WordPress sites with the theme Leitvia and the plugin Leitvia Studio.",
+	"owner": {
+		"name": "CMS ADMINS",
+		"url": "https://leitvia.com/"
+	},
+	"plugins": [
+		{
+			"name": "leitvia-skills",
+			"source": "./"
+		}
+	]
+}

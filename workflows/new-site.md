@@ -9,14 +9,14 @@ Chain: [leitvia-setup](../skills/leitvia-setup/SKILL.md), then [leitvia-design](
 An empty WordPress installation has neither the theme nor Leitvia Studio, and installing them is no ability: the area `admin` stays locked for agents. The operator, or the script that starts an unattended run, prepares the site once with WP-CLI on the server (WordPress 7.1 or later, PHP 8.2 or later, HTTPS):
 
 ```sh
-wp theme install https://github.com/cmsadmins/leitvia/releases/download/1.0.1/leitvia-1.0.1.zip --activate
-wp plugin install https://github.com/cmsadmins/leitvia-studio/releases/download/1.1.0/leitvia-studio-1.1.0.zip --activate
+wp theme install https://github.com/cmsadmins/leitvia/releases/download/1.0.2/leitvia-1.0.2.zip --activate
+wp plugin install https://github.com/cmsadmins/leitvia-studio/releases/download/1.1.1/leitvia-studio-1.1.1.zip --activate
 wp plugin install https://downloads.wordpress.org/plugin/mcp-adapter.0.7.1.zip --activate
 wp user create leitvia-agent agent@example.org --role=leitvia_agent --display_name="Leitvia agent"
 wp user application-password create leitvia-agent "leitvia agent" --porcelain
 ```
 
-The last command prints the application password once; store it as `LEITVIA_AUTH` (Base64 of `leitvia-agent:<password>`) for the agent, never in a file you commit. For a shop also `wp plugin install woocommerce --activate` before the run. The agent itself never runs WP-CLI; its first call is `leitvia/get-contract`, which proves the bootstrap worked.
+Once the theme and Leitvia Studio are listed on WordPress.org, `wp theme install leitvia --activate` and `wp plugin install leitvia-studio --activate` replace the first two lines. Keep MCP Adapter at 0.7, the version Leitvia Studio supports. The last command prints the application password once; store it as `LEITVIA_AUTH` (Base64 of `leitvia-agent:<password>`) for the agent, never in a file you commit. For a shop also `wp plugin install woocommerce --activate` before the run. The agent itself never runs WP-CLI; its first call is `leitvia/get-contract`, which proves the bootstrap worked.
 
 ## Choose the mode at the start
 

@@ -44,7 +44,7 @@ Tell the person which existing patterns you looked at and why they do not fit: c
 
 ### 2. Write new markup
 
-Start from the markup of the closest existing pattern and follow every [markup rule](references/markup.md#markup-rules): colors only as roles from `pairs`, spacing and sizes only as presets, never raw values, block styles of the contract, one root block with `metadata.name`, width only through `align`, headings from h2, real link targets, images from the media library, no scripts or Custom HTML, every text editable by a page edit.
+Start from the markup of the closest existing pattern and follow every [markup rule](references/markup.md#markup-rules): colors only as roles from `pairs`, spacing and sizes only as presets, never raw values, block styles of the contract, attribute keys in the order the editor saves them, one root block with `metadata.name`, width only through `align`, headings from h2, real link targets, images from the media library, no scripts or Custom HTML, every text editable by a page edit.
 
 Create it with `leitvia/create-pattern`: `title`, `content`, `base_hash: ""`, `package`, and `synced: true` only when every page should show the same content (for example opening hours kept in one place).
 
