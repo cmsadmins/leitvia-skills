@@ -19,7 +19,7 @@ The narrative order of the roles is `hook`, `context`, `proof`, `detail`, `offer
 
 ## Patterns that need facts
 
-Replace a planned section when it needs facts nobody gave you: prices (`leitvia/offer-pricing-3`, `leitvia/content-price-list`), figures (`leitvia/content-stats`), customer quotes and testimonials (`leitvia/content-quote`, `leitvia/proof-testimonial`), logos, team members.
+Replace a planned section when it needs facts nobody gave you: prices (`leitvia/offer-pricing-3`, `leitvia/content-price-list`), figures (`leitvia/content-stats`), customer quotes and testimonials (`leitvia/content-quote`, `leitvia/proof-testimonial`), logos, team members, files to download (`leitvia/content-downloads`, [files to download](content.md#files-to-download)).
 
 ## Templates and the h1
 
@@ -39,4 +39,4 @@ Edits address blocks by path ID: `p:0` is the root block of the pattern, `p:0.1`
 
 ## After the page exists
 
-Later changes go through `leitvia/update-content` (texts, title, button links of several blocks), `leitvia/update-block` (attributes, one image) and `leitvia/set-alt-text`, each with the `hash` of `leitvia/get-page-outline` as `base_hash`. To change the order or the set of sections, compose a new page and let the person swap them. New section designs belong to the skill `leitvia-pattern`.
+Later changes go through `leitvia/update-content` (texts, title, button links of several blocks), `leitvia/update-block` (attributes, one image) and `leitvia/set-alt-text`, each with the `hash` of `leitvia/get-page-outline` as `base_hash`. To add a section, send as `content` of `leitvia/update-content` the `markup` of `leitvia/get-block` for each top-level block in order, with the new section (`leitvia/get-pattern`, root block with `"metadata":{"patternName":"<slug>"}`) where it belongs. For a new order of most sections, compose a new page and let the person swap them. New section designs belong to the skill `leitvia-pattern`.

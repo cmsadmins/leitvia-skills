@@ -1,6 +1,6 @@
 # leitvia/list-blocks
 
-Generated from Leitvia Studio 1.1.1. Do not edit. Group: Read. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.2.1. Do not edit. Group: Read. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **List blocks.** Returns the block catalog of Leitvia Studio and its add-ons with attribute schema and usage rules. With post_type only the blocks the editor allows for that post type.
 

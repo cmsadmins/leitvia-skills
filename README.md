@@ -20,7 +20,39 @@ Each skill stops at checkpoints and asks the person: before the first write, bef
 - The theme **Leitvia** and the plugin **Leitvia Studio**. Both are submitted to WordPress.org and not listed there yet. Until they are, install the zips from the releases of [cmsadmins/leitvia](https://github.com/cmsadmins/leitvia/releases) and [cmsadmins/leitvia-studio](https://github.com/cmsadmins/leitvia-studio/releases) under **Appearance, Themes, Add New, Upload Theme** and **Plugins, Add New, Upload Plugin**. Once listed, search for them on the same screens.
 - For MCP: the plugin **MCP Adapter** 0.7 from WordPress.org. Without it the agent uses the REST API, see step 2.
 
-With WP-CLI on the server, the bootstrap in [workflows/new-site.md](workflows/new-site.md#bootstrap-the-operator-or-the-runner-before-the-agent) does this step and creates the agent user of step 2.
+With WP-CLI on the server, the bootstrap in [workflows/new-site.md](workflows/new-site.md#bootstrap-the-operator-or-the-runner-before-the-agent) does this step and creates the agent user of step 2. For a test site on your own machine the same section starts WordPress Playground from a blueprint, without a server.
+
+### Test site with WordPress Playground
+
+For a test or demo run on your own machine, without a server, the Playground CLI (`@wp-playground/cli`, needs Node.js) starts a site from a blueprint. Save as `blueprint.json`:
+
+```json
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"preferredVersions": { "php": "8.3", "wp": "latest" },
+	"constants": { "WP_ENVIRONMENT_TYPE": "local" },
+	"siteOptions": { "permalink_structure": "/%postname%/" },
+	"steps": [
+		{ "step": "installTheme", "themeData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia/releases/download/1.1.0/leitvia-1.1.0.zip" }, "options": { "activate": true } },
+		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia-studio/releases/download/1.2.1/leitvia-studio-1.2.1.zip" }, "options": { "activate": true } },
+		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://downloads.wordpress.org/plugin/mcp-adapter.0.7.1.zip" }, "options": { "activate": true } },
+		{ "step": "installPlugin", "pluginData": { "resource": "wordpress.org/plugins", "slug": "woocommerce" }, "options": { "activate": true } },
+		{ "step": "runPHP", "code": "<?php require_once '/wordpress/wp-load.php'; $id = wp_insert_user( array( 'user_login' => 'leitvia-agent', 'user_email' => 'agent@example.org', 'user_pass' => wp_generate_password( 32 ), 'role' => 'leitvia_agent' ) ); $created = WP_Application_Passwords::create_new_application_password( $id, array( 'name' => 'leitvia agent' ) ); file_put_contents( '/leitvia-run/agent-password.txt', $created[0] );" }
+	]
+}
+```
+
+Leave out the WooCommerce step for a site without a shop. Then start the server with an empty folder `run` next to the blueprint; the application password lands in `run/agent-password.txt`:
+
+```sh
+npx @wp-playground/cli@latest server --port=9481 --blueprint=blueprint.json --mount-dir ./run /leitvia-run --login
+```
+
+- `WP_ENVIRONMENT_TYPE` `local` lets application passwords work without HTTPS. Use it only on a site of your own machine.
+- On Windows use `--mount-dir <host> <vfs>` (the colon of `C:` breaks `--mount`) with a Windows path as host (`C:/Users/me/run`, not `/c/Users/me/run`); in Git Bash set `MSYS_NO_PATHCONV=1`, or Git Bash rewrites `/leitvia-run`.
+- The site lives in memory and is gone when the server stops. WP-Cron does not run by itself there (call `GET /wp-cron.php` after writes), and every call takes a few seconds.
+- Shop: WooCommerce cannot reserve stock on the SQLite database of Playground, so an order of a product with stock management fails with `woocommerce_product_not_enough_stock`. Create test products without `stock`. Placing an order takes up to a minute or more; give browser tests a long timeout.
+- `--login` signs you in as `admin` in the browser for the [steps of the person](workflows/new-site.md#steps-of-the-person).
 
 ## 2. Connect the agent to the site
 
@@ -171,7 +203,7 @@ Name the task and the site; the agent picks the skill from its description. Star
 Each workflow asks for the mode at the start:
 
 - **package:** every write of the task goes into one change package, whatever the autonomy levels allow. Nothing changes on the site until a person reviews the package in **Leitvia Studio, Inbox** (block diff and preview) and applies it.
-- **direct:** the autonomy levels of the site decide what goes live. Legal texts, prices, slugs and organization data still wait in a package for a person.
+- **direct:** only with a person present; the autonomy levels of the site decide what goes live, and with the default levels new pages, header, footer and navigation stay drafts the person publishes. Legal texts, prices, slugs and organization data still wait in a package for a person. Unattended runs always use mode package.
 
 ## Privacy
 

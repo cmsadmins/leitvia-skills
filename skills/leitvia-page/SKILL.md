@@ -8,7 +8,7 @@ compatibility: Needs a site with the theme Leitvia and the plugin Leitvia Studio
 
 You turn a goal and a few content points into a page that reads as designed: a clear opening, sections that alternate in tone and layout, one accent at most, real texts and real links. You build it only through the Leitvia abilities.
 
-Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [get-contract](../../handbook/abilities/leitvia-get-contract.md), [list-patterns](../../handbook/abilities/leitvia-list-patterns.md), [plan-page](../../handbook/abilities/leitvia-plan-page.md), [check-composition](../../handbook/abilities/leitvia-check-composition.md), [get-pattern](../../handbook/abilities/leitvia-get-pattern.md), [add-media](../../handbook/abilities/leitvia-add-media.md), [compose-page](../../handbook/abilities/leitvia-compose-page.md), [get-page-outline](../../handbook/abilities/leitvia-get-page-outline.md), [audit-site](../../handbook/abilities/leitvia-audit-site.md). Composition rules, templates, edits and later changes: [composition details](references/composition.md). Texts, links and images: [content rules](references/content.md).
+Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [get-contract](../../handbook/abilities/leitvia-get-contract.md), [list-patterns](../../handbook/abilities/leitvia-list-patterns.md), [plan-page](../../handbook/abilities/leitvia-plan-page.md), [check-composition](../../handbook/abilities/leitvia-check-composition.md), [get-pattern](../../handbook/abilities/leitvia-get-pattern.md), [add-media](../../handbook/abilities/leitvia-add-media.md), [compose-page](../../handbook/abilities/leitvia-compose-page.md), [get-page-outline](../../handbook/abilities/leitvia-get-page-outline.md), [audit-site](../../handbook/abilities/leitvia-audit-site.md). Composition, templates, edits, later changes: [composition details](references/composition.md). Texts, links, images: [content rules](references/content.md). Entries of a content type and their overview: [entries](references/entries.md). A blog or journal: [blog](references/blog.md).
 
 ## Access
 
@@ -16,7 +16,7 @@ MCP server `leitvia` or the REST routes of the Abilities API, as the agent user 
 
 ## Modes
 
-- **direct:** The autonomy levels of the site decide. With the default levels a new page is created as a draft; it goes live only when the owner set the area `content` to `autonomous`. Send no `package` key: a key always means a package.
+- **direct:** The autonomy levels of the site decide. With the default levels a new page is created as a draft; the person publishes it (no ability does), or the owner sets the area `content` to `autonomous`. Only with a person present. Send no `package` key: a key always means a package.
 - **package:** send the same `package` key on every write of the task (for example `landing-bike-repair`), so a person reviews one change package in the inbox of Leitvia Studio. Use it on live sites unless the person asked for direct work. With a key nothing goes live, whatever the autonomy levels allow.
 
 The result of every write says what happened in `mode`: `live`, `draft`, `package` or `unchanged`. Report it as it is; never claim a page is live when the result says `draft` or `package`.
@@ -38,7 +38,7 @@ Collect, before any call: the goal of the page (what should a visitor do), the c
 
 ### 2. Plan the outline
 
-Call `leitvia/plan-page` with `goal`, `points` and `frame` (`home`, `service`, `about`, `contact`, `article`). Without an AI connector the plan comes from the rules of the contract (`source: rules`) and is the same for the same input; that is normal, not a fault. Leave `ai` false unless the person wants the goal and points sent to the AI provider the site owner set up.
+Call `leitvia/plan-page` with `goal`, `points` and `frame` (`home`, `service`, `about`, `contact`, `article`). Without an AI connector the plan comes from the rules of the contract (`source: rules`) and is the same for the same input; that is normal, not a fault. The rules leave out patterns that need images while the media library has none, post teasers below three posts, and proof or offer patterns, which carry facts of the person; on a shop the home plan uses the shop patterns. Leave `ai` false unless the person wants the goal and points sent to the AI provider the site owner set up.
 
 The plan gives per section the pattern, its role, its slot, text lengths (`length.heading`, `length.text` in characters) and the points it carries. Treat it as a first outline, not as the answer. Replace a planned section when:
 
@@ -72,7 +72,7 @@ On a rejection follow its `message` and `next_ability` and correct the call **on
 - `leitvia/audit-site` for published pages: pass the ID before the page as `after` and `limit: 1`, or page through with `next`. The page needs no findings.
 - When the page is live, open its public URL and check that it answers 200 and has one h1.
 
-A post or an entry of a post type of the content model is no page: `leitvia/compose-page` creates pages only. For those, [`leitvia/create-content`](../../handbook/abilities/leitvia-create-content.md) takes `post_type`, the `sections` of the outline (or `content` as block markup), `terms` and `fields`, with the same `package` key.
+A post or an entry of a post type of the content model is no page: `leitvia/compose-page` creates pages only. For those, [`leitvia/create-content`](../../handbook/abilities/leitvia-create-content.md) takes `post_type`, the `sections` of the outline (or `content` as block markup), `terms` and `fields`, with the same `package` key. Entry pages with their fields and the overview page of a type: [entries](references/entries.md). Products come from `leitvia/create-product`.
 
 Report: page ID, URL, `mode` of the write, score, open findings, the open questions from your texts and the package ID if there is one. Later changes to the page: [after the page exists](references/composition.md#after-the-page-exists).
 
@@ -89,14 +89,17 @@ Stop and ask the person, then continue with the answer:
 
 ## Unattended
 
-When no person answers (a scheduled or hosted run), do not wait at a checkpoint. Send the `package` key on every write, also in mode `direct`; never apply, roll back or publish anything. Take facts only from a source you name in the report (briefing, a page of the site, a read ability); without one the fact stays out and becomes an open question. A second rejection, or `retry: never`, stops that part. End with the package ID, what it holds and the open questions. Each checkpoint gets this answer:
+When no person answers (a scheduled or hosted run), do not wait at a checkpoint. Send the `package` key on every write, even when the briefing says nobody visits the site (mode `direct` needs a person who is present); never apply, roll back or publish anything. Take facts only from a source you name in the report (briefing, a page of the site, a read ability); without one the fact stays out and becomes an open question. A second rejection, or `retry: never`, stops that part. End with the package ID, what it holds and the open questions. Each checkpoint gets this answer:
 
 | Checkpoint | Answer without a person |
 |---|---|
 | Brief unclear | No goal in the briefing: stop. Missing link targets: leave the button out or link a page of the site the briefing names. Language: the language of the site from `leitvia/get-contract`. |
 | Outline confirmed | Build the outline at or above `min_score` without waiting; list it in the report. |
-| Facts from the person | Choose patterns without the missing facts; list each missing fact as a question. |
+| Facts from the person | Choose patterns without the missing facts; list each missing fact as a question. On an invented site the briefing allows invented facts, except operator and legal facts. |
 | Score still too low | Build nothing; report both outlines with their findings. |
 | Second rejection | Build nothing for this page; report code and message. |
 | Held for a person | Expected: the page waits in the package; report its ID. |
 | New images | An image added with `leitvia/add-media` waits in the package and has no ID before a person applies it: choose a pattern without an image slot, or leave the page for the next run. |
+| New content type | Entries of a type that waits in the package come in the next run, after a person applied it. |
+
+Steps only a person can do go into the report as a list: [new-site, steps of the person](../../workflows/new-site.md#steps-of-the-person). A briefing that asks for an invented site is the source of its invented content: [invented sites](../../workflows/new-site.md#invented-sites).

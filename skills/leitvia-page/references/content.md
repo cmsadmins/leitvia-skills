@@ -17,6 +17,7 @@ Details for `leitvia-page`. Read it before you write the edits of step 4.
 - Every link and button needs a real target: a page of the site, an `https` URL, `mailto:` or `tel:`. A link to `#` is rejected by the link text check; so is link text that does not name its target.
 - Button texts name the action and the target ("Book a repair by e-mail", not "Click here").
 - A text with one link, such as a contact line "Write to hello@example.com", keeps its link: send `text`, `link_text` (the part that stays linked) and `url` in one edit. A text that would drop a link with a real target is rejected with `leitvia_invalid_input`; a sample link to `#` may be replaced by plain text.
+- A text without a link cannot get one by an edit (`leitvia_static_markup`). For a new link, such as an e-mail address in a contact paragraph, send the whole content with `leitvia/update-content` and `content`, the paragraph written as `<p>Write to <a href="mailto:hello@example.org">hello@example.org</a>.</p>`, or use a pattern whose block already has a link.
 - Only link to pages that exist. When a target page is missing, build it first or ask.
 
 ## Images
@@ -27,3 +28,10 @@ Details for `leitvia-page`. Read it before you write the edits of step 4.
 - Use the attachment ID in the `image` edit with the same alt text or `decorative: true` (stored as `metadata.leitviaDecorative`). An image without alt and without that flag is rejected.
 - Sample images of a pattern come with a sample alt text that describes the sample picture. Replace the image, or choose a pattern without an image slot.
 - `images` in `leitvia/list-patterns` gives aspect ratio and recommended size per slot.
+
+## Files to download
+
+- Files are not uploaded by an ability: `leitvia/add-media` takes images only. Use files the person put into the media library and find them with `leitvia/list-media` (`mime` `application/pdf`, or `application` for every document); each item has `url`, `filename`, `mime` and `filesize` in bytes. A file that is missing is an open question, never a link to `#`.
+- Use `leitvia/content-downloads`: one list item per file. Its `text` edit holds the link text and one sentence about the file, with `link_text` the part that stays linked and `url` the file URL: `{"block": "p:0.2.0", "text": "Price list 2026 (PDF, 180 KB) All plans and services with prices excluding VAT.", "link_text": "Price list 2026 (PDF, 180 KB)", "url": "<url>"}`. The list style puts the link on its own line.
+- The link text names the file, its format in capitals and its size, rounded: KB below 1 MB, MB with one decimal above. Keep each link text unique on the page. Remove list items you have no file for, or choose another pattern; never keep a sample item.
+- One file inside running text needs no pattern: link it in the sentence with the same text, "the price list (PDF, 180 KB)".

@@ -35,7 +35,7 @@ Findings with severity `warning` (for example `font_not_bundled`) do not block; 
 
 ## Fonts
 
-Studio ships the faces of a token set only when the theme bundles that family. A brand font the theme does not bundle gives the warning `font_not_bundled` and falls back to the system font. Uploading font files goes through the Font Library of WordPress (Appearance, Editor, Typography), which is a task for the person; check the font license first. Until then set the font stack with the brand family first and a generic family last.
+Studio ships the faces of a token set only when the theme bundles that family. Bundled today: Newsreader, Inter Tight, IBM Plex Sans and IBM Plex Mono from the theme and its style variations, Libre Franklin and Young Serif from Leitvia Studio; all are served from the site, no other host. A brand font the theme does not bundle gives the warning `font_not_bundled` and falls back to the system font. Uploading font files goes through the Font Library of WordPress (Appearance, Editor, Typography), which is a task for the person; check the font license first. Until then set the font stack with the brand family first and a generic family last.
 
 ## Limits
 

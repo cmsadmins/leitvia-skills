@@ -15,7 +15,7 @@ Read before the first call: the [agent handbook](../../handbook/README.md) (acce
 - The site is the one at the address of your task, which in a multisite network can have a path (`https://example.org/club/`); every path starts there, not at the host. Call `leitvia/get-contract` first and compare `site.url` with that address; when they differ, write nothing and ask the person.
 - Token sets and their activation are in the area `design`, which by default only suggests: every write lands in a change package for a person. Send one `package` key for the task, for example `brand-2026-10`.
 - **Facts are never guessed.** Organization data, prices, legal texts, figures, quotes and people come only from a source you can name: the person, a page of the site or a read ability, with the source in your report. Without one, stop at a checkpoint; never write a placeholder that looks like a fact.
-- Brand values are facts too: they come from the brand source the person names (style guide, design file, existing site). Never guess a brand color or font; a value you cannot find is a question to the person.
+- Brand values are facts too: they come from the brand source the person names (style guide, design file, existing site). Never guess a brand color or font; a value you cannot find is a question to the person. The one exception: the person asks you to design the brand ("own brand, your proposal", an invented demo site). Then choose the values, compute every pair and call the set a proposal in its `$description` and in your report.
 - Roles, slugs and the contrast pairs come from `leitvia/get-contract`, never from memory or from files of the theme.
 - A rejection is corrected once. If the corrected call is rejected again, stop and ask the person.
 
@@ -32,6 +32,7 @@ Checkpoint "Brand confirmed".
 - `leitvia/get-contract`: `roles` (every color, font size, font family, spacing, radius and shadow slug), `pairs` (foreground, background, minimum ratio, optional `ring`).
 - `leitvia/get-tokens`: the current `document` (start from it), `sets` (existing token sets) and `contrast` (findings of the current palette).
 - The front page: its `--wp--preset--color--*` and `--wp--preset--font-family--*` values are what visitors see. When they differ from the `document`, tell the person which values differ and ask which ones to keep before you write; never build a set on values the site does not show.
+- A style variation of a recipe (such as `corporate-light`, in the same package as the recipe) and a token set do not add up: once the set is active, its colors and fonts replace those of the variation. Build the set on the `document` of `leitvia/get-tokens`; a variation that still waits in an open package is no reason to ask.
 
 ### 3. Map brand values to roles
 
@@ -79,10 +80,12 @@ Also stop after the second rejection of the same call.
 
 ## Unattended
 
-When no person answers (a scheduled or hosted run), do not wait at a checkpoint. Send the `package` key on every write, also in mode `direct`; never apply, roll back or publish anything. Take facts only from a source you name in the report (briefing, a page of the site, a read ability); without one the fact stays out and becomes an open question. A second rejection, or `retry: never`, stops that part. End with the package ID, what it holds and the open questions. Each checkpoint gets this answer:
+When no person answers (a scheduled or hosted run), do not wait at a checkpoint. Send the `package` key on every write, even when the briefing says nobody visits the site (mode `direct` needs a person who is present); never apply, roll back or publish anything. Take facts only from a source you name in the report (briefing, a page of the site, a read ability); without one the fact stays out and becomes an open question. A second rejection, or `retry: never`, stops that part. End with the package ID, what it holds and the open questions. Each checkpoint gets this answer:
 
 | Checkpoint | Answer without a person |
 |---|---|
-| Brand confirmed | Only values the briefing or the named brand source states; a role without a value keeps the value of the current `document`. No source at all: stop. |
+| Brand confirmed | Only values the briefing or the named brand source states; a role without a value keeps the value of the current `document`. The briefing asks you to design the brand: your proposal, as in the ground rules. No source and no such request: skip the skill and report it; the workflow goes on without a brand. |
 | Contrast correction accepted | Make the one correction of step 5 and leave the set in the package; report old and new value with their ratios as a question. |
 | Package applied | Stop after step 5; activation and the front end check belong to the next run. |
+
+Steps only a person can do go into the report as a list: [new-site, steps of the person](../../workflows/new-site.md#steps-of-the-person).

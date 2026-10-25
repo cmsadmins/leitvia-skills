@@ -12,11 +12,11 @@ Read before the first call: the [agent handbook](../../handbook/README.md) (acce
 
 ## Access
 
-MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Paths start at the address of the site, not at the host. While the classic theme is active, `leitvia/get-contract` answers `leitvia_no_contract`; compare the address of your task with `home` of the public `GET /wp-json/` instead. After the switch call `leitvia/get-contract` and compare `site.url`. When the addresses differ, write nothing and ask the person. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read: the abilities give you every ID, hash and status you need. Reading public pages of the site is fine and part of the inventory. Where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after each write.
+MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Paths start at the address of the site, not at the host. While the classic theme is active, `leitvia/get-contract` answers `leitvia_no_contract`; compare the address of your task with `home` of the public `GET /wp-json/` instead. After the switch call `leitvia/get-contract` and compare `site.url`. When the addresses differ, write nothing and ask the person. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read. Reading public pages of the site is fine and part of the inventory.
 
 ## Source outside this site
 
-When the source is another site (any system, for example Wix), read its public pages as a visitor, never its admin or an export. Inventory pages, navigation, texts, images and embeds, and map each page to a page, a post or an entry of a post type of the content model with its fields and terms; take over no scripts, trackers, fonts or forms of the source; add images with `leitvia/add-media` as Base64 (up to 5 MB, alt text required); add images in one package, create the entries with their content and the menu in a second one, and end with a reconciliation report. Steps 2 and 3 below do not apply. Details: [external source](references/external.md).
+When the source is another site (any system, for example Wix), read its public pages as a visitor, never its admin or an export. Inventory pages, navigation, texts, images and embeds, and map each page to a page, a post or an entry of a post type of the content model with its fields and terms; take over no scripts, trackers, fonts or forms of the source; add images with `leitvia/add-media` as Base64 (up to 5 MB, alt text required) in one package, create the entries with their content and the menu in a second one, and end with a reconciliation report. Steps 2 and 3 below do not apply. Details: [external source](references/external.md).
 
 ## Modes
 
@@ -111,7 +111,7 @@ Stop and ask the person, then continue with the answer:
 
 ## Unattended
 
-When no person answers (a scheduled or hosted run), do not wait at a checkpoint. Send the `package` key on every write, also in mode `direct`; never apply, roll back or publish anything. Take facts only from a source you name in the report (briefing, a page of the site, a read ability); without one the fact stays out and becomes an open question. A second rejection, or `retry: never`, stops that part. End with the package ID, what it holds and the open questions. Each checkpoint gets this answer:
+When no person answers (a scheduled or hosted run), do not wait at a checkpoint. Send the `package` key on every write, even when the briefing says nobody visits the site (mode `direct` needs a person who is present); never apply, roll back or publish anything. Take facts only from a source you name in the report (briefing, a page of the site, a read ability); without one the fact stays out and becomes an open question. A second rejection, or `retry: never`, stops that part. End with the package ID, what it holds and the open questions. Each checkpoint gets this answer:
 
 | Checkpoint | Answer without a person |
 |---|---|

@@ -36,7 +36,7 @@ const AREAS = {
 };
 
 const KINDS = {
-	prices: 'Pricing blocks, price columns of comparison tables and product prices.',
+	prices: 'Pricing blocks, price columns of comparison tables and product prices. Prices in plain text are not detected.',
 	legal: 'Pages with a legal page kind (imprint, privacy, terms, withdrawal, accessibility) and the privacy policy page.',
 	slugs: 'A changed slug, which changes a URL.',
 	organization: 'Site options such as the site title, the logo and the reading settings.',

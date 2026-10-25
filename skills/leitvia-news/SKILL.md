@@ -8,7 +8,7 @@ compatibility: Needs a site with the theme Leitvia and the plugin Leitvia Studio
 
 One run, at most one post: find what is new in the sources of the brief, drop what the site already covered, write a short post with its sources and an AI notice, and leave it as a draft in a change package. Nothing is published by this skill.
 
-Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [get-contract](../../handbook/abilities/leitvia-get-contract.md), [list-content](../../handbook/abilities/leitvia-list-content.md), [create-content](../../handbook/abilities/leitvia-create-content.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md), [get-package](../../handbook/abilities/leitvia-get-package.md). The brief, the duplicate check, the sources and the post format: [news details](references/brief.md).
+Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [get-contract](../../handbook/abilities/leitvia-get-contract.md), [list-content](../../handbook/abilities/leitvia-list-content.md), [create-content](../../handbook/abilities/leitvia-create-content.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md), [get-package](../../handbook/abilities/leitvia-get-package.md). The brief, the duplicate check, the sources and the post format: [news details](references/brief.md). Overview, archives and post page come from the theme; setting up the blog itself: [blog or journal](../leitvia-page/references/blog.md).
 
 ## Access
 
@@ -68,7 +68,7 @@ Stop and ask the person, then continue with the answer:
 
 ## Unattended
 
-When no person answers (a scheduled or hosted run), do not wait at a checkpoint. Send the `package` key on every write, also in mode `direct`; never apply, roll back or publish anything. Take facts only from a source you name in the report (briefing, a page of the site, a read ability); without one the fact stays out and becomes an open question. A second rejection, or `retry: never`, stops that part. End with the package ID, what it holds and the open questions. Each checkpoint gets this answer:
+When no person answers (a scheduled or hosted run), do not wait at a checkpoint. Send the `package` key on every write, even when the briefing says nobody visits the site (mode `direct` needs a person who is present); never apply, roll back or publish anything. Take facts only from a source you name in the report (briefing, a page of the site, a read ability); without one the fact stays out and becomes an open question. A second rejection, or `retry: never`, stops that part. End with the package ID, what it holds and the open questions. Each checkpoint gets this answer:
 
 | Checkpoint | Answer without a person |
 |---|---|
