@@ -37,7 +37,7 @@ For a test or demo run on your own machine, without a server, the Playground CLI
 		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia-studio/releases/download/1.2.1/leitvia-studio-1.2.1.zip" }, "options": { "activate": true } },
 		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://downloads.wordpress.org/plugin/mcp-adapter.0.7.1.zip" }, "options": { "activate": true } },
 		{ "step": "installPlugin", "pluginData": { "resource": "wordpress.org/plugins", "slug": "woocommerce" }, "options": { "activate": true } },
-		{ "step": "runPHP", "code": "<?php require_once '/wordpress/wp-load.php'; $id = wp_insert_user( array( 'user_login' => 'leitvia-agent', 'user_email' => 'agent@example.org', 'user_pass' => wp_generate_password( 32 ), 'role' => 'leitvia_agent' ) ); $created = WP_Application_Passwords::create_new_application_password( $id, array( 'name' => 'leitvia agent' ) ); file_put_contents( '/leitvia-run/agent-password.txt', $created[0] );" }
+		{ "step": "runPHP", "code": "<?php require_once '/wordpress/wp-load.php'; $id = wp_insert_user( array( 'user_login' => 'leitvia-agent', 'display_name' => 'Leitvia agent', 'user_email' => 'agent@example.org', 'user_pass' => wp_generate_password( 32 ), 'role' => 'leitvia_agent' ) ); $created = WP_Application_Passwords::create_new_application_password( $id, array( 'name' => 'leitvia agent' ) ); file_put_contents( '/leitvia-run/agent-password.txt', $created[0] );" }
 	]
 }
 ```
@@ -52,7 +52,7 @@ npx @wp-playground/cli@latest server --port=9481 --blueprint=blueprint.json --mo
 - On Windows use `--mount-dir <host> <vfs>` (the colon of `C:` breaks `--mount`) with a Windows path as host (`C:/Users/me/run`, not `/c/Users/me/run`); in Git Bash set `MSYS_NO_PATHCONV=1`, or Git Bash rewrites `/leitvia-run`.
 - The site lives in memory and is gone when the server stops. WP-Cron does not run by itself there (call `GET /wp-cron.php` after writes), and every call takes a few seconds.
 - Shop: WooCommerce cannot reserve stock on the SQLite database of Playground, so an order of a product with stock management fails with `woocommerce_product_not_enough_stock`. Create test products without `stock`. Placing an order takes up to a minute or more; give browser tests a long timeout.
-- `--login` signs you in as `admin` in the browser for the [steps of the person](workflows/new-site.md#steps-of-the-person).
+- `--login` signs you in as `admin` in the browser for the [steps of the person](workflows/new-site.md#steps-of-the-person). In another browser or a script, Playground's `admin` signs in with the password `password`.
 
 ## 2. Connect the agent to the site
 

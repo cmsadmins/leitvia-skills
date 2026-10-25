@@ -40,6 +40,8 @@ Compose the `content` of an entry page in this order:
 3. Call to action: how to book or ask, for example `leitvia/cta-banner` with its button to the contact page. It spans the width of the entry like the image; keep the button text short ("Book this course"), the heading names the entry. Only link to pages that exist.
 4. Nothing more: the template adds "More <type>".
 
+The facts and the call to action carry no `metadata.patternName`: the composition check is for the sections of pages, and on an entry it counts the introduction as a section with an unknown pattern (score 50, a warning that sends the entry to a package).
+
 A price in a `number` field is no content kind `prices` of the gateway: in mode `direct` it goes live like any field. When the price is a fact of the person, send the entry with the `package` key.
 
 ## Overview page

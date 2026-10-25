@@ -30,7 +30,7 @@ MCP server `leitvia` or the REST routes of the Abilities API, as the agent user 
 
 A new pattern is the last resort. First look for one that fits:
 
-- `leitvia/list-patterns` with `role`, `tone` or `layout` (the `composition` metadata), or `category`. Read `description`, `useWhen`, `avoidWhen`, `images` and `status` of each candidate; skip deprecated ones (`replacedBy` set).
+- `leitvia/list-patterns` with `role`, `tone` or `layout` (the `composition` metadata), or `category`, the slug of a block pattern category such as `text`, `header`, `footer`, `posts` or `leitvia-shop` (the shop patterns). Read `description`, `useWhen`, `avoidWhen`, `images` and `status` of each candidate; skip deprecated ones (`replacedBy` set).
 - `leitvia/get-pattern` shows the markup and where the pattern is used.
 
 Then decide:
