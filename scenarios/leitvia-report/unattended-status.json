@@ -1,0 +1,120 @@
+{
+	"$schema": "../scenario.schema.json",
+	"title": "Unattended: a site report from read abilities only, nothing written",
+	"skill": "leitvia-report",
+	"briefing": "Write a short status report on this site for its owner: content checks, search data, versions and open changes. Nobody answers questions during this run: follow the section Unattended of the skill.",
+	"mode": "package",
+	"unattended": true,
+	"budget": {
+		"tokens": 9500,
+		"files": [
+			"skills/leitvia-report/references/format.md",
+			"handbook/abilities/leitvia-audit-site.md",
+			"handbook/abilities/leitvia-get-site-health.md",
+			"handbook/abilities/leitvia-list-content.md",
+			"handbook/abilities/leitvia-get-seo.md"
+		]
+	},
+	"setup": [
+		{
+			"step": "runPHP",
+			"code": "<?php require_once '/wordpress/wp-load.php';\nwp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Opening hours', 'post_name' => 'opening-hours', 'post_content' => \"<!-- wp:heading {\\\"level\\\":3} -->\n<h3 class=\\\"wp-block-heading\\\">Weekdays</h3>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>Monday to Friday from 9 to 18.</p>\n<!-- /wp:paragraph -->\" ) );"
+		}
+	],
+	"steps": [
+		{
+			"ability": "leitvia/get-contract",
+			"capture": {
+				"url": "site.url"
+			},
+			"expect": {
+				"site.url": {
+					"$match": "^http"
+				}
+			}
+		},
+		{
+			"ability": "leitvia/get-site-health",
+			"expect": {
+				"wordpress.version": {
+					"$match": "^d"
+				},
+				"theme.slug": "leitvia"
+			}
+		},
+		{
+			"ability": "leitvia/audit-site",
+			"input": {
+				"limit": 20
+			},
+			"expect": {
+				"items.length": {
+					"$gte": 1
+				}
+			}
+		},
+		{
+			"ability": "leitvia/list-content",
+			"input": {
+				"post_type": "page",
+				"status": "publish",
+				"search": "Opening hours"
+			},
+			"capture": {
+				"page": "items.0.id"
+			},
+			"expect": {
+				"items.length": 1
+			}
+		},
+		{
+			"ability": "leitvia/get-seo",
+			"input": {
+				"posts": [
+					"{{capture.page}}"
+				]
+			},
+			"expect": {
+				"plugin": null,
+				"notice": {
+					"$match": "No supported SEO plugin"
+				},
+				"items.0.seo": null,
+				"items.0.defaults.canonical": {
+					"$match": "/opening-hours/$"
+				}
+			}
+		},
+		{
+			"ability": "leitvia/get-tokens",
+			"expect": {
+				"contrast.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/list-packages",
+			"input": {
+				"state": "open"
+			},
+			"expect": {
+				"length": 0
+			}
+		}
+	],
+	"expect": [
+		{
+			"ability": "leitvia/list-packages",
+			"input": {
+				"state": "open"
+			},
+			"expect": {
+				"length": 0
+			}
+		},
+		{
+			"url": "/opening-hours/",
+			"status": 200,
+			"h1": 1
+		}
+	]
+}

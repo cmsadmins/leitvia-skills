@@ -6,7 +6,7 @@
 	"mode": "package",
 	"unattended": true,
 	"budget": {
-		"tokens": 9500,
+		"tokens": 9650,
 		"files": [
 			"skills/leitvia-news/references/brief.md",
 			"handbook/abilities/leitvia-get-contract.md",

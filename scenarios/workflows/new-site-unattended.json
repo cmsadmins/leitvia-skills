@@ -6,7 +6,7 @@
 	"mode": "package",
 	"unattended": true,
 	"budget": {
-		"tokens": 15800,
+		"tokens": 15950,
 		"files": [
 			"skills/leitvia-setup/SKILL.md",
 			"skills/leitvia-page/SKILL.md",

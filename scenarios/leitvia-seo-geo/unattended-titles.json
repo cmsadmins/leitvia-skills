@@ -1,0 +1,111 @@
+{
+	"$schema": "../scenario.schema.json",
+	"title": "Unattended: titles and descriptions from the page wait in one package, invented numbers are refused",
+	"skill": "leitvia-seo-geo",
+	"briefing": "Improve the titles and meta descriptions of the published pages so they are found in search and AI answers. Nobody answers questions during this run: follow the section Unattended of the skill.",
+	"mode": "package",
+	"unattended": true,
+	"budget": {
+		"tokens": 9650,
+		"files": [
+			"skills/leitvia-seo-geo/references/seo.md",
+			"handbook/abilities/leitvia-list-content.md",
+			"handbook/abilities/leitvia-get-seo.md",
+			"handbook/abilities/leitvia-update-seo.md"
+		]
+	},
+	"setup": [
+		{
+			"step": "runPHP",
+			"code": "<?php require_once '/wordpress/wp-load.php';\n// Stands in for Yoast SEO: Leitvia Studio only reads and writes its post meta.\nwp_mkdir_p( WPMU_PLUGIN_DIR );\nfile_put_contents( WPMU_PLUGIN_DIR . '/seo-stub.php', \"<?php\ndefine( 'WPSEO_VERSION', '26.0' );\n\" );\n$page = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Repairs', 'post_name' => 'repairs', 'post_excerpt' => 'We repair city bikes and e-bikes in 2 days, from 40 euros.', 'post_content' => \"<!-- wp:paragraph -->\n<p>We repair city bikes and e-bikes in 2 days. A service starts at 40 euros. Bring your bike on weekdays.</p>\n<!-- /wp:paragraph -->\" ) );\nupdate_post_meta( $page, '_yoast_wpseo_title', 'Home' );"
+		}
+	],
+	"steps": [
+		{
+			"ability": "leitvia/get-contract",
+			"expect": {
+				"site.url": {
+					"$match": "^http"
+				}
+			}
+		},
+		{
+			"ability": "leitvia/list-content",
+			"input": {
+				"post_type": "page",
+				"status": "publish",
+				"search": "Repairs"
+			},
+			"capture": {
+				"page": "items.0.id"
+			},
+			"expect": {
+				"items.length": 1
+			}
+		},
+		{
+			"ability": "leitvia/get-seo",
+			"input": {
+				"posts": [
+					"{{capture.page}}"
+				]
+			},
+			"capture": {
+				"hash": "items.0.hash"
+			},
+			"expect": {
+				"plugin.key": "yoast",
+				"items.0.seo.title": "Home",
+				"items.0.seo.description": "",
+				"items.0.seo.noindex": false
+			}
+		},
+		{
+			"ability": "leitvia/update-seo",
+			"input": {
+				"post": "{{capture.page}}",
+				"title": "Bike repairs in 2 days, from 40 euros",
+				"description": "We repair city bikes and e-bikes in 2 days. A service starts at 40 euros; bring your bike on weekdays.",
+				"base_hash": "{{capture.hash}}",
+				"package": "seo-unattended"
+			},
+			"expect": {
+				"mode": "package",
+				"findings.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/update-seo",
+			"input": {
+				"post": "{{capture.page}}",
+				"title": "Bike repairs since 1998",
+				"base_hash": "{{capture.hash}}",
+				"package": "seo-unattended"
+			},
+			"expectError": "leitvia_invalid_input"
+		}
+	],
+	"expect": [
+		{
+			"ability": "leitvia/list-packages",
+			"input": {
+				"state": "open"
+			},
+			"expect": {
+				"length": 1,
+				"0.state": "open"
+			}
+		},
+		{
+			"ability": "leitvia/get-seo",
+			"input": {
+				"posts": [
+					"{{capture.page}}"
+				]
+			},
+			"expect": {
+				"items.0.seo.title": "Home"
+			}
+		}
+	]
+}

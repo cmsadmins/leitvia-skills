@@ -1,8 +1,8 @@
 # Leitvia agent handbook
 
-Generated from Leitvia Studio 1.2.1. Do not edit.
+Generated from Leitvia Studio 1.3.1. Do not edit.
 
-Everything an agent needs to work on a WordPress site with Leitvia Studio through its 42 abilities: how to call them, how hashes, autonomy and change packages work, what a rejection means and what each ability takes and returns. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call; it holds the rules every skill relies on and the index of all abilities.
+Everything an agent needs to work on a WordPress site with Leitvia Studio through its 45 abilities: how to call them, how hashes, autonomy and change packages work, what a rejection means and what each ability takes and returns. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call; it holds the rules every skill relies on and the index of all abilities.
 
 ## Access over MCP and REST
 
@@ -114,6 +114,7 @@ Read abilities change nothing. Call them first: they return the IDs, block IDs a
 |---|---|---|
 | [`leitvia/audit-site`](abilities/leitvia-audit-site.md) | GET | Runs the content checks over published content, at most 20 posts per call in ID order. |
 | [`leitvia/check-composition`](abilities/leitvia-check-composition.md) | GET | Scores a page against the composition rules of the contract: pass pattern slugs in page order, or a post ID to read the sections of a saved page from metadata.patternName. |
+| [`leitvia/export`](abilities/leitvia-export.md) | GET | Exports the site as a portable JSON package, page by page. |
 | [`leitvia/get-block`](abilities/leitvia-get-block.md) | GET | Returns one block of a post by its ID or path ID with all attributes, its markup alone and with children, the image attachments, its hash, the IDs of its children and the document hash. |
 | [`leitvia/get-content-model`](abilities/leitvia-get-content-model.md) | GET | Returns the content model declaration: post types, taxonomies, fields, relations and site settings with their definitions, never content. |
 | [`leitvia/get-contract`](abilities/leitvia-get-contract.md) | GET | Returns the site this connection works on and the design contract of the active theme: version, rules, color roles, contrast pairs, composition rules, page frames, template parts, templates, block styles and style variations. |
@@ -121,6 +122,7 @@ Read abilities change nothing. Call them first: they return the IDs, block IDs a
 | [`leitvia/get-page-outline`](abilities/leitvia-get-page-outline.md) | GET | Returns a post as a compact block tree: per block the ID, name, pattern, the first 80 characters of text, the link targets of the block itself, size, hash and children. |
 | [`leitvia/get-pattern`](abilities/leitvia-get-pattern.md) | GET | Returns one pattern of the theme or of Leitvia Studio with its markup, metadata and the first 20 posts and templates that use it. |
 | [`leitvia/get-product`](abilities/leitvia-get-product.md) | GET | Returns one product or variation: texts, images with alt text, categories and tags with their hash, attributes, price, tax and shipping class, stock status, merchandising and the hash to use as base_hash. |
+| [`leitvia/get-seo`](abilities/leitvia-get-seo.md) | GET | Returns the SEO data of posts, pages and entries from the active SEO plugin. |
 | [`leitvia/get-site-health`](abilities/leitvia-get-site-health.md) | GET | Returns the versions of WordPress, PHP, the theme and the plugins and the updates WordPress knows of, read from its last update check; nothing is requested. |
 | [`leitvia/get-tokens`](abilities/leitvia-get-tokens.md) | GET | Returns the active design tokens as a DTCG document, the token sets with their status, the active style variations, whether the global styles drifted from the active set and the contrast findings of the current palette. |
 | [`leitvia/list-blocks`](abilities/leitvia-list-blocks.md) | GET | Returns the block catalog of Leitvia Studio and its add-ons with attribute schema and usage rules. |
@@ -175,3 +177,4 @@ Texts, links, alt text, deprecated patterns, products and change packages of exi
 | [`leitvia/update-content`](abilities/leitvia-update-content.md) | POST | Updates title, excerpt, slug, date, terms, fields, featured image, comment status and the texts and button links of several blocks of one post in one operation, blocks found by their ID from the outline. |
 | [`leitvia/update-product`](abilities/leitvia-update-product.md) | POST | Updates texts, status, images, categories and tags of one product or variation, and its prices, tax and shipping class. |
 | [`leitvia/update-product-category`](abilities/leitvia-update-product-category.md) | POST | Updates name, description, parent and image of a product category, or name and description of a product tag. |
+| [`leitvia/update-seo`](abilities/leitvia-update-seo.md) | POST | Writes SEO title, meta description and robots of one post through the active SEO plugin. |

@@ -1,6 +1,6 @@
 # leitvia/list-recipes
 
-Generated from Leitvia Studio 1.2.1. Do not edit. Group: Read. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.1. Do not edit. Group: Read. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **List recipes.** Lists the site recipes of Leitvia Studio and its add-ons with owner, pages and whether the plugins they require are active.
 
