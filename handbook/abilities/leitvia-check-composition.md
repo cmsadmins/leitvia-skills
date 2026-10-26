@@ -1,6 +1,6 @@
 # leitvia/check-composition
 
-Generated from Leitvia Studio 1.3.4. Do not edit. Group: Read. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.5. Do not edit. Group: Read. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **Check composition.** Scores a page against the composition rules of the contract: pass pattern slugs in page order (block:\<ID> for a Lab pattern; only approved ones count as known), or a post ID to read the sections of a saved page from metadata.patternName. Returns the findings (rule and 0-based section index), the score from 100 down, the minimum score for autonomous writes and per finding up to three patterns that would fix it.
 
