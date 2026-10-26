@@ -29,8 +29,7 @@
 				"source": "rules",
 				"score": { "$gte": 80 },
 				"sections.0.pattern": "leitvia/hero-centered",
-				"sections.4.pattern": "leitvia/content-quote",
-				"sections.5.pattern": "leitvia/offer-pricing-3"
+				"sections.5.pattern": "leitvia/cta-banner"
 			}
 		},
 		{

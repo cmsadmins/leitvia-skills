@@ -37,7 +37,7 @@
 			"ability": "leitvia/get-site-health",
 			"expect": {
 				"wordpress.version": {
-					"$match": "^d"
+					"$match": "^[0-9]"
 				},
 				"theme.slug": "leitvia"
 			}
