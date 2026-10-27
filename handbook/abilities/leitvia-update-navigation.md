@@ -1,6 +1,6 @@
 # leitvia/update-navigation
 
-Generated from Leitvia Studio 1.3.6. Do not edit. Group: Set up. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.7. Do not edit. Group: Set up. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **Update navigation.** Replaces the links of a navigation menu, by default the one published last, which headers without a chosen menu show. Send items (with one level of sub items) or block markup of navigation links, submenus, page lists and mega menus. Links point to this site, use https, mailto: or tel:, and need a text that names their target. The change publishes the menu, a draft one too, since core shows no draft menu. The base hash is the hash of the menu, empty when the site has none. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash.
 
