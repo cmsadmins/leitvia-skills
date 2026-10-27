@@ -1,6 +1,6 @@
 # leitvia/list-media
 
-Generated from Leitvia Studio 1.3.8. Do not edit. Group: Read. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.9. Do not edit. Group: Read. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **List media.** Lists the media library, newest first: ID, URL, file name, MIME type, file size in bytes, alt text, width, height and hash (the base_hash for leitvia/set-alt-text). Filter by search text, MIME type (image, image/png or application/pdf) and uploaded after a date.
 

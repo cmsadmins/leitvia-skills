@@ -1,6 +1,6 @@
 # leitvia/add-media
 
-Generated from Leitvia Studio 1.3.8. Do not edit. Group: Build. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.9. Do not edit. Group: Build. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **Add media.** Adds an image to the media library from a URL of this site or as Base64 data up to 5 MB, with alt text or marked as decorative. URLs of other hosts are rejected; nothing is fetched from them. base_hash is empty. Images already in the library are used by their ID in compose-page and update-block.
 

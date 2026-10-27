@@ -10,7 +10,7 @@ An empty WordPress installation has neither the theme nor Leitvia Studio, and in
 
 ```sh
 wp theme install https://github.com/cmsadmins/leitvia/releases/download/1.2.8/leitvia-1.2.8.zip --activate
-wp plugin install https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.8/leitvia-studio-1.3.8.zip --activate
+wp plugin install https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.9/leitvia-studio-1.3.9.zip --activate
 wp plugin install https://downloads.wordpress.org/plugin/mcp-adapter.0.7.1.zip --activate
 wp user create leitvia-agent agent@example.org --role=leitvia_agent --display_name="Leitvia agent"
 wp user application-password create leitvia-agent "leitvia agent" --porcelain

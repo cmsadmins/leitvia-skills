@@ -1,6 +1,6 @@
 # leitvia/compose-page
 
-Generated from Leitvia Studio 1.3.8. Do not edit. Group: Build. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.9. Do not edit. Group: Build. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **Compose page.** Creates a page from patterns in the order of a page frame of the contract. Plan it with leitvia/plan-page first; base_hash is empty for the new page. Per section only texts (also quote citations and details summaries), links and images at block IDs of the pattern outline can change; a text that would drop a link is refused. Each section keeps metadata.patternName (core/block/\<ID> for a Lab pattern). Unknown patterns are rejected with a pointer to leitvia/list-patterns, deprecated ones with their replacement, Lab patterns that are not approved (also through a part) with leitvia_pattern_not_approved. Later changes go through leitvia/update-content and leitvia/update-block.
 

@@ -1,6 +1,6 @@
 # leitvia/list-content
 
-Generated from Leitvia Studio 1.3.8. Do not edit. Group: Read. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.9. Do not edit. Group: Read. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **List content.** Lists posts, pages and entries of the content model, newest first, with hash, terms and the open package that waits for each. Per item: ID, type, status, title, slug, date, modified, excerpt, terms, fields, link, hash and package. Filter by type, status, search text, modified since and published after a date. Only content agents may read; no comments, users or form entries.
 
