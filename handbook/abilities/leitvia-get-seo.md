@@ -1,6 +1,6 @@
 # leitvia/get-seo
 
-Generated from Leitvia Studio 1.3.5. Do not edit. Group: Read. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.6. Do not edit. Group: Read. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **Get SEO data.** Returns the SEO data of posts, pages and entries from the active SEO plugin. Supported are Yoast SEO, Rank Math, SEOPress and The SEO Framework. Per item: title, meta description, canonical, noindex, nofollow, Open Graph title, description and image, focus keyword and schema type. An empty value means the plugin falls back to its template. defaults holds what WordPress itself would print and a description suggested from the excerpt; without a supported plugin seo is null and notice says why. hash is the base_hash of leitvia/update-seo. IDs that are no readable content come back under skipped.
 
