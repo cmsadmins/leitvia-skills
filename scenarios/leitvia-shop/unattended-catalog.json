@@ -1,0 +1,168 @@
+{
+	"$schema": "../scenario.schema.json",
+	"title": "Unattended: catalog care in one package, the price from the briefing waits as a suggestion",
+	"skill": "leitvia-shop",
+	"tags": [
+		"commerce"
+	],
+	"briefing": "Tidy up our catalog. The oak tray needs a real short description: it is made of oiled oak and measures 40 by 25 cm. Show the linen cloth as a cross-sell of the tray. Rename the category Kitchen to Kitchen and table. From November the linen cloth costs 21.00. Nobody answers questions during this run: follow the section Unattended of the skill.",
+	"mode": "package",
+	"unattended": true,
+	"budget": {
+		"tokens": 9800,
+		"files": [
+			"handbook/abilities/leitvia-list-products.md",
+			"handbook/abilities/leitvia-get-product.md",
+			"handbook/abilities/leitvia-update-product.md",
+			"handbook/abilities/leitvia-set-merchandising.md",
+			"handbook/abilities/leitvia-update-product-category.md",
+			"handbook/abilities/leitvia-list-packages.md"
+		]
+	},
+	"setup": [
+		{
+			"step": "installPlugin",
+			"pluginData": {
+				"resource": "url",
+				"url": "https://downloads.wordpress.org/plugin/woocommerce.11.2.1.zip"
+			},
+			"options": {
+				"activate": true
+			}
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php require_once '/wordpress/wp-load.php';\n$kitchen = wp_insert_term( 'Kitchen', 'product_cat' );\n$product = static function ( string $name, string $price, string $short ) use ( $kitchen ): int {\n\t$p = new WC_Product_Simple();\n\t$p->set_name( $name );\n\t$p->set_status( 'publish' );\n\t$p->set_regular_price( $price );\n\t$p->set_short_description( $short );\n\t$p->set_category_ids( array( $kitchen['term_id'] ) );\n\treturn $p->save();\n};\n$product( 'Oak tray', '48.00', 'Tray.' );\n$product( 'Linen cloth', '19.00', 'A cloth of linen, 50 by 70 cm, washable at 60 degrees.' );"
+		}
+	],
+	"steps": [
+		{
+			"ability": "leitvia/list-products",
+			"capture": {
+				"tray": "products.0.id",
+				"cloth": "products.1.id",
+				"kitchen": "categories.0.id",
+				"kitchenHash": "categories.0.hash"
+			},
+			"expect": {
+				"total": 2,
+				"products.0.title": "Oak tray",
+				"products.1.title": "Linen cloth",
+				"categories.0.name": "Kitchen"
+			}
+		},
+		{
+			"ability": "leitvia/get-product",
+			"input": {
+				"product": "{{capture.tray}}"
+			},
+			"capture": {
+				"trayHash": "hash"
+			},
+			"expect": {
+				"short_description": "Tray.",
+				"cross_sells.length": 0,
+				"price.regular": "48.00"
+			}
+		},
+		{
+			"ability": "leitvia/update-product",
+			"input": {
+				"product": "{{capture.tray}}",
+				"short_description": "A tray of oiled oak, 40 by 25 cm.",
+				"base_hash": "{{capture.trayHash}}",
+				"package": "catalog-unattended"
+			},
+			"expect": {
+				"mode": "package",
+				"package": {
+					"$gte": 1
+				}
+			}
+		},
+		{
+			"ability": "leitvia/set-merchandising",
+			"input": {
+				"product": "{{capture.tray}}",
+				"cross_sells": [
+					"{{capture.cloth}}"
+				],
+				"base_hash": "{{capture.trayHash}}",
+				"package": "catalog-unattended"
+			},
+			"expect": {
+				"mode": "package"
+			}
+		},
+		{
+			"ability": "leitvia/update-product-category",
+			"input": {
+				"term": "{{capture.kitchen}}",
+				"name": "Kitchen and table",
+				"base_hash": "{{capture.kitchenHash}}",
+				"package": "catalog-unattended"
+			},
+			"expect": {
+				"mode": "package"
+			}
+		},
+		{
+			"ability": "leitvia/get-product",
+			"input": {
+				"product": "{{capture.cloth}}"
+			},
+			"capture": {
+				"clothHash": "hash"
+			},
+			"expect": {
+				"price.regular": "19.00"
+			}
+		},
+		{
+			"ability": "leitvia/update-product",
+			"input": {
+				"product": "{{capture.cloth}}",
+				"regular_price": "21.00",
+				"base_hash": "{{capture.clothHash}}",
+				"package": "catalog-unattended"
+			},
+			"expect": {
+				"mode": "package",
+				"kinds.0": "prices"
+			}
+		}
+	],
+	"expect": [
+		{
+			"ability": "leitvia/list-packages",
+			"input": {
+				"state": "open"
+			},
+			"expect": {
+				"length": 1,
+				"0.key": "catalog-unattended",
+				"0.operations.open": 4
+			}
+		},
+		{
+			"ability": "leitvia/get-product",
+			"input": {
+				"product": "{{capture.tray}}"
+			},
+			"expect": {
+				"short_description": "Tray.",
+				"cross_sells.length": 0
+			}
+		},
+		{
+			"ability": "leitvia/list-products",
+			"input": {
+				"search": "Linen"
+			},
+			"expect": {
+				"products.0.price": "19.00",
+				"categories.0.name": "Kitchen"
+			}
+		}
+	]
+}

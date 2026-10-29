@@ -1,12 +1,12 @@
 # Leitvia Skills
 
-Agent skills and workflows for WordPress sites with the theme Leitvia and the plugin Leitvia Studio. They teach an AI coding agent (Claude Code, Codex CLI, Gemini CLI, Cursor, GitHub Copilot and other agents that read Agent Skills) how to set up, design, build, maintain, check and migrate such a site, write its news, improve how it is found and report on it, with a person at each checkpoint or unattended. The agent works only through the abilities of Leitvia Studio, so every change passes the same checks, autonomy levels, snapshots and change packages as in the backend.
+Agent skills and workflows for WordPress sites with the theme Leitvia and the plugin Leitvia Studio. They teach an AI coding agent (Claude Code, Codex CLI, Gemini CLI, Cursor, GitHub Copilot and other agents that read Agent Skills) how to set up, design, build, maintain, check and migrate such a site, look after its shop, write its news, improve how it is found and report on it, with a person at each checkpoint or unattended. The agent works only through the abilities of Leitvia Studio, so every change passes the same checks, autonomy levels, snapshots and change packages as in the backend.
 
 ## What is inside
 
 | Folder | Content |
 |---|---|
-| `skills/` | Ten skills in the Agent Skills format, one folder each with a short `SKILL.md` and, under `references/`, the details it names when they are needed: `leitvia-setup`, `leitvia-design`, `leitvia-page`, `leitvia-pattern`, `leitvia-maintain`, `leitvia-a11y`, `leitvia-migrate`, `leitvia-news`, `leitvia-seo-geo`, `leitvia-report`. |
+| `skills/` | Eleven skills in the Agent Skills format, one folder each with a short `SKILL.md` and, under `references/`, the details it names when they are needed: `leitvia-setup`, `leitvia-design`, `leitvia-page`, `leitvia-pattern`, `leitvia-maintain`, `leitvia-a11y`, `leitvia-migrate`, `leitvia-shop`, `leitvia-news`, `leitvia-seo-geo`, `leitvia-report`. |
 | `workflows/` | `new-site`, `maintenance-cycle` and `migrate-site`: several skills in a row with fixed checkpoints and a mode chosen at the start. |
 | `handbook/` | The agent handbook, generated from Leitvia Studio: `README.md` (rules and an index of all abilities), one page per ability under `abilities/`, every rejection in `rejections.md`, and the abilities with their schemas in `abilities.json`. A skill loads the rules and only the pages of the abilities it calls. |
 | `.claude-plugin/` | The manifests that let Claude Code install the package as a plugin. |
@@ -33,8 +33,8 @@ For a test or demo run on your own machine, without a server, the Playground CLI
 	"constants": { "WP_ENVIRONMENT_TYPE": "local" },
 	"siteOptions": { "permalink_structure": "/%postname%/" },
 	"steps": [
-		{ "step": "installTheme", "themeData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia/releases/download/1.2.10/leitvia-1.2.10.zip" }, "options": { "activate": true } },
-		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.9/leitvia-studio-1.3.9.zip" }, "options": { "activate": true } },
+		{ "step": "installTheme", "themeData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia/releases/download/1.2.11/leitvia-1.2.11.zip" }, "options": { "activate": true } },
+		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.10/leitvia-studio-1.3.10.zip" }, "options": { "activate": true } },
 		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://downloads.wordpress.org/plugin/mcp-adapter.0.7.1.zip" }, "options": { "activate": true } },
 		{ "step": "installPlugin", "pluginData": { "resource": "wordpress.org/plugins", "slug": "woocommerce" }, "options": { "activate": true } },
 		{ "step": "runPHP", "code": "<?php require_once '/wordpress/wp-load.php'; $id = wp_insert_user( array( 'user_login' => 'leitvia-agent', 'display_name' => 'Leitvia agent', 'user_email' => 'agent@example.org', 'user_pass' => wp_generate_password( 32 ), 'role' => 'leitvia_agent' ) ); $created = WP_Application_Passwords::create_new_application_password( $id, array( 'name' => 'leitvia agent' ) ); file_put_contents( '/leitvia-run/agent-password.txt', $created[0] );" }

@@ -1,13 +1,13 @@
 ---
 name: leitvia-design
-description: Derives a Leitvia token set from a brand (colors, fonts, radii, spacing, logo) and activates it through the leitvia abilities only. Maps brand values to the color roles of the design contract, computes every contrast pair before writing, fixes a contrast rejection itself once, and hands the set to a person as a change package. Use it when a site should carry a brand; site structure belongs to leitvia-setup, pages to leitvia-page.
+description: Derives a Leitvia token set from a brand (colors, fonts, radii, spacing, logo) and activates it through the leitvia abilities only. Maps brand values to the color roles of the design contract, computes every contrast pair before writing, fixes a contrast rejection itself once, and hands the set to a person as a change package; without a brand of its own it applies a style variation of the theme instead. Use it when a site should carry a brand or another look; site structure belongs to leitvia-setup, pages to leitvia-page.
 ---
 
 # leitvia-design
 
 Bring a brand onto a Leitvia site as a token set: one DTCG document with every role of the design contract, checked for contrast, activated by a person. You change the site only through the abilities of Leitvia Studio.
 
-Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [get-contract](../../handbook/abilities/leitvia-get-contract.md), [get-tokens](../../handbook/abilities/leitvia-get-tokens.md), [create-token-set](../../handbook/abilities/leitvia-create-token-set.md), [activate-token-set](../../handbook/abilities/leitvia-activate-token-set.md), [audit-site](../../handbook/abilities/leitvia-audit-site.md). Roles, token format, the contrast formula, fonts and what a token set cannot carry: [token details](references/tokens.md).
+Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [get-contract](../../handbook/abilities/leitvia-get-contract.md), [get-tokens](../../handbook/abilities/leitvia-get-tokens.md), [create-token-set](../../handbook/abilities/leitvia-create-token-set.md), [activate-token-set](../../handbook/abilities/leitvia-activate-token-set.md), [set-variation](../../handbook/abilities/leitvia-set-variation.md), [audit-site](../../handbook/abilities/leitvia-audit-site.md). Roles, token format, the contrast formula, fonts and what a token set cannot carry: [token details](references/tokens.md).
 
 ## Ground rules
 
@@ -65,6 +65,10 @@ After the person applied the activation:
 - `leitvia/get-tokens`: `source` is `set`, `active` is the ID of your set, `drift` is false, `contrast` is empty.
 - Fetch the front page and check that the CSS custom properties carry your values, for example `--wp--preset--color--accent` with your accent hex. On some sites global styles written without a signed in user were not found again and the site silently fell back to the theme default; only the front end proves the brand is live.
 - `leitvia/audit-site`: no new findings.
+
+### Style variation instead of a brand
+
+When the person wants one of the looks of the theme and no brand of its own, take the slug from the style variations of `leitvia/get-contract` and call `leitvia/set-variation` with `variation`, empty `base_hash` and the `package` key; after `leitvia_stale_hash` repeat it once with `current_hash`. A full variation replaces the global styles, a colors or typography variation only its part. While a token set is active (`source` of `leitvia/get-tokens` is `set`), its colors and fonts win over any variation, so do not set one; tell the person. Then checkpoint "Package applied" and step 7.
 
 Fonts the theme does not bundle, heading weights, layout widths, the logo and composition rules of the brand: [token details](references/tokens.md#fonts). Tell the person what the set cannot carry.
 

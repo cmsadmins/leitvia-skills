@@ -1,6 +1,6 @@
 ---
 name: leitvia-report
-description: Writes a report on a WordPress site with the Leitvia theme and Leitvia Studio for the person who owns or runs it, from read abilities only (audit-site, get-site-health, get-seo, get-tokens, list-packages) and the public pages. Covers content quality and accessibility findings, search data, versions and updates, design contrast and open change packages, each figure with its source and date, in plain language with the most important points first. Changes nothing. Use it when someone asks for a status, health, quality or SEO report, a monthly summary or a handover document; fixing belongs to leitvia-maintain, leitvia-a11y and leitvia-seo-geo.
+description: Writes a report on a WordPress site with the Leitvia theme and Leitvia Studio for the person who owns or runs it, from read abilities only (audit-site, get-site-health, get-seo, get-tokens, list-packages) and the public pages. Covers content quality and accessibility findings, search data, versions and updates, design contrast and open change packages, each figure with its source and date, in plain language with the most important points first, and on request a JSON export of pages, menus and token sets for a handover. Changes nothing. Use it when someone asks for a status, health, quality or SEO report, a monthly summary or a handover document; fixing belongs to leitvia-maintain, leitvia-a11y and leitvia-seo-geo.
 compatibility: Needs a site with the theme Leitvia and the plugin Leitvia Studio, reached over the MCP server leitvia or the REST routes of the Abilities API with an application password.
 ---
 
@@ -8,7 +8,7 @@ compatibility: Needs a site with the theme Leitvia and the plugin Leitvia Studio
 
 You read a site and tell its owner, in their words, how it stands and what to do next. Every statement rests on a source you name. You change nothing.
 
-Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [audit-site](../../handbook/abilities/leitvia-audit-site.md), [get-site-health](../../handbook/abilities/leitvia-get-site-health.md), [list-content](../../handbook/abilities/leitvia-list-content.md), [get-seo](../../handbook/abilities/leitvia-get-seo.md), [get-tokens](../../handbook/abilities/leitvia-get-tokens.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md). Layout, severity and wording: [report format](references/format.md).
+Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [audit-site](../../handbook/abilities/leitvia-audit-site.md), [get-site-health](../../handbook/abilities/leitvia-get-site-health.md), [list-content](../../handbook/abilities/leitvia-list-content.md), [get-seo](../../handbook/abilities/leitvia-get-seo.md), [get-tokens](../../handbook/abilities/leitvia-get-tokens.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md), for an export [export](../../handbook/abilities/leitvia-export.md). Layout, severity and wording: [report format](references/format.md).
 
 ## Access
 
@@ -46,6 +46,10 @@ Sort what you found into high, medium and low with the [severity scale](referenc
 ### 4. Write
 
 Use the [layout](references/format.md#layout): summary, key figures, findings by area, open decisions, what the report does not cover, sources. Plain words for the reader of step 1; technical names only in the sources and for a technical reader. Compare with an earlier report when the person gives you one, and say what changed.
+
+### 5. Export, when asked
+
+For a handover or a copy of the content, call `leitvia/export`: pages (block markup), navigation menus and token sets come as `items`, the first call also brings template parts and the content model. Call again with `offset` set to `next` until `next` is `null`; `parts` narrows it. Save the items of all calls in one JSON file and name its counts in the report. Say what it lacks: media files, posts, products and settings; drafts are in it, and it restores nothing by itself.
 
 ## Report
 

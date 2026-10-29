@@ -1,8 +1,8 @@
 # Workflow: maintenance-cycle
 
-A regular maintenance run on a site with the Leitvia theme and Leitvia Studio: repair what broke, check accessibility, report to the person. The workflow chains two skills and a report and stops at fixed checkpoints; each skill keeps its own rules and checkpoints. How to call the abilities, hashes and rejections: [agent handbook](../handbook/README.md).
+A regular maintenance run on a site with the Leitvia theme and Leitvia Studio: repair what broke, check accessibility, report to the person. The workflow chains two skills (three on a shop) and a report and stops at fixed checkpoints; each skill keeps its own rules and checkpoints. How to call the abilities, hashes and rejections: [agent handbook](../handbook/README.md).
 
-Chain: [leitvia-maintain](../skills/leitvia-maintain/SKILL.md), then [leitvia-a11y](../skills/leitvia-a11y/SKILL.md), then the report.
+Chain: [leitvia-maintain](../skills/leitvia-maintain/SKILL.md), then [leitvia-a11y](../skills/leitvia-a11y/SKILL.md), on a shop optionally [leitvia-shop](../skills/leitvia-shop/SKILL.md), then the report.
 
 ## Choose the mode at the start
 
@@ -31,19 +31,27 @@ When no person answers, the workflow runs in several unattended runs with the sa
 - **Writes:** alt text, decorative images, link texts, empty headings, heading levels, with the same key in mode `package`.
 - **Checkpoints:** "Link targets" and "AI for alt text" of the skill: "May the images of <pages> go to the AI provider of the site for a first draft of their alt text?"
 
-### 3. Package
+### 3. Shop catalog, optional
+
+- **Only** when WooCommerce is active (`leitvia/list-products` is an ability of the site) and the person asks for it, or the briefing names it. Otherwise skip this step.
+- **Skill:** leitvia-shop, steps 1 to 7.
+- **Input:** `leitvia/list-products` and `leitvia/get-product`; products without alt text on their images, empty short descriptions and empty categories are the usual findings.
+- **Writes:** `leitvia/update-product`, `leitvia/update-product-category`, `leitvia/set-merchandising`, with the same key in mode `package`. Prices, tax and shipping always wait for a person, in mode `direct` too.
+- **Checkpoints:** "Plan confirmed" and "Facts from the person" of the skill: "The price of <product> is <old>. Which price should it have?"
+
+### 4. Package
 
 - `leitvia/list-packages` with `state: open`: in mode `package` exactly one package with your key; in mode `direct` the packages of the writes the levels held back. `leitvia/get-package` with each `id` gives the diff per operation and the `preview` link.
 - **Checkpoint "Package applied":** "Package <id> holds <n> changes: <short list>. Please review it in the inbox at `/wp-admin/admin.php?page=leitvia-studio-inbox&package=<id>` (block diff and preview) and apply it. Shall I wait?"
 - After it is applied: `GET /wp-cron.php` where WP-Cron does not run by itself, then `leitvia/audit-site` again; that is the "after" of the report. A `conflict` in the applied package means someone changed the post in between: read it again and repeat that change once in a new run.
 
-### 4. Report
+### 5. Report
 
 In the language of the person:
 
 1. **Packages:** ID, state and inbox link of each package; in mode `direct` also the corrections that went live, with the ID of their recorded package.
 2. **Before and after:** findings per page from the first and the last audit, counted per check.
-3. **Fixed:** per page what changed (links from and to, alt texts, replaced sections, texts, heading levels).
+3. **Fixed:** per page what changed (links from and to, alt texts, replaced sections, texts, heading levels), and per product of step 3.
 4. **Open with reason:** findings no ability fixes, links in header, footer or navigation, external links not checked, conflicts.
 5. **For a person:** the tests leitvia-a11y lists in its step 6 (keyboard, screen reader, zoom). Never call the site accessible or compliant.
 
@@ -51,6 +59,7 @@ In the language of the person:
 
 1. **Link targets**, **Section without replacement** and **Facts from the person** (step 1).
 2. **AI for alt text** (step 2).
-3. **Package applied** (step 3), before the audit after.
-4. **Rollback confirmed**, only when the person asks to undo a package (leitvia-maintain, Rollback).
-5. **Second rejection** of the same call, or a rejection with `retry: never`, in any step.
+3. **Plan confirmed** and **Facts from the person** of leitvia-shop (step 3), only on a shop.
+4. **Package applied** (step 4), before the audit after.
+5. **Rollback confirmed**, only when the person asks to undo a package (leitvia-maintain, Rollback).
+6. **Second rejection** of the same call, or a rejection with `retry: never`, in any step.

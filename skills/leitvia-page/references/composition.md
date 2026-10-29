@@ -19,7 +19,7 @@ The narrative order of the roles is `hook`, `context`, `proof`, `detail`, `offer
 
 ## Patterns that need facts
 
-Replace a planned section when it needs facts nobody gave you: prices (`leitvia/offer-pricing-3`, `leitvia/content-price-list`), figures (`leitvia/content-stats`), customer quotes and testimonials (`leitvia/content-quote`, `leitvia/proof-testimonial`), logos, team members, files to download (`leitvia/content-downloads`, [files to download](content.md#files-to-download)).
+Replace a planned section when it needs facts nobody gave you: prices (`leitvia/offer-pricing-3`, `leitvia/content-price-list`), figures (`leitvia/content-stats`), customer quotes and testimonials (`leitvia/content-quote`, `leitvia/proof-testimonial`), logos, team members, files to download (`leitvia/content-downloads`, [files to download](content.md#files-to-download)), videos (`leitvia/content-video`, [videos](content.md#videos)).
 
 ## Templates and the h1
 

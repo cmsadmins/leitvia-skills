@@ -9,8 +9,8 @@ Chain: [leitvia-setup](../skills/leitvia-setup/SKILL.md), then [leitvia-design](
 An empty WordPress installation has neither the theme nor Leitvia Studio, and installing them is no ability: the area `admin` stays locked for agents. The operator, or the script that starts an unattended run, prepares the site once with WP-CLI on the server (WordPress 7.1 or later, PHP 8.2 or later, HTTPS):
 
 ```sh
-wp theme install https://github.com/cmsadmins/leitvia/releases/download/1.2.10/leitvia-1.2.10.zip --activate
-wp plugin install https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.9/leitvia-studio-1.3.9.zip --activate
+wp theme install https://github.com/cmsadmins/leitvia/releases/download/1.2.11/leitvia-1.2.11.zip --activate
+wp plugin install https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.10/leitvia-studio-1.3.10.zip --activate
 wp plugin install https://downloads.wordpress.org/plugin/mcp-adapter.0.7.1.zip --activate
 wp user create leitvia-agent agent@example.org --role=leitvia_agent --display_name="Leitvia agent"
 wp user application-password create leitvia-agent "leitvia agent" --porcelain

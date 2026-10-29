@@ -8,7 +8,7 @@ Details for `leitvia-page`. Read it before you write the edits of step 4.
 - A pattern with more slots than you have facts (a strip of five items for four points, a step the briefing does not describe) gets a pattern with fewer slots, or the slot repeats a fact the person gave you. Never fill it with an assumption about the business, even one you flag in the report.
 - Some blocks hold text you cannot change with an edit: a caption, or a text with more than one link. Use those patterns only when their sample text fits, otherwise choose another pattern of the same role. The attribution of a quote (`cite`) and the question of a details block (`summary`) take a `text` edit at the quote or details block itself.
 - Keep to the text lengths of the plan; a hero heading of 120 characters breaks the layout the pattern was made for.
-- Write in the language of the page. In German headings, compound words longer than about 18 characters need soft hyphens (U+00AD) at the joints, or they overflow at 320 px.
+- Write in the language of the page. Leitvia hyphenates German headings and wraps a word longer than the line, so long compound words need no soft hyphens; pages in easy language keep words whole.
 - A page in another language than the site needs its own document language. Core has no setting per page; tell the person, who decides on a language plugin.
 - Never put review notes or HTML comments into block markup. Open questions go into your report.
 
@@ -35,3 +35,9 @@ Details for `leitvia-page`. Read it before you write the edits of step 4.
 - Use `leitvia/content-downloads`: one list item per file. Its `text` edit holds the link text and one sentence about the file, with `link_text` the part that stays linked and `url` the file URL: `{"block": "p:0.2.0", "text": "Price list 2026 (PDF, 180 KB) All plans and services with prices excluding VAT.", "link_text": "Price list 2026 (PDF, 180 KB)", "url": "<url>"}`. The list style puts the link on its own line.
 - The link text names the file, its format in capitals and its size, rounded: KB below 1 MB, MB with one decimal above. Keep each link text unique on the page. Remove list items you have no file for, or choose another pattern; never keep a sample item.
 - One file inside running text needs no pattern: link it in the sentence with the same text, "the price list (PDF, 180 KB)".
+
+## Videos
+
+- `leitvia/add-media` takes images only: use a video the person put into the media library (`leitvia/list-media`, `mime` `video`); a missing one is an open question.
+- Use `leitvia/content-video`. Its transcript holds one list item per scene in the words on screen; without the script of the video, ask. Spoken words also need captions in a text track, a task for the person.
+- Its video block is empty and its caption takes no edit: after composing, send the whole content with `leitvia/update-content`, the video with attachment `id`, `src`, `controls` and a caption. Never `autoplay`.

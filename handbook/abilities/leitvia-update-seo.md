@@ -1,6 +1,6 @@
 # leitvia/update-seo
 
-Generated from Leitvia Studio 1.3.9. Do not edit. Group: Maintain. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.10. Do not edit. Group: Maintain. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **Update SEO data.** Writes SEO title, meta description and robots of one post through the active SEO plugin. It covers posts, pages and entries in Yoast SEO, Rank Math, SEOPress or The SEO Framework; without one of them it is rejected with leitvia_no_seo_plugin. Read the post with leitvia/get-seo first and send its hash as base_hash. A title has at most 60 characters, a description 50 to 160; an empty string hands the field back to the template of the plugin. Say only what the page says: every number in title or description must appear in the title, excerpt or content of the post. Autonomy and change packages work as for leitvia/update-content; a live write gets a change package for leitvia/rollback.
 

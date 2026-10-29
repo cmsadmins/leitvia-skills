@@ -16,6 +16,7 @@ The operator keeps the brief in a file next to the task (for example `news-brief
 | Category and tags | category `News`, tags from the topic | no |
 | Length | 300 to 600 words | no |
 | Avoid | competitors by name, prices, medical advice | no |
+| Images | featured image, screenshots, video with script | no |
 
 A topic or a source outside the brief is not used. A brief without topics or sources: stop (checkpoint **Brief**).
 
@@ -36,8 +37,8 @@ A topic or a source outside the brief is not used. A brief without topics or sou
 
 - Title: names the news, at most 70 characters, no clickbait.
 - First paragraph: what happened, when, where, why it matters to the audience of the brief.
-- Body: short paragraphs with h2 subheadings where the post is longer than 300 words; only core blocks (`core/paragraph`, `core/heading`, `core/list`, `core/quote`, `core/image` from the media library, `core/embed`).
+- Body: short paragraphs with h2 subheadings where the post is longer than 300 words; only core blocks (`core/paragraph`, `core/heading`, `core/list`, `core/quote`, `core/image` from the media library, `core/video`, `core/embed`).
 - Sources: a heading "Sources" and a list with one link per source item (title of the item, publisher, date).
 - AI notice: `ai_generated` true on `leitvia/create-content`. Studio then shows a note before the text that AI wrote it, in the language of the site; a person removes it after their own review by deleting the custom field `leitvia_ai_generated`. Do not add a notice of your own to the content.
 - Excerpt: one or two sentences, at most 160 characters.
-- No images unless the brief names an image source the operator may use; an image from a news source is never copied.
+- No images unless the brief names images the operator may use; an image from a news source is never copied. Featured image: `featured_image`, with alt text. Screenshots: one or two real screens, no mockups, with alt text and caption. Video: only with its script; `core/video` with `controls` and caption, then `core/details` "Transcript of the video", one list item per scene, as in `leitvia/content-video`.
