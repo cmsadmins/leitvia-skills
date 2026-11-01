@@ -1,5 +1,5 @@
 {
-	"studio": "1.3.10",
+	"studio": "1.3.14",
 	"abilities": [
 		{
 			"name": "leitvia/activate-token-set",
@@ -84,6 +84,87 @@
 				"readonly": false,
 				"destructive": true,
 				"idempotent": false
+			}
+		},
+		{
+			"name": "leitvia/add-building-block",
+			"label": "Add building block",
+			"description": "Adds a building block of leitvia/list-building-blocks to the site: its content types, taxonomies, relations and site settings through leitvia/define-content-type, merged with the entries that exist so fields a person added stay; the default values of its site settings that are empty; and its sample entries with their terms as drafts. Design, header, footer, pages and front page stay as they are. What the autonomy does not let go live waits in one change package. With settle, a person (manage_options, not the agent role) in the admin, neither signed in with an application password nor calling over MCP, gets that package applied right away: applied lists it, partial names a package applied in part with its errors. Entries that exist are kept, so the block can be added again to fill in what is missing.",
+			"category": "leitvia",
+			"group": "setup",
+			"input_schema": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string",
+						"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
+						"description": "Name of the building block, for example my-addon/events."
+					},
+					"samples": {
+						"type": "boolean",
+						"default": true,
+						"description": "Whether to add the sample entries as drafts."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: every part goes into the change package of that key, nothing goes live."
+					},
+					"settle": {
+						"type": "boolean",
+						"default": false,
+						"description": "Apply what collects at once instead of leaving it in the Inbox. Only for a person in the admin; agents, application passwords and MCP clients get the autonomy."
+					}
+				},
+				"required": [
+					"name"
+				],
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"buildingBlock": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"steps": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"applied": {
+						"type": "array",
+						"items": {
+							"type": "integer"
+						}
+					},
+					"partial": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"package": {
+									"type": "integer"
+								},
+								"errors": {
+									"type": "array",
+									"items": {
+										"type": "object"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": false,
+				"idempotent": true
 			}
 		},
 		{
@@ -229,7 +310,7 @@
 		{
 			"name": "leitvia/apply-recipe",
 			"label": "Apply recipe",
-			"description": "Sets up the site from a recipe of leitvia/list-recipes: content model, token set, style variation, header and footer, pages from patterns, navigation, reading settings and options that save data. Each part runs through its own ability with the autonomy level of its area; what may not go live lands in one change package, and with a package key everything does. Settings that point to a page waiting in that package (front page, privacy policy page) are set when the package is applied. Pages that exist, and variation, header, footer and navigation changed since a recipe wrote them, are kept, as is the variation while a token set is active, so the recipe can run again after the package was applied. Review the package with leitvia/get-package.",
+			"description": "Sets up the site from a recipe of leitvia/list-recipes: content model and building blocks, token set, style variation, header and footer, pages from patterns, navigation, reading settings and options that save data. Each part runs through its own ability with the autonomy level of its area; what may not go live lands in one change package, and with a package key everything does. Settings that point to a page waiting in that package (front page, privacy policy page) are set when the package is applied. Pages that exist, and variation, header, footer and navigation changed since a recipe wrote them, are kept, as is the variation while a token set is active, so the recipe can run again after the package was applied. parts, pages and buildingBlocks limit the run to a selection, and dryRun reports what would change without writing. Review the package with leitvia/get-package. With settle, a person (manage_options, not the agent role) in the admin, neither signed in with an application password nor calling over MCP, who runs it without a package key applies what collects at once: applied lists the packages applied in full, which can be rolled back in the Inbox, and partial the packages applied in part, with their errors. Without settle the package waits.",
 			"category": "leitvia",
 			"group": "setup",
 			"input_schema": {
@@ -243,6 +324,51 @@
 						"type": "string",
 						"maxLength": 64,
 						"description": "Key of the task: every part goes into the change package of that key, nothing goes live."
+					},
+					"parts": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"enum": [
+								"buildingBlocks",
+								"samples",
+								"design",
+								"header",
+								"footer",
+								"pages",
+								"navigation",
+								"frontPage",
+								"options"
+							]
+						},
+						"uniqueItems": true,
+						"description": "Parts to apply, all by default: buildingBlocks (content model and building blocks), samples (their sample entries), design (token set and style variation), header, footer, pages, navigation, frontPage (reading settings) and options (page settings and data-saving options)."
+					},
+					"pages": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"pattern": "^[a-z0-9-]+$"
+						},
+						"description": "Slugs of the recipe pages to create, all by default."
+					},
+					"buildingBlocks": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"pattern": "^[a-z0-9-]+/[a-z0-9-]+$"
+						},
+						"description": "Names of the building blocks of the recipe to add, all by default. With a list only these blocks add content types, not the whole content model of the recipe."
+					},
+					"dryRun": {
+						"type": "boolean",
+						"default": false,
+						"description": "Report what each step would do (new, replace, exists, package, waiting) and the parts it replaces, without writing anything."
+					},
+					"settle": {
+						"type": "boolean",
+						"default": false,
+						"description": "Apply what collects at once instead of leaving it in the Inbox. Only for a person in the admin; agents, application passwords and MCP clients get the autonomy."
 					}
 				},
 				"required": [
@@ -263,6 +389,38 @@
 						"type": "array",
 						"items": {
 							"type": "object"
+						}
+					},
+					"dryRun": {
+						"type": "boolean"
+					},
+					"applied": {
+						"type": "array",
+						"items": {
+							"type": "integer"
+						}
+					},
+					"partial": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"package": {
+									"type": "integer"
+								},
+								"errors": {
+									"type": "array",
+									"items": {
+										"type": "object"
+									}
+								}
+							}
+						}
+					},
+					"replaces": {
+						"type": "array",
+						"items": {
+							"type": "string"
 						}
 					}
 				}
@@ -1205,7 +1363,7 @@
 		{
 			"name": "leitvia/define-content-type",
 			"label": "Define content type",
-			"description": "Adds or replaces entries of the content model (postTypes, taxonomies, relations, settings) and keeps the others. Read the declaration with leitvia/get-content-model first. The base hash is the hash of the content model. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash. showInAbilities stays a decision of a person: agents may not set it.",
+			"description": "Adds entries to the content model (postTypes, taxonomies, relations, settings) and keeps the others. An entry that exists is merged: the input sets its own keys and fields, fields, repeaters and supports it does not name stay, and the postTypes of a taxonomy are joined; relations and settings are replaced whole. Nothing is removed through this ability: an entry, field, repeater or supports value can only be removed by a person on the Model screen. Read the declaration with leitvia/get-content-model first. The base hash is the hash of the content model. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash. showInAbilities stays a decision of a person: agents may not set it.",
 			"category": "leitvia",
 			"group": "setup",
 			"input_schema": {
@@ -2190,6 +2348,67 @@
 									"minLength": 1
 								}
 							}
+						}
+					}
+				}
+			},
+			"annotations": {
+				"readonly": true,
+				"destructive": false,
+				"idempotent": true,
+				"openWorldHint": false
+			}
+		},
+		{
+			"name": "leitvia/list-building-blocks",
+			"label": "List building blocks",
+			"description": "Lists the building blocks of add-ons: name, title, description, whether the site has them, their post types and taxonomies, the patterns that show them and the number of sample entries. Add one with leitvia/add-building-block.",
+			"category": "leitvia",
+			"group": "read",
+			"input_schema": [],
+			"output_schema": {
+				"type": "array",
+				"items": {
+					"type": "object",
+					"properties": {
+						"name": {
+							"type": "string"
+						},
+						"owner": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"icon": {
+							"type": "string"
+						},
+						"installed": {
+							"type": "boolean"
+						},
+						"postTypes": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						},
+						"taxonomies": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						},
+						"patterns": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						},
+						"sampleCount": {
+							"type": "integer"
 						}
 					}
 				}
@@ -4274,6 +4493,7 @@
 			"leitvia_stale_hash",
 			"leitvia_static_markup",
 			"leitvia_too_large",
+			"leitvia_unknown_building_block",
 			"leitvia_unknown_package",
 			"leitvia_unknown_pattern",
 			"leitvia_unknown_recipe",
@@ -4313,7 +4533,7 @@
 				"code": "leitvia_ai_not_approved",
 				"status": 503,
 				"reason": "ai",
-				"message": "The AI provider could not be reached, or an administrator has not approved this request for the connector yet. When the AI plugin is active, an administrator approves pending connector requests in its settings; until then, call again with ai set to false.",
+				"message": "The AI provider could not be reached, or an administrator has not approved this request for the connector yet. When the AI plugin is active, an administrator approves pending connector requests under Tools, Connector Approvals; until then, call again with ai set to false.",
 				"next_ability": [],
 				"retry": "never"
 			},
@@ -4829,6 +5049,16 @@
 					""
 				],
 				"retry": "once"
+			},
+			{
+				"code": "leitvia_unknown_building_block",
+				"status": 404,
+				"reason": "building_block",
+				"message": "There is no building block with this name.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
 			},
 			{
 				"code": "leitvia_unknown_package",

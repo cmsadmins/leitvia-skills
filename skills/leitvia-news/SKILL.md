@@ -54,7 +54,7 @@ Call `leitvia/create-content` with `post_type` `post` (or the type of the conten
 ### 6. Check and report
 
 - `leitvia/list-packages` with `state: open` and `leitvia/get-package`: the package holds exactly one operation, the draft.
-- Report: package ID and inbox link `/wp-admin/admin.php?page=leitvia-studio-inbox&package=<id>`, title, the sources, the duplicates you dropped with the post they match, and open questions.
+- Report: package ID, Inbox link `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=<id>`, title, sources, the duplicates you dropped with the post they match, and open questions.
 
 ## Checkpoints
 

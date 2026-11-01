@@ -266,6 +266,14 @@ export function handbook( dump ) {
 			'|---|---|---|---|---|',
 			...( rejections.cases ?? [] ).map( ( item ) => `| \`${ item.code }\` | ${ item.status ?? 'varies' } | ${ item.retry ? `\`${ item.retry }\`` : 'varies' } | ${ item.next_ability.length ? item.next_ability.map( ( name ) => ( name ? `\`${ name }\`` : 'none' ) ).join( ' or ' ) : 'set at run time' } | ${ cell( item.message ?? 'Built at run time; read the message.' ) } |` ),
 			'',
+			'## Codes of other plugins',
+			'',
+			'Other plugins may replace a rejection of Leitvia Studio with their own code. Over MCP, call Leitvia tools on the server `leitvia`: another plugin (MCP Access of the AI plugin) can list them on the default server of the adapter too, with the same checks but rejections without hash, next ability and retry rule. Known codes:',
+			'',
+			'| Code | HTTP | Retry | Plugin | What to do |',
+			'|---|---|---|---|---|',
+			'| `wpai_connector_not_approved` | 403 | `never` | AI 1.5 or later, over REST | The AI plugin blocked a request to the AI provider and replaced the answer. An administrator approves pending requests under Tools, Connector Approvals; until then, call again with ai set to false. |',
+			'',
 		].join( '\n' ),
 	};
 	for ( const [ group, [ title, intro ] ] of Object.entries( GROUPS ) ) {

@@ -20,6 +20,14 @@ The recipe runs content model, token set, style variation, header and footer, pa
 
 Settings that point to recipe pages (front page, privacy policy page, terms page of the shop) wait in the same package and get the ID of their page when the person applies it, so one package covers the whole setup. You cannot apply operations of areas that are not autonomous; `leitvia/apply-package` answers `leitvia_needs_human` and that is expected.
 
+## Parts and dry run
+
+A recipe runs whole by default. On a site that already has its design, pages and front page, take only what the task needs:
+
+- `dryRun: true` writes nothing. Each step says `new`, `replace`, `unchanged`, `exists`, `package` or `waiting`, and `replaces` lists the parts that would overwrite something (style variation, header, footer, navigation, a setting). Show `replaces` to the person before the real run, then send the same selection without `dryRun`.
+- `parts` limits the run: `buildingBlocks`, `samples`, `design`, `header`, `footer`, `pages`, `navigation`, `frontPage`, `options`. `pages` takes recipe page slugs, `buildingBlocks` names of the blocks of the recipe.
+- One content feature on its own (events, team, services) is a building block: `leitvia/list-building-blocks` lists them with `installed`, `leitvia/add-building-block` adds one with its types, settings that are empty and sample entries as drafts. Design, header, footer, pages and front page stay. Prefer it to a recipe run on an existing site.
+
 ## Sample texts of the recipe
 
 Recipe pages, header and footer are built from patterns and carry the sample texts of their patterns (names, addresses, prices, quotes). Legal pages and, in the recipe `leitvia/shop`, About and Contact hold only placeholders that say so; the home page and the footer still carry sample texts. Read the diff of the package (`leitvia/get-package`) and list every such text with its page before the person applies it, so they know what goes live. After it was applied, read header and footer with `leitvia/get-page-outline` (the template part ID is `target.post` of the step `templateParts` in the confirmation run, setup step 5): `links` of each block shows where it leads, and a link to `#` or to a page the site lacks is a finding to fix with `leitvia/update-template-part`. New links (accessibility statement, overview pages): edit the `markup` of `leitvia/get-block` on the root block of the part, send it as `content`. Replacing them is work for `leitvia-page` after the setup, not a reason to rebuild the recipe by hand. On a site that is already live, ask whether the package should wait until those texts are replaced.

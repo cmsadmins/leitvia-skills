@@ -35,6 +35,7 @@ Collect, before any call: the goal of the page (what should a visitor do), the c
 
 - `leitvia/get-contract`: `pageFrames` (frame types, their template and slots), `compositionRules`, `templates`, `roles` and `blockStyles`.
 - `leitvia/list-patterns`: filter by `role`, `tone` or `layout`; each item has `composition`, `images`, `useWhen`, `avoidWhen`, `status` and `replacedBy`. Use only patterns with `status` `approved`: `leitvia/compose-page` refuses a Lab pattern (`block:<ID>`) in draft or review with `leitvia_pattern_not_approved`.
+- [`leitvia/list-building-blocks`](../../handbook/abilities/leitvia-list-building-blocks.md): a pattern in `patterns` of a block with `installed: false` shows nothing until the block is on the site. Add just that block with [`leitvia/add-building-block`](../../handbook/abilities/leitvia-add-building-block.md) (`name`, your `package` key; sample entries come as drafts) once the person agreed, never a whole recipe: a recipe also replaces design, header and front page.
 
 ### 2. Plan the outline
 

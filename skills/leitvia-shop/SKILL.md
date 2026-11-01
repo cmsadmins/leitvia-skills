@@ -66,7 +66,7 @@ A product image needs alt text that says what the picture shows; product images 
 
 ### 8. The package
 
-After the last write: `leitvia/list-packages` with `state: open`, then `leitvia/get-package` with `id`, and check each diff. Do not call `leitvia/apply-package`: the area `products` and the kinds `prices`, `tax` and `shipping` are not `autonomous` by default, and the person reviews the package at `/wp-admin/admin.php?page=leitvia-studio-inbox&package=<id>`. Checkpoint **Package applied**. Afterwards read each product again with `leitvia/get-product` and request its `link`: it answers 200 and shows the new texts.
+After the last write: `leitvia/list-packages` with `state: open`, then `leitvia/get-package` with `id`, and check each diff. Do not call `leitvia/apply-package`: the area `products` and the kinds `prices`, `tax` and `shipping` are not `autonomous` by default, and the person reviews the package at `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=<id>`. Checkpoint **Package applied**. Afterwards read each product again with `leitvia/get-product` and request its `link`: it answers 200 and shows the new texts.
 
 ## Report
 

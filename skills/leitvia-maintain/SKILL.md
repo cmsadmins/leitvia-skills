@@ -66,6 +66,8 @@ Look at each image and its place on the page, write one short sentence, and send
 
 Change stale figures, dates and names only against a source the person named or a read ability; open markers (`CHECK:`, `TODO`, sample texts) go into the report. Details: [outdated content](references/fixes.md#outdated-content).
 
+A section that shows nothing on the public page may need a building block the site lacks: `leitvia/list-building-blocks` lists it with `installed: false` and its `patterns`. Report it; add it with `leitvia/add-building-block` and your `package` key only when the person asks.
+
 ### 6. The package
 
 Every write of the run carries the same `package` key. After the last write:
@@ -74,7 +76,7 @@ Every write of the run carries the same `package` key. After the last write:
 - `leitvia/get-package` with `id`: the diff per operation. Check that every operation does what you meant.
 - Do not call `leitvia/apply-package` for operations of areas that are not `autonomous` for you; it answers `leitvia_needs_human`, whose `data.inbox` is the link for the person.
 
-The person reviews the package in the inbox of Leitvia Studio: `/wp-admin/admin.php?page=leitvia-studio-inbox&package=<id>`. Checkpoint **Package applied**.
+The person reviews the package in the inbox of Leitvia Studio: `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=<id>`. Checkpoint **Package applied**.
 
 ### 7. After the person applied it
 
@@ -91,7 +93,7 @@ Only when a person asks for it, never to tidy up your own run: confirm the packa
 
 Write the report in the chat, in the language of the person:
 
-1. **Package:** ID, state and the inbox link `/wp-admin/admin.php?page=leitvia-studio-inbox&package=<id>`; plus the IDs of corrections that went live on their own.
+1. **Package:** ID, state and the inbox link `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=<id>`; plus the IDs of corrections that went live on their own.
 2. **Before and after:** per post the findings of the first audit and of the audit after the package was applied (or "waiting for the package" until then), counted per check.
 3. **Fixed:** per post what you changed (links from and to, alt texts, replaced patterns, texts).
 4. **Open with reason:** findings no ability can fix, broken links in template parts, external links not checked, conflicts.

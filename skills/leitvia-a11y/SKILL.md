@@ -63,7 +63,7 @@ Landmarks and the h1 of a template, classic content and blocks of other plugins,
 
 ### 5. After the person applied the package
 
-`leitvia/list-packages` with `state: open` gives your package; `leitvia_needs_human` from `leitvia/apply-package` carries the inbox link in `data.inbox`. The person applies it at `/wp-admin/admin.php?page=leitvia-studio-inbox&package=<id>` (checkpoint **Package applied**). Then `GET /wp-cron.php` where needed, `leitvia/get-package` for conflicts, `leitvia/audit-site` and the public pages again: the "after" of your report.
+`leitvia/list-packages` with `state: open` gives your package; `leitvia_needs_human` from `leitvia/apply-package` carries the inbox link in `data.inbox`. The person applies it at `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=<id>` (checkpoint **Package applied**). Then `GET /wp-cron.php` where needed, `leitvia/get-package` for conflicts, `leitvia/audit-site` and the public pages again: the "after" of your report.
 
 ### 6. What only a person can test
 

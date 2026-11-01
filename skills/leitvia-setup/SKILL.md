@@ -61,6 +61,8 @@ Checkpoint "Recipe chosen".
 
 Call `leitvia/apply-recipe` with `recipe` and your `package` key. With a key nothing goes live: every part lands in that one change package, whatever the autonomy of the site allows. In mode `direct` send no key; then the autonomy levels decide and what they hold back still lands in one package. With the default levels new pages become drafts the person publishes. The person rejects a package left by a switch to `package`. Read the `steps` of the result (statuses: [recipe details](references/recipe.md#status-of-a-step)). For a shop, create the products of the briefing with `leitvia/create-product` and the same key; they need nothing from the package ([shop sites](references/recipe.md#shop-sites)).
 
+A site that already has design and pages gets a dry run first (`dryRun: true`) and then only the parts it needs; a single content feature is a building block, not a recipe ([parts and dry run](references/recipe.md#parts-and-dry-run)).
+
 The recipe pages carry the sample texts of their patterns. Read the diff with `leitvia/get-package` and list every sample text with its page before the person applies the package ([recipe details](references/recipe.md#sample-texts-of-the-recipe)). Tell the person what the package contains and that it needs their decision in the inbox of Leitvia Studio.
 
 Checkpoint "Package applied".

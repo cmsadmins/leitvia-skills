@@ -42,7 +42,7 @@ When no person answers, the workflow runs in several unattended runs with the sa
 ### 4. Package
 
 - `leitvia/list-packages` with `state: open`: in mode `package` exactly one package with your key; in mode `direct` the packages of the writes the levels held back. `leitvia/get-package` with each `id` gives the diff per operation and the `preview` link.
-- **Checkpoint "Package applied":** "Package <id> holds <n> changes: <short list>. Please review it in the inbox at `/wp-admin/admin.php?page=leitvia-studio-inbox&package=<id>` (block diff and preview) and apply it. Shall I wait?"
+- **Checkpoint "Package applied":** "Package <id> holds <n> changes: <short list>. Please review it in the inbox at `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=<id>` (block diff and preview) and apply it. Shall I wait?"
 - After it is applied: `GET /wp-cron.php` where WP-Cron does not run by itself, then `leitvia/audit-site` again; that is the "after" of the report. A `conflict` in the applied package means someone changed the post in between: read it again and repeat that change once in a new run.
 
 ### 5. Report

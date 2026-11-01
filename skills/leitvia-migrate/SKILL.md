@@ -8,15 +8,15 @@ compatibility: Needs a site with the plugin Leitvia Studio, before the switch wi
 
 A migration takes a site built with a classic theme and the classic editor and leaves it on Leitvia with the same content as blocks: same pages, same URLs, same texts and images, the same menu, the brand as a token set. You change the site only through the abilities of Leitvia Studio.
 
-Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [audit-site](../../handbook/abilities/leitvia-audit-site.md), [get-page-outline](../../handbook/abilities/leitvia-get-page-outline.md), [get-block](../../handbook/abilities/leitvia-get-block.md), [get-contract](../../handbook/abilities/leitvia-get-contract.md), [get-content-model](../../handbook/abilities/leitvia-get-content-model.md), [compose-page](../../handbook/abilities/leitvia-compose-page.md), [update-content](../../handbook/abilities/leitvia-update-content.md), [add-media](../../handbook/abilities/leitvia-add-media.md), [update-navigation](../../handbook/abilities/leitvia-update-navigation.md), [update-template-part](../../handbook/abilities/leitvia-update-template-part.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md), [get-package](../../handbook/abilities/leitvia-get-package.md). Tag to block, images, the comparison and rejections of step 4: [translation details](references/translate.md); markup examples: [block markup](references/block-markup.md).
+Read before the first call: the [agent handbook](../../handbook/README.md). Read the page of an ability before you first call it: [audit-site](../../handbook/abilities/leitvia-audit-site.md), [get-page-outline](../../handbook/abilities/leitvia-get-page-outline.md), [get-block](../../handbook/abilities/leitvia-get-block.md), [get-contract](../../handbook/abilities/leitvia-get-contract.md), [get-content-model](../../handbook/abilities/leitvia-get-content-model.md), [compose-page](../../handbook/abilities/leitvia-compose-page.md), [update-content](../../handbook/abilities/leitvia-update-content.md), [add-media](../../handbook/abilities/leitvia-add-media.md), [update-navigation](../../handbook/abilities/leitvia-update-navigation.md), [update-template-part](../../handbook/abilities/leitvia-update-template-part.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md), [get-package](../../handbook/abilities/leitvia-get-package.md). Tag to block, images, the comparison and rejections of step 4: [translation details](references/translate.md); markup examples: [block markup](references/block-markup.md).
 
 ## Access
 
-MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Paths start at the address of the site, not at the host. While the classic theme is active, `leitvia/get-contract` answers `leitvia_no_contract`; compare the address of your task with `home` of the public `GET /wp-json/` instead. After the switch call `leitvia/get-contract` and compare `site.url`. When the addresses differ, write nothing and ask the person. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read. Reading public pages of the site is fine and part of the inventory.
+As the agent user over MCP or REST: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). While the classic theme is active, `leitvia/get-contract` answers `leitvia_no_contract`; compare the address of your task with `home` of the public `GET /wp-json/` instead, after the switch with `site.url` of `leitvia/get-contract`. When they differ, write nothing and ask. No SQL, WP-CLI or core REST routes (`/wp-json/wp/v2/...`), not even to read; public pages are fine and part of the inventory.
 
 ## Source outside this site
 
-When the source is another site (any system, for example Wix), read its public pages as a visitor, never its admin or an export. Inventory pages, navigation, texts, images and embeds, and map each page to a page, a post or an entry of a post type of the content model with its fields and terms; take over no scripts, trackers, fonts or forms of the source; add images with `leitvia/add-media` as Base64 (up to 5 MB, alt text required) in one package, create the entries with their content and the menu in a second one, and end with a reconciliation report. Steps 2 and 3 below do not apply. Details: [external source](references/external.md).
+When the source is another site (any system, for example Wix), read its public pages as a visitor, never its admin or an export. Map each page to a page, a post or an entry of the content model with its fields and terms; take over no scripts, trackers, fonts or forms; add images with `leitvia/add-media` as Base64 (up to 5 MB, alt text required) in one package, create the entries with their content and the menu in a second one, and end with a reconciliation report. Steps 2 and 3 below do not apply. Details: [external source](references/external.md).
 
 ## Modes
 
@@ -74,7 +74,7 @@ For each post: `leitvia/get-block` with `block: "p:0"` (keep `document_hash` and
 
 Rebuild the main menu of the inventory with `leitvia/update-navigation`: `items` with `label` and `url` per entry, one level of sub `items`. Use paths of this site (`/about-us/`) for its own pages; external links need `https`. A deeper level or more than 30 items: ask the person how to fold it (checkpoint **Open items**). The menu WordPress made on the first visit has a hash no ability returns: send `base_hash` empty, take `current_hash` from the rejection `leitvia_stale_hash` and send once more with it. Send the `package` key.
 
-Footer and sidebar menus are links in template parts; offer them to the person and change them with `leitvia/update-template-part` only on their word.
+Footer and sidebar menus are links in template parts; change them with `leitvia/update-template-part` only on the person's word.
 
 ### 6. Widgets and leftovers
 
@@ -82,11 +82,11 @@ Widgets do not move by themselves. For each widget of the inventory the person d
 
 ### 7. After the person applied the package
 
-`leitvia/list-packages` with `state: open` gives your package; the person applies it at `/wp-admin/admin.php?page=leitvia-studio-inbox&package=<id>` (checkpoint **Package applied**). Then:
+`leitvia/list-packages` with `state: open` gives your package; the person applies it in the inbox (checkpoint **Package applied**). Then:
 
 - `GET /wp-cron.php` where needed, `leitvia/get-package` for conflicts.
 - `leitvia/audit-site` again: no item may still report `classic-content`.
-- Each migrated page in the browser: the texts of the inventory are there, images load, the embed shows the consent placeholder, the menu shows its submenus.
+- Each migrated page in the browser: texts of the inventory, images, the consent placeholder of embeds, submenus.
 - Run the skill `leitvia-a11y` over the migrated pages.
 
 ## Report

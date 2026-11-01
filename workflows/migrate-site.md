@@ -50,7 +50,7 @@ Agents cannot switch themes or activate plugins; the area `admin` is locked. Ask
 ### 5. Package
 
 - `leitvia/list-packages` with `state: open`: in mode `package` exactly one package with your key. `leitvia/get-package` with its `id` gives the diff per operation and the `preview` link.
-- **Checkpoint "Package applied":** "Package <id> holds <n> changes: <short list>. Please review it in the inbox at `/wp-admin/admin.php?page=leitvia-studio-inbox&package=<id>` (block diff and preview) and apply it. Shall I wait?"
+- **Checkpoint "Package applied":** "Package <id> holds <n> changes: <short list>. Please review it in the inbox at `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=<id>` (block diff and preview) and apply it. Shall I wait?"
 - After it is applied, activate the token set (leitvia-design, step 6) with the same key; that is the next package and the same checkpoint.
 
 ### 6. Accessibility check

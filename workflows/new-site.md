@@ -9,14 +9,14 @@ Chain: [leitvia-setup](../skills/leitvia-setup/SKILL.md), then [leitvia-design](
 An empty WordPress installation has neither the theme nor Leitvia Studio, and installing them is no ability: the area `admin` stays locked for agents. The operator, or the script that starts an unattended run, prepares the site once with WP-CLI on the server (WordPress 7.1 or later, PHP 8.2 or later, HTTPS):
 
 ```sh
-wp theme install https://github.com/cmsadmins/leitvia/releases/download/1.2.13/leitvia-1.2.13.zip --activate
-wp plugin install https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.10/leitvia-studio-1.3.10.zip --activate
+wp theme install https://github.com/cmsadmins/leitvia/releases/download/1.2.14/leitvia-1.2.14.zip --activate
+wp plugin install https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.14/leitvia-studio-1.3.14.zip --activate
 wp plugin install https://downloads.wordpress.org/plugin/mcp-adapter.0.7.1.zip --activate
 wp user create leitvia-agent agent@example.org --role=leitvia_agent --display_name="Leitvia agent"
 wp user application-password create leitvia-agent "leitvia agent" --porcelain
 ```
 
-Once the theme and Leitvia Studio are listed on WordPress.org, `wp theme install leitvia --activate` and `wp plugin install leitvia-studio --activate` replace the first two lines. Keep MCP Adapter at 0.7, the version Leitvia Studio supports. The last command prints the application password once; store it as `LEITVIA_AUTH` (Base64 of `leitvia-agent:<password>`) for the agent, never in a file you commit. For a shop also `wp plugin install woocommerce --activate` before the run. The agent itself never runs WP-CLI; its first call is `leitvia/get-contract`, which proves the bootstrap worked.
+Once the theme and Leitvia Studio are listed on WordPress.org, `wp theme install leitvia --activate` and `wp plugin install leitvia-studio --activate` replace the first two lines. Keep MCP Adapter at 0.7, the version Leitvia Studio supports. Leave the experiment MCP Access of the AI plugin off on this site: it installs the newest MCP Adapter from WordPress.org. The last command prints the application password once; store it as `LEITVIA_AUTH` (Base64 of `leitvia-agent:<password>`) for the agent, never in a file you commit. For a shop also `wp plugin install woocommerce --activate` before the run. The agent itself never runs WP-CLI; its first call is `leitvia/get-contract`, which proves the bootstrap worked.
 
 Without a server, for a test or demo run on your own machine: [WordPress Playground](../README.md#test-site-with-wordpress-playground) from a blueprint.
 
@@ -37,13 +37,13 @@ Some steps belong to a person by design: the area `admin` is locked for agents, 
 
 | Step | Where | Needed for |
 |---|---|---|
-| Apply the change package | Inbox `/wp-admin/admin.php?page=leitvia-studio-inbox&package=<id>`, or `leitvia/apply-package` called by an administrator | Everything after "Package applied": entries of new types, texts on recipe pages, token set activation, checks of the live site |
+| Apply the change package | Inbox `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=<id>`, or `leitvia/apply-package` called by an administrator | Everything after "Package applied": entries of new types, texts on recipe pages, token set activation, checks of the live site |
 | Shop settings (recipe `leitvia/shop`) | WooCommerce, Settings: payment method, store address with state (`DE:DE-SN`), currency, taxes, a shipping zone with a shipping method, visibility "Live", vouchers "Virtual" ([recipe details](../skills/leitvia-setup/references/recipe.md#shop-sites)) | The checkout |
 | Admin settings | Settings, General: site title and tagline (the agent proposes both from the briefing); logo, avatars off (Gravatar is a third party), the sample post "Hello world!" and the "Sample Page" deleted. No ability changes them. | A finished site: header, footer and the browser tab show the site title |
 | Publish drafts (mode `direct`) | Pages, Publish | Pages of a run in mode `direct` |
 | Open a content type to other AI tools (`showInAbilities`) | Leitvia Studio, Content Model (`/wp-admin/admin.php?page=leitvia-studio-model`) | Only abilities outside Leitvia; Leitvia's own abilities do not need it |
 
-The report lists the open ones under the heading "For the person", numbered, each with what to do, where, and which step of the workflow waits for it, for example: "1. Apply package 10 (26 operations) at `/wp-admin/admin.php?page=leitvia-studio-inbox&package=10`. Step 4 waits for it." The next run goes on as the section on the mode says, and checks the shop settings on the checkout page.
+The report lists the open ones under the heading "For the person", numbered, each with what to do, where, and which step of the workflow waits for it, for example: "1. Apply package 10 (26 operations) at `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=10`. Step 4 waits for it." The next run goes on as the section on the mode says, and checks the shop settings on the checkout page.
 
 ## Invented sites
 
@@ -55,7 +55,7 @@ A briefing that says the site is invented (a demo, a test, a fictional brand) is
 
 - **Skill:** leitvia-setup, steps 1 to 4.
 - **Input:** the briefing of the person.
-- **Writes:** `leitvia/apply-recipe` with the recipe and, in mode `package`, the key. Settings that point to recipe pages (front page, privacy policy page) wait in the same package and are set when it is applied. Own content types with `leitvia/define-content-type`, for a shop the products with `leitvia/create-product`, same key.
+- **Writes:** `leitvia/apply-recipe` with the recipe and, in mode `package`, the key. Settings that point to recipe pages (front page, privacy policy page) wait in the same package and are set when it is applied. Own content types with `leitvia/define-content-type`, or a building block of an add-on (`leitvia/list-building-blocks`) with `leitvia/add-building-block`, for a shop the products with `leitvia/create-product`, same key.
 - **Checkpoints:** "Briefing confirmed": "Is this right: operator <name>, kind of site <kind>, mode <mode>, fixed URLs <list>, legal texts from <person>?" Then "Recipe chosen": "I will use the recipe <name>. It creates the pages <titles> with the addresses <slugs>. Shall I apply it?"
 
 ### 2. Brand
@@ -75,7 +75,7 @@ A briefing that says the site is invented (a demo, a test, a fictional brand) is
 ### 4. Review of the package
 
 - `leitvia/list-packages` with `state: open` shows exactly one package with your key; `leitvia/get-package` with its `id` lists every operation with its diff and the `preview` link. `preview` stays empty while the package only creates pages and nothing it changes has an address yet; the inbox shows the block diff all the same.
-- **Checkpoint "Package applied":** "Package <id> holds <n> changes: <short list>. Please review it in the inbox at `/wp-admin/admin.php?page=leitvia-studio-inbox&package=<id>` (block diff and preview) and apply it. Shall I wait?" Do not continue before the person applied it.
+- **Checkpoint "Package applied":** "Package <id> holds <n> changes: <short list>. Please review it in the inbox at `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=<id>` (block diff and preview) and apply it. Shall I wait?" Do not continue before the person applied it.
 - After it is applied: `leitvia/apply-recipe` with the same recipe and key reports `package: 0` and only `exists` (leitvia-setup, step 5).
 
 ### 5. Legal texts and activation

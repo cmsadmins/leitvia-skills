@@ -1,6 +1,6 @@
 # Rejections
 
-Generated from Leitvia Studio 1.3.10. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
+Generated from Leitvia Studio 1.3.14. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
 
 Every rejection of Leitvia Studio with its retry rule and next ability. Messages with `%s` or `%d` get a value at run time; codes with several rows come from several places.
 
@@ -9,7 +9,7 @@ Every rejection of Leitvia Studio with its retry rule and next ability. Messages
 | `leitvia_ai_failed` | 502 | `never` | set at run time | The AI provider refused or failed the request. An administrator checks the connector under Settings, Connectors; until then, call again with ai set to false. |
 | `leitvia_ai_invalid_response` | 502 | `once` | set at run time | The AI model answered with data that does not match the expected format. Try once more, or call again with ai set to false. |
 | `leitvia_ai_invalid_response` | 502 | `once` | set at run time | The AI model named no pattern of this site. Try once more, or call again with ai set to false. |
-| `leitvia_ai_not_approved` | 503 | `never` | set at run time | The AI provider could not be reached, or an administrator has not approved this request for the connector yet. When the AI plugin is active, an administrator approves pending connector requests in its settings; until then, call again with ai set to false. |
+| `leitvia_ai_not_approved` | 503 | `never` | set at run time | The AI provider could not be reached, or an administrator has not approved this request for the connector yet. When the AI plugin is active, an administrator approves pending connector requests under Tools, Connector Approvals; until then, call again with ai set to false. |
 | `leitvia_ai_timeout` | 504 | `once` | set at run time | The AI provider did not answer within %d seconds. Try once more, or call again with ai set to false. |
 | `leitvia_ai_unavailable` | 424 | `never` | set at run time | AI is not available on this site: it needs WordPress with the AI client, AI switched on and a connector with a text model set up by an administrator under Settings, Connectors. Call again with ai set to false for a plan without AI. |
 | `leitvia_check_failed` | 422 | `once` | `leitvia/set-alt-text` | A product image needs alt text that describes it. Set it with leitvia/set-alt-text and try again. |
@@ -62,8 +62,17 @@ Every rejection of Leitvia Studio with its retry rule and next ability. Messages
 | `leitvia_stale_hash` | 409 | `once` | none or `leitvia/get-page-outline` | The target changed since it was read. Read it again and repeat the change on the current state. |
 | `leitvia_static_markup` | 422 | `once` | `leitvia/compose-page` | This change needs markup that cannot be rebuilt safely. Insert the pattern again with leitvia/compose-page, or change a block that supports it. |
 | `leitvia_too_large` | 413 | `once` | none | The change is too large to compare (more than %d KB). Split it into smaller changes. |
+| `leitvia_unknown_building_block` | 404 | `never` | none | There is no building block with this name. |
 | `leitvia_unknown_package` | 404 | `never` | `leitvia/list-packages` | There is no change package with this ID. List the packages and use one of them. |
 | `leitvia_unknown_pattern` | 404 | `once` | `leitvia/list-patterns` | There is no pattern with this name for this template part. List the patterns of its area and use one of them. |
 | `leitvia_unknown_pattern` | 404 | `once` | `leitvia/list-patterns` | There is no pattern with this name. List the patterns and use one of them. |
 | `leitvia_unknown_recipe` | 404 | `once` | `leitvia/list-recipes` | There is no recipe with this name. List the recipes and use one of them. |
 | `leitvia_unsafe_content` | 422 | `once` | `leitvia/list-blocks` | The content holds markup agents may not write: scripts, event attributes, Custom HTML blocks, classic blocks or Base64 data. Use registered blocks and media from the library. |
+
+## Codes of other plugins
+
+Other plugins may replace a rejection of Leitvia Studio with their own code. Over MCP, call Leitvia tools on the server `leitvia`: another plugin (MCP Access of the AI plugin) can list them on the default server of the adapter too, with the same checks but rejections without hash, next ability and retry rule. Known codes:
+
+| Code | HTTP | Retry | Plugin | What to do |
+|---|---|---|---|---|
+| `wpai_connector_not_approved` | 403 | `never` | AI 1.5 or later, over REST | The AI plugin blocked a request to the AI provider and replaced the answer. An administrator approves pending requests under Tools, Connector Approvals; until then, call again with ai set to false. |
