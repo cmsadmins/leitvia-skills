@@ -9,8 +9,8 @@ Chain: [leitvia-setup](../skills/leitvia-setup/SKILL.md), then [leitvia-design](
 An empty WordPress installation has neither the theme nor Leitvia Studio, and installing them is no ability: the area `admin` stays locked for agents. The operator, or the script that starts an unattended run, prepares the site once with WP-CLI on the server (WordPress 7.1 or later, PHP 8.2 or later, HTTPS):
 
 ```sh
-wp theme install https://github.com/cmsadmins/leitvia/releases/download/1.2.16/leitvia-1.2.16.zip --activate
-wp plugin install https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.15/leitvia-studio-1.3.15.zip --activate
+wp theme install https://github.com/cmsadmins/leitvia/releases/download/1.2.17/leitvia-1.2.17.zip --activate
+wp plugin install https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.16/leitvia-studio-1.3.16.zip --activate
 wp plugin install https://downloads.wordpress.org/plugin/mcp-adapter.0.7.1.zip --activate
 wp user create leitvia-agent agent@example.org --role=leitvia_agent --display_name="Leitvia agent"
 wp user application-password create leitvia-agent "leitvia agent" --porcelain
@@ -40,6 +40,7 @@ Some steps belong to a person by design: the area `admin` is locked for agents, 
 | Apply the change package | Inbox `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=<id>`, or `leitvia/apply-package` called by an administrator | Everything after "Package applied": entries of new types, texts on recipe pages, token set activation, checks of the live site |
 | Shop settings (recipe `leitvia/shop`) | WooCommerce, Settings: payment method, store address with state (`DE:DE-SN`), currency, taxes, a shipping zone with a shipping method, visibility "Live", vouchers "Virtual" ([recipe details](../skills/leitvia-setup/references/recipe.md#shop-sites)) | The checkout |
 | Admin settings | Settings, General: site title and tagline (the agent proposes both from the briefing); logo, avatars off (Gravatar is a third party), the sample post "Hello world!" and the "Sample Page" deleted. No ability changes them. | A finished site: header, footer and the browser tab show the site title |
+| Search visibility | Settings, Reading: untick "Discourage search engines" once the site is live | Being found; without it the report lists it as open, high |
 | Publish drafts (mode `direct`) | Pages, Publish | Pages of a run in mode `direct` |
 | Open a content type to other AI tools (`showInAbilities`) | Leitvia Studio, Content Model (`/wp-admin/admin.php?page=leitvia-studio-model`) | Only abilities outside Leitvia; Leitvia's own abilities do not need it |
 

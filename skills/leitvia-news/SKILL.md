@@ -1,14 +1,14 @@
 ---
 name: leitvia-news
-description: Writes a regular news post for the blog of a WordPress site with the Leitvia theme and Leitvia Studio, for example once a week, through the leitvia abilities only. Takes topics and sources from a news brief of the operator, checks candidates against the posts the site already has, writes the post from sources it lists under the post, marks it as written by AI and leaves it as a draft in a change package for a person. Use it for scheduled news runs or when someone asks for a news post from given sources; pages belong to leitvia-page.
-compatibility: Needs a site with the theme Leitvia and the plugin Leitvia Studio, reached over the MCP server leitvia or the REST routes of the Abilities API with an application password. Steps 2 and 5 need leitvia/list-content and leitvia/create-content (Leitvia Studio after 1.0.0).
+description: Writes a regular news post for the blog of a WordPress site with the Leitvia theme and Leitvia Studio, for example once a week, through the leitvia abilities only. Takes topics and sources from a news brief of the operator, checks candidates against the posts the site already has, writes the post from sources it lists under the post, makes it fit for search, Google News and AI answers (SEO and GEO: title, description, first paragraph, internal links, image, a site visible to search engines), marks it as written by AI and leaves it as a draft in a change package for a person. Use it for scheduled news runs or when someone asks for a news post from given sources; pages belong to leitvia-page.
+compatibility: Needs a site with the theme Leitvia and the plugin Leitvia Studio, reached over the MCP server leitvia or the REST routes of the Abilities API with an application password. Steps 2 and 6 need leitvia/list-content and leitvia/create-content (Leitvia Studio after 1.0.0), step 5 leitvia/get-seo.
 ---
 
 # leitvia-news
 
-One run, at most one post: find what is new in the sources of the brief, drop what the site already covered, write a short post with its sources and an AI notice, and leave it as a draft in a change package. Nothing is published by this skill.
+One run, at most one post: find what is new in the sources of the brief, drop what the site already covered, write a short post with its sources and an AI notice, make it fit for search and AI answers, and leave it as a draft in a change package. Nothing is published by this skill.
 
-Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [get-contract](../../handbook/abilities/leitvia-get-contract.md), [list-content](../../handbook/abilities/leitvia-list-content.md), [create-content](../../handbook/abilities/leitvia-create-content.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md), [get-package](../../handbook/abilities/leitvia-get-package.md). The brief, the duplicate check, the sources and the post format: [news details](references/brief.md). Overview, archives and post page come from the theme; setting up the blog itself: [blog or journal](../leitvia-page/references/blog.md).
+Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [get-contract](../../handbook/abilities/leitvia-get-contract.md), [list-content](../../handbook/abilities/leitvia-list-content.md), [create-content](../../handbook/abilities/leitvia-create-content.md), [get-seo](../../handbook/abilities/leitvia-get-seo.md), [update-seo](../../handbook/abilities/leitvia-update-seo.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md), [get-package](../../handbook/abilities/leitvia-get-package.md). The brief, the duplicate check, the sources, the post format and the limits for SEO and GEO: [news details](references/brief.md). Overview, archives and post page come from the theme; setting up the blog itself: [blog or journal](../leitvia-page/references/blog.md).
 
 ## Access
 
@@ -47,14 +47,23 @@ Read the sources of the brief and note items newer than the latest post that fit
 
 Write title, excerpt and content as block markup following the [post format](references/brief.md#post-format): the news first, short paragraphs, a list of sources with links. Check every fact against its source item once more before you write.
 
-### 5. Create the draft
+### 5. SEO and GEO
 
-Call `leitvia/create-content` with `post_type` `post` (or the type of the content model the brief names, with its `fields`), `title`, `content`, `excerpt`, `slug`, `terms` (category and tags from the brief by name; a category must exist, new tags are created), `status` `draft`, `ai_generated` true, `sources` (the URLs), empty `base_hash` and the `package` key. A category that does not exist (`leitvia_invalid_input`, reason `term`): send the call once more without it and name the category in the report.
+Required for every post; limits and Google News rules: [SEO and GEO](references/brief.md#seo-and-geo).
 
-### 6. Check and report
+- `leitvia/get-seo` with the ID of the latest news post of step 2: `indexable` false means the site is hidden from search engines (checkpoint **Site hidden from search**); `plugin` says whether an SEO plugin is active.
+- Title and excerpt within the limits: they are the SEO title and description of the draft, which has no ID until the package is applied. Without an SEO plugin say so in the report. With one, published news posts of earlier runs with an empty `seo.description` get title and description through `leitvia/update-seo` and the same `package` key, at most five per run.
+- A first paragraph that answers who, what, when, where and why; h2 that name their section; two internal links, `link` from `leitvia/list-content`; a featured image of at least 1200 px width with alt text, or an open point in the report.
 
-- `leitvia/list-packages` with `state: open` and `leitvia/get-package`: the package holds exactly one operation, the draft.
-- Report: package ID, Inbox link `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=<id>`, title, sources, the duplicates you dropped with the post they match, and open questions.
+### 6. Create the draft
+
+Call `leitvia/create-content` with `post_type` `post` (or the type of the content model the brief names, with its `fields`), `title`, `content`, `excerpt`, `slug`, `terms` (category and tags from the brief by name; a category must exist, new tags are created), `status` `draft`, `ai_generated` true, `sources` (the URLs), `featured_image` when step 5 found one, empty `base_hash` and the `package` key. A category that does not exist (`leitvia_invalid_input`, reason `term`): send the call once more without it and name the category in the report.
+
+### 7. Check and report
+
+- `leitvia/list-packages` with `state: open` and `leitvia/get-package`: the package holds the draft and the SEO writes of step 5, nothing else.
+- Open the preview link of the package from `leitvia/list-packages`: the post shows date and author, and its JSON-LD has `@type` `NewsArticle`, or `BlogPosting` when `news_categories` of Studio leaves out the category of the post. Anything else goes into the report.
+- Report: a hidden site first, as high. Then package ID, Inbox link `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=<id>`, title, sources, the duplicates you dropped with the post they match, the SEO title and description, and open questions (image, SEO plugin, editorial page).
 
 ## Checkpoints
 
@@ -63,6 +72,7 @@ Stop and ask the person, then continue with the answer:
 - **Brief:** topics or sources are missing, or a source asks for a login.
 - **No news:** every candidate is a duplicate, or the cadence says it is too early. Report it; nothing to write.
 - **Facts from the person:** a fact the post needs is in no source item.
+- **Site hidden from search:** `indexable` is false ("Discourage search engines" in the reading settings). Only the person turns it off.
 - **Second rejection** of the same call, or a rejection with `retry: never`.
 - **Package applied:** a person reviews the draft, publishes or rejects it.
 
@@ -75,5 +85,6 @@ When no person answers (a scheduled or hosted run), do not wait at a checkpoint.
 | Brief | Stop; report what the brief lacks. |
 | No news | Write nothing; report the candidates and why each was dropped. |
 | Facts from the person | Leave the fact out; when the post makes no sense without it, write nothing. |
+| Site hidden from search | Write the draft all the same; name it first in the report, as high, with the step of the person: Settings, Reading, untick "Discourage search engines". |
 | Second rejection | Stop; report code and message. |
 | Package applied | Expected: the draft waits in the package; the run ends with the report. |

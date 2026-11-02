@@ -19,4 +19,15 @@ The blog needs no pattern and no page content of yours. The theme templates show
 5. Posts get one category each, `comment_status` as the person decided, a featured image with alt text (it appears on the archive grid and in the band of the sticky post) and an excerpt of one or two sentences. Category descriptions and the biographical info of authors are set by the person in WordPress; ask for them, an empty description leaves the archive without a lead.
 6. On the home page, point to the journal with `leitvia/teaser-posts-list` or `leitvia/teaser-posts-grid`; their heading names the journal.
 
+## News section
+
+A blog with news for Google News and AI answers needs a few things more; `leitvia-news` and `leitvia-seo-geo` check them.
+
+1. **Editorial page:** a page with `leitvia/create-content`, `kind` `editorial`: who writes, how sources are checked, how corrections and AI texts are handled, all from the person. The person picks it in Leitvia Studio as the editorial page (`editorial_page`); Studio then links it in the author box and names it as `publishingPrinciples` in the structured data.
+2. **Categories:** two to six, each with a description. The overview shows them as chips; more than six make the row hard to scan, one makes it useless.
+3. **Featured images:** every post has one, at least 1200 px wide, fit for a 16:9 crop, with alt text. The newest post leads the card grid with it.
+4. **Authors:** real names with a biographical info in the profile, set by the person. The author box and the author page show it.
+5. **Imprint and contact** pages exist and are linked in the footer.
+6. **Visible to search engines:** in Settings, Reading, "Discourage search engines" is unticked once the site is live, a step of the person.
+
 Check the result on the public URLs: the overview, one category archive, one author page and one post, each with one h1.

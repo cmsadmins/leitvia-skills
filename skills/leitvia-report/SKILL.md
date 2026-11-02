@@ -34,7 +34,7 @@ Ask who reads the report and what for (checkpoint **Reader**): an owner without 
 - `leitvia/get-contract`: site address, theme and Studio version, name of the site.
 - `leitvia/get-site-health`: versions of WordPress, PHP, theme and plugins and the updates WordPress knows of. A `leitvia_forbidden` rejection means the agent user may not read versions; note it.
 - `leitvia/audit-site` with `limit: 20`, paging with `after` set to `next` until `next` is `null`: findings per page with `check` and `severity`.
-- `leitvia/list-content` with `status: publish`, all pages of it, then `leitvia/get-seo` with up to 50 IDs per call: the SEO plugin and per page title, description and `noindex`.
+- `leitvia/list-content` with `status: publish`, all pages of it, then `leitvia/get-seo` with up to 50 IDs per call: the SEO plugin, per page title, description, `noindex` and `schema_type`, and for the site `indexable` and `news_sitemap`. Open `/robots.txt`, `/wp-sitemap.xml` and, with news, `/news.xml`.
 - `leitvia/get-tokens`: `contrast` lists color pairs of the palette that miss their minimum.
 - `leitvia/list-packages` with `state: open`: changes that wait for a person.
 - Public pages: the home page and the pages the person named; note whether they load, the `<title>` and anything plainly broken.

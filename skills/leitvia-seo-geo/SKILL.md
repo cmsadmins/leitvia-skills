@@ -1,6 +1,6 @@
 ---
 name: leitvia-seo-geo
-description: Improves how a WordPress site with the Leitvia theme and Leitvia Studio is found in search engines and cited in AI answers (ChatGPT, Perplexity, Google AI Overviews), without tricks. Reads titles, meta descriptions, robots and structured data of every page through the active SEO plugin (Yoast SEO, Rank Math, SEOPress, The SEO Framework), writes better titles and descriptions from what the pages say in a change package, suggests clearer structure and drafts an llms.txt for the person to publish. Use it after a site went live, after new pages, or when someone asks about SEO, rankings, AI search or llms.txt; a full report on a site belongs to leitvia-report.
+description: Improves how a WordPress site with the Leitvia theme and Leitvia Studio is found in search engines and cited in AI answers (ChatGPT, Perplexity, Google AI Overviews), without tricks. Reads titles, meta descriptions, robots and structured data of every page through the active SEO plugin (Yoast SEO, Rank Math, SEOPress, The SEO Framework), writes better titles and descriptions from what the pages say in a change package, suggests clearer structure and drafts an llms.txt for the person to publish. Checks first that the whole site is visible to search engines and fit for Google News. Use it after a site went live, after new pages, or when someone asks about SEO, rankings, AI search or llms.txt; a full report on a site belongs to leitvia-report.
 compatibility: Needs a site with the theme Leitvia and the plugin Leitvia Studio, reached over the MCP server leitvia or the REST routes of the Abilities API with an application password. Writing SEO data needs one of the four SEO plugins; without one the skill reads and suggests only.
 ---
 
@@ -8,7 +8,7 @@ compatibility: Needs a site with the theme Leitvia and the plugin Leitvia Studio
 
 You make each page say clearly, in its title, description and first lines, what it offers, so search engines list it and AI answers can quote it. You change the site only through the abilities of Leitvia Studio and never with tricks.
 
-Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [list-content](../../handbook/abilities/leitvia-list-content.md), [get-seo](../../handbook/abilities/leitvia-get-seo.md), [update-seo](../../handbook/abilities/leitvia-update-seo.md), [get-page-outline](../../handbook/abilities/leitvia-get-page-outline.md), [update-content](../../handbook/abilities/leitvia-update-content.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md), [get-package](../../handbook/abilities/leitvia-get-package.md). Rules for titles, descriptions, structure, structured data and llms.txt: [SEO and GEO details](references/seo.md).
+Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [list-content](../../handbook/abilities/leitvia-list-content.md), [get-seo](../../handbook/abilities/leitvia-get-seo.md), [update-seo](../../handbook/abilities/leitvia-update-seo.md), [get-page-outline](../../handbook/abilities/leitvia-get-page-outline.md), [update-content](../../handbook/abilities/leitvia-update-content.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md), [get-package](../../handbook/abilities/leitvia-get-package.md). Rules for site visibility, titles, descriptions, structure, structured data, Google News and llms.txt: [SEO and GEO details](references/seo.md).
 
 ## Access
 
@@ -36,6 +36,7 @@ Ask which pages matter most and who should find them (people, region, language) 
 
 ### 2. Read
 
+- **Site visibility first:** `indexable` and `news_sitemap` of `leitvia/get-seo` (with any published ID), `<meta name="robots">` of the home page, `/robots.txt`, `/wp-sitemap.xml` and, with news, `/news.xml`: [site visibility](references/seo.md#site-visibility). A live site with `indexable` false is the first finding of the report, high; only the person changes it (checkpoint **Indexing**, with your proposal to turn indexing on).
 - `leitvia/list-content` with `status: publish` and `limit: 100`, all pages of it: IDs, types, titles, excerpts.
 - `leitvia/get-seo` with up to 50 IDs per call: `plugin`, per item `seo` (what the plugin stores; empty means its template), `defaults` (what WordPress prints, a description suggested from the excerpt) and `hash`.
 - Public pages: open the most important ones and note `<title>`, `<meta name="description">`, `<link rel="canonical">`, `<meta name="robots">`, the `h1`, JSON-LD blocks, then `/robots.txt` and `/llms.txt`. What the plugin prints is what counts.
@@ -66,9 +67,10 @@ Leitvia Studio writes no files. Draft an `llms.txt` from the pages you read ([ll
 
 In the chat, in the language of the person:
 
-1. **Changed:** per page the old and new title and description, live or waiting in the package (ID and inbox link).
-2. **Suggested:** structure and text changes, the `llms.txt` draft, an SEO plugin when none is active.
-3. **For the person to decide:** indexing, AI crawlers, facts you lacked.
+1. **Visibility:** whether search engines may index the site, and the sitemaps found; a hidden live site comes first.
+2. **Changed:** per page the old and new title and description, live or waiting in the package (ID and inbox link).
+3. **Suggested:** structure and text changes, Google News gaps, the `llms.txt` draft, an SEO plugin when none is active.
+4. **For the person to decide:** indexing, AI crawlers, facts you lacked.
 
 End with the scope, the SEO plugin and the date. Promise no rankings: search engines and AI services decide what they show.
 
@@ -77,7 +79,7 @@ End with the scope, the SEO plugin and the date. Promise no rankings: search eng
 Stop and ask the person, then continue with the answer:
 
 - **Goal:** pages and audience when the request does not say it.
-- **Indexing:** any change of `noindex` or `nofollow`.
+- **Indexing:** any change of `noindex` or `nofollow`, and a site hidden from search engines.
 - **New text:** a text change beyond title and description that needs facts the page does not hold.
 - **AI crawlers:** whether AI crawlers may read the site.
 - **Package applied:** the person reviews and applies the package in the inbox.
@@ -90,7 +92,7 @@ When no person answers (a scheduled or hosted run), do not wait at a checkpoint.
 | Checkpoint | Answer without a person |
 |---|---|
 | Goal | Every published page and post, the language of the site. |
-| Indexing | Change nothing; list pages whose indexing looks wrong. |
+| Indexing | Change nothing; list pages whose indexing looks wrong. A hidden live site goes first in the report, high, with the step of the person. |
 | New text | Only titles and descriptions; list text suggestions in the report. |
 | AI crawlers | Change nothing; report what robots.txt says. |
 | Package applied | Stop after step 6; the check after belongs to the next run. |

@@ -1,6 +1,6 @@
 # News brief, duplicate check and post format
 
-Details for `leitvia-news`. Read "News brief" before the first run, "Duplicate check" before you choose a topic, "Post format" before you write.
+Details for `leitvia-news`. Read "News brief" before the first run, "Duplicate check" before you choose a topic, "Post format" before you write and "SEO and GEO" before step 5.
 
 ## News brief
 
@@ -35,10 +35,30 @@ A topic or a source outside the brief is not used. A brief without topics or sou
 
 ## Post format
 
-- Title: names the news, at most 70 characters, no clickbait.
+- Title: names the news, at most 60 characters, no clickbait, no question you do not answer. It is the h1 of the post page; the SEO title says the same.
 - First paragraph: what happened, when, where, why it matters to the audience of the brief.
 - Body: short paragraphs with h2 subheadings where the post is longer than 300 words; only core blocks (`core/paragraph`, `core/heading`, `core/list`, `core/quote`, `core/image` from the media library, `core/video`, `core/embed`).
 - Sources: a heading "Sources" and a list with one link per source item (title of the item, publisher, date).
 - AI notice: `ai_generated` true on `leitvia/create-content`. Studio then shows a note before the text that AI wrote it, in the language of the site; a person removes it after their own review by deleting the custom field `leitvia_ai_generated`. Do not add a notice of your own to the content.
-- Excerpt: one or two sentences, at most 160 characters.
-- No images unless the brief names images the operator may use; an image from a news source is never copied. Featured image: `featured_image`, with alt text. Screenshots: one or two real screens, no mockups, with alt text and caption. Video: only with its script; `core/video` with `controls` and caption, then `core/details` "Transcript of the video", one list item per scene, as in `leitvia/content-video`.
+- Excerpt: one or two sentences, 50 to 160 characters. It is the meta description of the post.
+- Images only from the brief: images the operator may use; an image from a news source is never copied. Featured image: `featured_image`, with alt text. Screenshots: one or two real screens, no mockups, with alt text and caption. Video: only with its script; `core/video` with `controls` and caption, then `core/details` "Transcript of the video", one list item per scene, as in `leitvia/content-video`.
+
+Rules of Google News that the post and the site have to meet:
+
+- Date and author are visible on the post page; the theme prints both. Never change the date of an older post to make it look new.
+- A real author with a biographical info in the profile is better than an anonymous team account. When the posts appear under a team account, name it in the report as a step of the person.
+- One featured image per post is required: at least 1200 px wide, fit for a 16:9 crop, with alt text. Without one the post is written all the same and the image is an open point of the report.
+- The site needs an editorial page (page kind `editorial`) that says who writes, how sources are checked and how corrections work. The author box of a post links it when Studio knows the page; when the public post shows no such link, the report names it as open for `leitvia-page`.
+
+## SEO and GEO
+
+| Field | Limit |
+|---|---|
+| Title | At most 60 characters, the news first, the same text as the h1. No site name; the SEO plugin adds it. |
+| Description (excerpt) | 50 to 160 characters, one or two full sentences from the post. Only numbers the post holds. |
+| First paragraph | Two or three sentences: who, what, when, where, why. It makes sense without the rest of the post, so AI answers can quote it. |
+| Headings | Each h2 names its section ("New lane between Felsenkeller and Plagwitz", not "Details"). |
+| Internal links | Two links in the text to pages or posts of the site on the same topic, `link` from `leitvia/list-content`. None fits: none, and say so in the report. |
+| Image | Featured image of at least 1200 px width with alt text. |
+
+`schema_type` of a published news post in `leitvia/get-seo` names its structured data: `NewsArticle`, or `BlogPosting` for posts outside the news categories set in Studio. `indexable` and `news_sitemap` are site settings of the person; report them, change nothing.

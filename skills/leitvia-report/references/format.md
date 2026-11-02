@@ -18,6 +18,7 @@ Two to four sentences: how the site stands, then the most important points, at m
 | Area | Figure | Source |
 |---|---|---|
 | Content checks | 12 findings on 7 of 34 pages, 3 high | leitvia/audit-site |
+| Search visibility | indexable, sitemap and news sitemap found | leitvia/get-seo, /wp-sitemap.xml |
 | Search data | 9 pages without description | leitvia/get-seo (Yoast SEO) |
 | Updates | 2 plugins and the theme have updates | leitvia/get-site-health |
 | Colors | all palette pairs pass | leitvia/get-tokens |
@@ -27,6 +28,9 @@ Two to four sentences: how the site stands, then the most important points, at m
 
 ### Accessibility and content
 ### Search and AI answers
+
+Start with visibility: whether search engines may index the site (`indexable`), the robots meta of the home page and which sitemaps answer. A live site that is hidden is a high finding.
+
 ### Versions and updates
 ### Design
 
@@ -51,7 +55,7 @@ Leave out an area with nothing to say rather than writing "no findings" five tim
 
 | Level | Meaning | Examples |
 |---|---|---|
-| High | Visitors are blocked or misled, or the site is at risk | images without alt text on main pages, a page with `noindex` that should be found, legal page placeholders, a pending update of WordPress, a PHP version without security support |
+| High | Visitors are blocked or misled, or the site is at risk | a live site hidden from search engines, images without alt text on main pages, a page with `noindex` that should be found, legal page placeholders, a pending update of WordPress, a PHP version without security support |
 | Medium | Visitors are slowed or search results suffer | missing or duplicate descriptions, skipped heading levels, vague link texts, broken internal links, deprecated patterns |
 | Low | Polish | long titles, a description slightly over length, classic content that still shows fine |
 

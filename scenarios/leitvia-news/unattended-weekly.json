@@ -1,17 +1,18 @@
 {
 	"$schema": "../scenario.schema.json",
-	"title": "Unattended weekly news: duplicate check with list-content, one AI-marked draft in a package",
+	"title": "Unattended weekly news: duplicate check, site visibility with get-seo, one AI-marked draft in a package",
 	"skill": "leitvia-news",
 	"briefing": "Weekly news run for the blog of the Speiche bike workshop. News brief: topics \"cycling in Leipzig\" and \"bike care\"; source the feed {{source}}/feed.xml; language en-GB; cadence one post per week; category News. Nobody answers questions during this run: follow the section Unattended of the skill.",
 	"mode": "package",
 	"unattended": true,
 	"budget": {
-		"tokens": 9850,
+		"tokens": 11400,
 		"files": [
 			"skills/leitvia-news/references/brief.md",
 			"handbook/abilities/leitvia-get-contract.md",
 			"handbook/abilities/leitvia-list-content.md",
 			"handbook/abilities/leitvia-create-content.md",
+			"handbook/abilities/leitvia-get-seo.md",
 			"handbook/abilities/leitvia-list-packages.md",
 			"handbook/abilities/leitvia-get-package.md"
 		]
@@ -43,6 +44,21 @@
 				"items.length": 2,
 				"items.1.title": "Spring check: what city bikes need after winter",
 				"items.1.terms.category.0": "News"
+			},
+			"capture": {
+				"latest": "items.1.id"
+			}
+		},
+		{
+			"ability": "leitvia/get-seo",
+			"input": {
+				"posts": [
+					"{{capture.latest}}"
+				]
+			},
+			"expect": {
+				"indexable": true,
+				"items.length": 1
 			}
 		},
 		{

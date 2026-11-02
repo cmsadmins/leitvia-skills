@@ -1,6 +1,20 @@
 # SEO and GEO details
 
-Load this file when the skill names it. It holds the rules behind steps 3 to 6 of [leitvia-seo-geo](../SKILL.md).
+Load this file when the skill names it. It holds the rules behind steps 2 to 6 of [leitvia-seo-geo](../SKILL.md).
+
+## Site visibility
+
+Check this before any page. A site that tells search engines to stay away gains nothing from good titles.
+
+| Check | Where | Finding |
+|---|---|---|
+| Indexing | `indexable` of `leitvia/get-seo` (false when "Discourage search engines" is ticked in Settings, Reading) | false on a live site: high |
+| Robots of the home page | `<meta name="robots">` of the public home page | `noindex`: high |
+| robots.txt | `/robots.txt` | `Disallow: /` for all crawlers: high; no `Sitemap:` line: low |
+| Sitemap | `/wp-sitemap.xml` or the sitemap of the SEO plugin | missing or empty: medium |
+| News sitemap | `news_sitemap` of `leitvia/get-seo`, `/news.xml` | missing on a site with news: medium |
+
+Only the person changes indexing, in Settings, Reading. Propose it plainly: "The site is live but asks search engines not to index it. Untick 'Discourage search engines' in Settings, Reading." A site that is not live yet may stay hidden; say so and move on.
 
 ## Titles and descriptions
 
@@ -37,6 +51,16 @@ AI search (Google AI Overviews, ChatGPT search, Perplexity, Copilot) quotes shor
 - Questions people ask may become headings, answered right below, when the page really answers them. No invented FAQ.
 
 Structured data: with an SEO plugin, the plugin prints it (its settings decide the types). Without one, Leitvia Studio can print `BlogPosting` or `NewsArticle` with the organization as publisher on posts and `ProfilePage` on author pages, when its setting for structured data is on; `defaults.schema` of `leitvia/get-seo` names what a post gets. Never add JSON-LD in content blocks.
+
+## Google News
+
+Google decides which sites appear in Google News; the person applies in the Google Publisher Center. What the site can do:
+
+- Structured data `NewsArticle` on news posts, from Leitvia Studio or the SEO plugin; `schema_type` of `leitvia/get-seo` shows it per post.
+- The news sitemap `/news.xml` with the posts of the last 48 hours, listed in `robots.txt`.
+- Transparency pages: imprint, contact, an editorial page (who writes, how sources are checked, how corrections work) and author pages with a biographical info. Missing ones go into the report for `leitvia-page` and the person.
+- A featured image of at least 1200 px width on every news post, and `max-image-preview:large` in the robots meta, so large previews may show. Most SEO plugins print it; report it when the public post lacks it.
+- Visible date and author, a title without clickbait that matches the h1, no new date on old posts.
 
 ## llms.txt
 
