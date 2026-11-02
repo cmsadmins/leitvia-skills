@@ -1,5 +1,5 @@
 {
-	"studio": "1.3.14",
+	"studio": "1.3.15",
 	"abilities": [
 		{
 			"name": "leitvia/activate-token-set",
@@ -310,7 +310,7 @@
 		{
 			"name": "leitvia/apply-recipe",
 			"label": "Apply recipe",
-			"description": "Sets up the site from a recipe of leitvia/list-recipes: content model and building blocks, token set, style variation, header and footer, pages from patterns, navigation, reading settings and options that save data. Each part runs through its own ability with the autonomy level of its area; what may not go live lands in one change package, and with a package key everything does. Settings that point to a page waiting in that package (front page, privacy policy page) are set when the package is applied. Pages that exist, and variation, header, footer and navigation changed since a recipe wrote them, are kept, as is the variation while a token set is active, so the recipe can run again after the package was applied. parts, pages and buildingBlocks limit the run to a selection, and dryRun reports what would change without writing. Review the package with leitvia/get-package. With settle, a person (manage_options, not the agent role) in the admin, neither signed in with an application password nor calling over MCP, who runs it without a package key applies what collects at once: applied lists the packages applied in full, which can be rolled back in the Inbox, and partial the packages applied in part, with their errors. Without settle the package waits.",
+			"description": "Sets up the site from a recipe of leitvia/list-recipes: content model and building blocks, token set, style variation, header and footer, pages from patterns, navigation, reading settings and options that save data. Each part runs through its own ability with the autonomy level of its area; what may not go live lands in one change package, and with a package key everything does. Settings that point to a page waiting in that package (front page, privacy policy page) are set when the package is applied. Pages that exist, and variation, header, footer and navigation changed since a recipe wrote them, are kept, as is the variation while a token set is active, so the recipe can run again after the package was applied. parts, pages and buildingBlocks limit the run to a selection; navigation and footer then link only the pages that are on the site or come in this run, and a navigation without any of them waits. dryRun reports what would change without writing. Review the package with leitvia/get-package. With settle, a person (manage_options, not the agent role) in the admin, neither signed in with an application password nor calling over MCP, who runs it without a package key applies what collects at once: applied lists the packages applied in full, which can be rolled back in the Inbox, and partial the packages applied in part, with their errors. Without settle the package waits.",
 			"category": "leitvia",
 			"group": "setup",
 			"input_schema": {
@@ -2778,7 +2778,7 @@
 		{
 			"name": "leitvia/plan-page",
 			"label": "Plan page",
-			"description": "Proposes a page for a goal and content points: page frame, template, the patterns in page order with role, slot, text lengths and the points each section carries, and the composition score. Without AI the plan follows the page frames, examples and composition rules of the contract and is the same for the same input; it leaves out patterns that need images while the media library has none, post teasers below three published posts and proof or offer patterns, which carry facts of the person, and plans a shop home from the home page of the shop recipe. With ai set to true the AI connector the site owner set up in WordPress refines it; the goal, the points and pattern names with their metadata are sent to that provider. Writes nothing; build the page with leitvia/compose-page.",
+			"description": "Proposes a page for a goal and content points: page frame, template, the patterns in page order with role, slot, text lengths and the points each section carries, and the composition score. Without AI the plan follows the page frames, examples and composition rules of the contract and is the same for the same input; it leaves out patterns that need images while the media library has none, post teasers below three published posts and proof or offer patterns, which carry facts of the person, and patterns the inserter hides, and plans a shop home from the home page of the shop recipe. A point that starts with the role, slot or area of a section and a colon (Hero: ...) lands on that section. With ai set to true the AI connector the site owner set up in WordPress refines it; the goal, the points and pattern names with their metadata are sent to that provider. Writes nothing; build the page with leitvia/compose-page.",
 			"category": "leitvia",
 			"group": "read",
 			"input_schema": {
@@ -3398,7 +3398,7 @@
 		{
 			"name": "leitvia/update-block",
 			"label": "Update block",
-			"description": "Changes one block found by its ID or path ID: attributes from the block catalog and the level of a heading, the text of a paragraph, heading, list item or button, the citation of a quote, the summary of a details block, the link of a button or of the one link in a text (link_text names the linked part), or the image of an image or cover block with alt text. Static markup is rebuilt with the HTML API; changes it cannot rebuild safely are rejected with leitvia_static_markup. Read the post with leitvia/get-page-outline first and send its hash as base_hash; get-block shows the current attributes. For several text changes in one post use leitvia/update-content.",
+			"description": "Changes one block found by its ID or path ID: attributes from the block catalog and the level of a heading, the text of a paragraph, heading, list item or button, the citation of a quote, the summary of a details block, the link of a button or of the one link in a text (link_text names the linked part), or the image of an image or cover block with alt text. A spotlight point moves with attributes x and y in percent. Static markup is rebuilt with the HTML API; changes it cannot rebuild safely are rejected with leitvia_static_markup. Read the post with leitvia/get-page-outline first and send its hash as base_hash; get-block shows the current attributes. For several text changes in one post use leitvia/update-content.",
 			"category": "leitvia",
 			"group": "build",
 			"input_schema": {
@@ -3530,7 +3530,7 @@
 		{
 			"name": "leitvia/update-content",
 			"label": "Update content",
-			"description": "Updates title, excerpt, slug, date, terms, fields, featured image, comment status and the texts and button links of several blocks of one post in one operation, blocks found by their ID from the outline. Terms, fields and featured image follow the rules of leitvia/create-content; terms replace those of their taxonomy. Instead of blocks, content replaces the whole content with block markup, for example to turn classic content into blocks; the new content may hold no classic block. Read the post with leitvia/get-page-outline first and send its hash as base_hash. A slug change is a URL change and lands at most as a suggestion; after one, leitvia/repair-links with auto points the links of other posts to the new address. For attributes or images of a block use leitvia/update-block.",
+			"description": "Updates title, excerpt, slug, date, terms, fields, featured image, comment status and the texts and button links of several blocks of one post in one operation, blocks found by their ID from the outline. Per block, url changes the one link of a text too and link_text names the part that stays linked, as in leitvia/update-block. Terms, fields and featured image follow the rules of leitvia/create-content; terms replace those of their taxonomy. Instead of blocks, content replaces the whole content with block markup, for example to turn classic content into blocks; the new content may hold no classic block. Read the post with leitvia/get-page-outline first and send its hash as base_hash. A slug change is a URL change and lands at most as a suggestion; after one, leitvia/repair-links with auto points the links of other posts to the new address. For attributes or images of a block use leitvia/update-block.",
 			"category": "leitvia",
 			"group": "maintain",
 			"input_schema": {
@@ -3569,10 +3569,16 @@
 									"maxLength": 5000,
 									"description": "Plain text of a paragraph, heading, list item or button."
 								},
+								"link_text": {
+									"type": "string",
+									"minLength": 1,
+									"maxLength": 500,
+									"description": "Part of text that stays linked when the text holds a link, such as the mail address in a contact line. Without it the link stays around its old text, and a text without that is refused unless the link only points to #."
+								},
 								"url": {
 									"type": "string",
 									"maxLength": 2000,
-									"description": "Link of a button."
+									"description": "Link of a button, or of the one link in a paragraph, heading or list item (mailto: and tel: work too)."
 								}
 							},
 							"required": [
