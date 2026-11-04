@@ -11,6 +11,7 @@ Read the post with `leitvia/get-page-outline` (`hash`, block IDs) and the block 
 - **Link texts:** the link text names the target. For a text with one link use `leitvia/update-block` with `text` (the whole new text), `link_text` (the part that stays linked) and `url` when the target changes. A link to `#` needs the real target; when you cannot find it on the site, ask (checkpoint **Link targets**).
 - **Empty headings:** give them text with `leitvia/update-content` (`blocks` with `block` and `text`), or ask the person what the section is about.
 - **Heading levels:** a skipped level or a second h1 gets the level that fits the outline: `leitvia/update-block` with `attributes: { "level": <n> }` (1 to 6), for example h3 after h1 becomes h2. Work from the top of the page down, so each fix sees the level before it. A heading that is missing altogether needs its text from the person.
+- **Animation:** `leitviaAnimation` (in the `attributes` of `leitvia/get-block`) on the header, a form, a notice, a call to action or the first view, or on most sections of a page, goes: send the `markup` of every top-level block with the attribute removed as `content` of `leitvia/update-content`. `leitvia/update-block` refuses the attribute on core blocks and on Studio blocks with saved markup. A text that refers to the motion gets a new wording. Rules: [animation](../../leitvia-pattern/references/animation.md).
 
 ## What the abilities cannot fix
 
@@ -30,6 +31,7 @@ No ability and no automated check decides these. List each one that applies to t
 - **Videos and audio:** captions, audio description, transcripts; media embedded from other hosts also need a consent placeholder.
 - **Forms of other plugins** (contact forms, newsletter, shop checkout): labels, error messages, keyboard use; the checks of Studio do not see them.
 - **Documents:** PDF and office files linked from the pages.
+- **Motion:** with reduced motion turned on in the system every animated block is there at once; with it off, a block reached by keyboard shows itself when it gets focus, and no content depends on the effect.
 - **Zoom and reflow:** 200 % text zoom and 400 % zoom at 320 px width on the real content.
 
 ## Accessibility statement

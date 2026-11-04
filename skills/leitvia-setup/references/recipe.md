@@ -51,5 +51,6 @@ Tell the person about these points; there is no ability for them:
 - Avatars come from Gravatar, a third party; recommend switching them off in Settings, Discussion.
 - A page in another language than the site needs its own document language; core has no per-page setting.
 - Plugins, users, the site title and tagline, the logo and the permalink structure are admin settings for the person. Propose site title and tagline from the briefing.
+- A sticky header is off; on request see [sticky header](sticky-header.md).
 - The sample post "Hello world!" and the "Sample Page" of a new WordPress stay; no ability deletes content. Ask the person to delete them.
 - No recipe creates an accessibility statement. Build it with `leitvia/compose-page`, `frame` `contact` (the frame the recipes use for legal pages), `kind` `accessibility` and the pattern `leitvia/page-accessibility-statement`; its content is a legal text from the person (skill `leitvia-a11y`). Its placeholders in square brackets, such as `[Organization name]`, stay until the person supplies the facts; `leitvia/audit-site` lists each with the check `legal-placeholder`, an open point for the report.

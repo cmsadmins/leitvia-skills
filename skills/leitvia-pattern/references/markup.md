@@ -17,6 +17,7 @@ Read `leitvia/get-contract` (`roles.color`, `pairs`, `blockStyles`, `composition
 - **Links** need real targets in reusable patterns too: no `#`. Use a button whose link the page edit sets, or leave the link out.
 - **Images** from the media library only, with an alt text that fits every page the pattern will appear on, or `metadata.leitviaDecorative` with an empty alt. Add them with `leitvia/add-media`.
 - **Never** scripts, event attributes, Custom HTML blocks, classic blocks or Base64 data; they are rejected with `leitvia_unsafe_content`. No HTML comments besides block delimiters: between blocks they turn into classic content, inside a block they break it.
+- **Effects on scroll** (`leitviaAnimation`) only as the [animation rules](animation.md) allow.
 - Keep every text editable by a page edit: paragraphs, headings, list items, buttons, the `cite` of a quote and the `summary` of a details block, each with at most one link. Captions cannot be changed later through `leitvia/compose-page`.
 
 ## Replace deprecated patterns
