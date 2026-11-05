@@ -87,7 +87,7 @@ The person reviews the package in the inbox of Leitvia Studio: `/wp-admin/admin.
 
 ## Speed
 
-The target on mobile is 100 in PageSpeed for performance, accessibility, best practices and SEO. The theme prints block styles inside the document and preloads only the body and heading fonts in the weight they use; Studio loads its script modules last, at low priority. Up to 150 KB of stylesheets go inside the document, smallest first, also those of plugins with files on this site. A `link rel="stylesheet"` that remains is a large plugin stylesheet (WooCommerce keeps a few on shop pages) or one from another host: name it in the report. Scores vary between runs, so judge from the render-blocking list and the filmstrip, not from one number.
+The target on mobile is 100 in PageSpeed for performance, accessibility, best practices and SEO. The theme prints block styles inside the document and preloads only the body, heading and button fonts in the weight they use; Studio loads its script modules last, at low priority. Up to 150 KB of stylesheets go inside the document, smallest first, also those of plugins with files on this site. A `link rel="stylesheet"` that remains is a large plugin stylesheet (WooCommerce keeps a few on shop pages) or one from another host: name it in the report. Scores vary between runs, so judge from the render-blocking list and the filmstrip, not from one number.
 
 What stays with the site, for the person to decide: font files uploaded without a Latin subset (one file above 30 KB delays the first paint) and missing cache lifetimes for static files on the server. List both when you find them.
 
