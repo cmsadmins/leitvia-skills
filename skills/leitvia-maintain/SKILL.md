@@ -14,6 +14,8 @@ Read before the first call: the [agent handbook](../../handbook/README.md) (acce
 
 MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Paths start at the address of the site, not at the host. Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read: the abilities give you every ID, hash and status you need. Reading public pages of the site is fine. Where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after each write.
 
+If every write ends with 403 and the abilities answer 404, Leitvia Studio is not active. The role stores no capability, so without Studio the agent can change nothing on the site. Tell the person and stop; do not try core routes. The password works again once a person activates Studio. After Studio was deleted the password is gone and a person creates a new one.
+
 ## Modes
 
 - **package** (default for maintenance): send the same `package` key on every write of the run, for example `maintenance-2026-10`. One run, one key, one package for a person.
