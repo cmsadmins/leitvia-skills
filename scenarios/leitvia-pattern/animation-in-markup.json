@@ -1,8 +1,8 @@
 {
 	"$schema": "../scenario.schema.json",
-	"title": "A pattern carries its effect on scroll in the markup, update-block refuses leitviaAnimation on core and static blocks",
+	"title": "A pattern carries its effect on scroll in the markup, update-block sets the strength on a static block",
 	"skill": "leitvia-pattern",
-	"briefing": "We need a section with our three promises as an icon list, the points should appear one after another: Free estimate, Fixed price, Clean site. Make it a reusable pattern, our designer reviews it in the Lab.",
+	"briefing": "We need a section with our three promises as an icon list, the points should appear one after another, a bit livelier than usual: Free estimate, Fixed price, Clean site. Make it a reusable pattern, our designer reviews it in the Lab.",
 	"mode": "direct",
 	"answers": {
 		"need": "No existing pattern fits; build a new one and call it Promises. Only the heading Our promises and the three points from the briefing.",
@@ -36,8 +36,8 @@
 			"ability": "leitvia/update-block",
 			"input": {
 				"post": "{{capture.pattern}}",
-				"block": "p:0",
-				"attributes": { "leitviaAnimation": "rise" },
+				"block": "p:0.1",
+				"attributes": { "leitviaAnimation": "spin" },
 				"base_hash": "{{capture.hash}}"
 			},
 			"expectError": "leitvia_invalid_input"
@@ -47,10 +47,10 @@
 			"input": {
 				"post": "{{capture.pattern}}",
 				"block": "p:0.1",
-				"attributes": { "leitviaAnimation": "fade" },
+				"attributes": { "leitviaMotion": "bold" },
 				"base_hash": "{{capture.hash}}"
 			},
-			"expectError": "leitvia_static_markup"
+			"expect": { "findings.length": 0 }
 		}
 	],
 	"expect": [
@@ -59,7 +59,8 @@
 			"input": { "post": "{{capture.pattern}}", "block": "p:0.1" },
 			"expect": {
 				"attributes.leitviaAnimation": "stagger",
-				"markup": { "$match": "^<!-- wp:leitvia/icon-list \\{[^}]*\"leitviaAnimation\":\"stagger\"" }
+				"attributes.leitviaMotion": "bold",
+				"markup": { "$match": "^<!-- wp:leitvia/icon-list \\{\"leitviaAnimation\":\"stagger\",\"leitviaMotion\":\"bold\"\\} -->\n<ul role=\"list\" class=\"wp-block-leitvia-icon-list\">" }
 			}
 		},
 		{
