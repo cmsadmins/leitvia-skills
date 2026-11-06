@@ -6,9 +6,9 @@ Details for `leitvia-page`. Read it before you write the edits of step 4.
 
 - Replace every sample text of every pattern you use. Sample copy left on a page publishes fiction: invented names, figures, addresses, phone numbers and quotes.
 - A pattern with more slots than you have facts (a strip of five items for four points, a step the briefing does not describe) gets a pattern with fewer slots, or the slot repeats a fact the person gave you. Never fill it with an assumption about the business, even one you flag in the report.
-- Some blocks hold text you cannot change with an edit: a caption, or a text with more than one link. Use those patterns only when their sample text fits, otherwise choose another pattern of the same role. The attribution of a quote (`cite`) and the question of a details block (`summary`) take a `text` edit at the quote or details block itself.
+- Some blocks hold text you cannot change with a `text` edit: a text with more than one link. Use those patterns only when their sample text fits, otherwise choose another pattern of the same role. The attribution of a quote (`cite`) and the question of a details block (`summary`) take a `text` edit at the quote or details block itself, the caption of an image, video, audio, gallery, table or embed a `caption` edit at that block.
 - Keep to the text lengths of the plan; a hero heading of 120 characters breaks the layout the pattern was made for.
-- Write in the language of the page. German headings are not hyphenated: long compound words in headings need soft hyphens (`&shy;`); pages in easy language keep words whole.
+- Write in the language of the page. German headings are not hyphenated: long compound words in headings need soft hyphens (`&shy;`). Paragraphs and lists hyphenate words of ten letters or more, table cells every word, wherever the language has a dictionary; pages in easy language keep words whole.
 - A page in another language than the site needs its own document language. Core has no setting per page; tell the person, who decides on a language plugin.
 - Never put review notes or HTML comments into block markup. Open questions go into your report.
 

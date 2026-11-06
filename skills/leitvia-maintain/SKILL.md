@@ -51,6 +51,7 @@ Sort the findings by area. `check` holds the name of the check with the prefix `
 | `content-tokens`, `token-drift`, `content-contrast` | design | skill `leitvia-design` or a person |
 | `composition` | page composition | skill `leitvia-page` |
 | `query-context` | query filter or Load more without a working query | `leitvia/update-block` on the `core/query` block (own `queryId`, `inherit` false) |
+| `privacy-page` | contact form without a published privacy policy page | `leitvia/set-privacy-page`, a person applies it |
 | `page-kind`, `block-validity` | needs a person | report only |
 
 ### 2. Broken links
@@ -78,6 +79,7 @@ Every write of the run carries the same `package` key. After the last write:
 - `leitvia/list-packages` with `state: open`: your package with its operations.
 - `leitvia/get-package` with `id`: the diff per operation. Check that every operation does what you meant.
 - Do not call `leitvia/apply-package` for operations of areas that are not `autonomous` for you; it answers `leitvia_needs_human`, whose `data.inbox` is the link for the person.
+- A package that took a wrong turn: `leitvia/reject-package` with `id`, for your own package. Open operations stay unwritten, waiting files go, applied ones stay; the package and the audit log remain. Start again with a new `package` key.
 
 The person reviews the package in the inbox of Leitvia Studio: `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=<id>`. Checkpoint **Package applied**.
 

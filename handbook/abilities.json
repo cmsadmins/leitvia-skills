@@ -1,5 +1,5 @@
 {
-	"studio": "1.3.28",
+	"studio": "1.3.29",
 	"abilities": [
 		{
 			"name": "leitvia/activate-token-set",
@@ -177,7 +177,7 @@
 		{
 			"name": "leitvia/add-media",
 			"label": "Add media",
-			"description": "Adds an image to the media library from a URL of this site or as Base64 data up to 5 MB, with alt text or marked as decorative. URLs of other hosts are rejected; nothing is fetched from them. base_hash is empty. Images already in the library are used by their ID in compose-page and update-block.",
+			"description": "Adds an image to the media library from a URL of this site or as Base64 data up to 5 MB, with alt text or marked as decorative. It also takes a WebVTT file with captions for a video (.vtt, UTF-8, starts with WEBVTT, no alt text). It needs the right to upload files. URLs of other hosts are rejected; nothing is fetched from them. base_hash is empty. Images already in the library are used by their ID in compose-page and update-block, a WebVTT file by its ID in tracks of update-block.",
 			"category": "leitvia",
 			"group": "build",
 			"input_schema": {
@@ -642,6 +642,32 @@
 												"maxLength": 2000,
 												"description": "Link of a button, or of the one link in a paragraph, heading or list item (mailto: and tel: work too)."
 											},
+											"add_link": {
+												"type": "object",
+												"description": "New link around a passage of a paragraph, heading, list item, citation or summary, as text with the exact words and url. Other links and inline formatting stay; the first place outside a link counts.",
+												"properties": {
+													"text": {
+														"type": "string",
+														"minLength": 1,
+														"maxLength": 500
+													},
+													"url": {
+														"type": "string",
+														"minLength": 1,
+														"maxLength": 2000
+													}
+												},
+												"required": [
+													"text",
+													"url"
+												],
+												"additionalProperties": false
+											},
+											"caption": {
+												"type": "string",
+												"maxLength": 1000,
+												"description": "Caption of an image, video, audio, gallery, table or embed as plain text; empty removes it."
+											},
 											"image": {
 												"type": "object",
 												"properties": {
@@ -854,6 +880,32 @@
 												"type": "string",
 												"maxLength": 2000,
 												"description": "Link of a button, or of the one link in a paragraph, heading or list item (mailto: and tel: work too)."
+											},
+											"add_link": {
+												"type": "object",
+												"description": "New link around a passage of a paragraph, heading, list item, citation or summary, as text with the exact words and url. Other links and inline formatting stay; the first place outside a link counts.",
+												"properties": {
+													"text": {
+														"type": "string",
+														"minLength": 1,
+														"maxLength": 500
+													},
+													"url": {
+														"type": "string",
+														"minLength": 1,
+														"maxLength": 2000
+													}
+												},
+												"required": [
+													"text",
+													"url"
+												],
+												"additionalProperties": false
+											},
+											"caption": {
+												"type": "string",
+												"maxLength": 1000,
+												"description": "Caption of an image, video, audio, gallery, table or embed as plain text; empty removes it."
 											},
 											"image": {
 												"type": "object",
@@ -3024,6 +3076,35 @@
 			}
 		},
 		{
+			"name": "leitvia/reject-package",
+			"label": "Discard change package",
+			"description": "Discards an open or partly applied change package. Its open operations stay unwritten and their waiting files are deleted, operations already applied stay. Use it for your own package when a run took a wrong turn; users with manage_options may discard any package. The package stays with the state rejected and the audit log keeps the call. It cannot be undone, so build the change again with a new package key.",
+			"category": "leitvia",
+			"group": "maintain",
+			"input_schema": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"minimum": 1,
+						"description": "Change package ID."
+					}
+				},
+				"required": [
+					"id"
+				],
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object"
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": false
+			}
+		},
+		{
 			"name": "leitvia/repair-links",
 			"label": "Repair links",
 			"description": "Repairs internal links of one post: from pairs of old and new link, or with auto through the old slugs WordPress keeps for redirects. The base hash is the hash of the post from leitvia/get-page-outline. Only links of this site change. External links are never requested, only listed in the report, as are internal links that lead nowhere and cannot be resolved.",
@@ -3695,6 +3776,98 @@
 			}
 		},
 		{
+			"name": "leitvia/set-privacy-page",
+			"label": "Set privacy policy page",
+			"description": "Makes an existing page the privacy policy page of the site; 0 clears it. Contact forms, comment forms and the footer link to it. base_hash is empty. The page must exist, so create it first and wait until a package with it is applied. Like every setting it waits in a change package for a person. notice says so while the page is not published, and leitvia/audit-site reports contact forms without such a page.",
+			"category": "leitvia",
+			"group": "setup",
+			"input_schema": {
+				"properties": {
+					"page": {
+						"type": "integer",
+						"minimum": 0
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"page",
+					"base_hash"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					},
+					"notice": {
+						"type": "string"
+					},
+					"slug_changed": {
+						"type": "object",
+						"description": "The slug asked for (requested) is taken or reserved, so the address uses slug instead, on publishing at the latest."
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": false
+			}
+		},
+		{
 			"name": "leitvia/set-variation",
 			"label": "Set style variation",
 			"description": "Applies a style variation of the contract to the global styles of the active theme: a full variation replaces them, a colors or typography variation replaces only its part. Names come from the style variations of leitvia/get-contract. The base hash is the hash of the global styles. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash.",
@@ -3789,7 +3962,7 @@
 		{
 			"name": "leitvia/update-block",
 			"label": "Update block",
-			"description": "Changes one block found by its ID or path ID: attributes from the block catalog and the level of a heading, the text of a paragraph, heading, list item or button, the citation of a quote, the summary of a details block, the link of a button or of the one link in a text (link_text names the linked part), or the image of an image or cover block with alt text. A spotlight point moves with attributes x and y in percent. The effect on scroll (leitviaAnimation, leitviaMotion) changes on every block that has it, core blocks and saved markup included, since only the block comment changes. Static markup is rebuilt with the HTML API; changes it cannot rebuild safely are rejected with leitvia_static_markup. Read the post with leitvia/get-page-outline first and send its hash as base_hash; get-block shows the current attributes. For several text changes in one post use leitvia/update-content.",
+			"description": "Changes one block found by its ID or path ID: attributes from the block catalog and the level of a heading, the text of a paragraph, heading, list item or button, the citation of a quote, the summary of a details block, the link of a button or of the one link in a text (link_text names the linked part), or the image of an image or cover block with alt text. add_link sets a new link on a passage of a text, caption the caption of an image, video, audio, gallery, table or embed. Attributes that a static block keeps in its markup, such as prefix, value, suffix and label of a counter, change like any other. query of a core/query merges into its settings. tracks of a core/video replaces its text tracks: each names a WebVTT file from leitvia/add-media by id, with kind, srclang and label. A spotlight point moves with attributes x and y in percent. The effect on scroll (leitviaAnimation, leitviaMotion) changes on every block that has it, core blocks and saved markup included, since only the block comment changes. Static markup is rebuilt with the HTML API; changes it cannot rebuild safely are rejected with leitvia_static_markup. Read the post with leitvia/get-page-outline first and send its hash as base_hash; get-block shows the current attributes. For several text changes in one post use leitvia/update-content.",
 			"category": "leitvia",
 			"group": "build",
 			"input_schema": {
@@ -3817,6 +3990,32 @@
 						"maxLength": 2000,
 						"description": "Link of a button, or of the one link in a paragraph, heading or list item (mailto: and tel: work too)."
 					},
+					"add_link": {
+						"type": "object",
+						"description": "New link around a passage of a paragraph, heading, list item, citation or summary, as text with the exact words and url. Other links and inline formatting stay; the first place outside a link counts.",
+						"properties": {
+							"text": {
+								"type": "string",
+								"minLength": 1,
+								"maxLength": 500
+							},
+							"url": {
+								"type": "string",
+								"minLength": 1,
+								"maxLength": 2000
+							}
+						},
+						"required": [
+							"text",
+							"url"
+						],
+						"additionalProperties": false
+					},
+					"caption": {
+						"type": "string",
+						"maxLength": 1000,
+						"description": "Caption of an image, video, audio, gallery, table or embed as plain text; empty removes it."
+					},
 					"image": {
 						"type": "object",
 						"properties": {
@@ -3839,7 +4038,7 @@
 					},
 					"attributes": {
 						"type": "object",
-						"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; leitviaAnimation and leitviaMotion on every block that lists them (null removes leitviaMotion)."
+						"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label; leitviaAnimation and leitviaMotion on every block that lists them (null removes leitviaMotion)."
 					},
 					"post": {
 						"type": "integer",
@@ -3928,7 +4127,7 @@
 		{
 			"name": "leitvia/update-content",
 			"label": "Update content",
-			"description": "Updates title, excerpt, slug, date, author, terms, fields, featured image, comment status and the texts and button links of several blocks of one post in one operation, blocks found by their ID from the outline. Per block, url changes the one link of a text too and link_text names the part that stays linked, as in leitvia/update-block. Terms, fields and featured image follow the rules of leitvia/create-content; terms replace those of their taxonomy. Instead of blocks, content replaces the whole content with block markup, for example to turn classic content into blocks; the new content may hold no classic block. Read the post with leitvia/get-page-outline first and send its hash as base_hash. A slug change is a URL change and lands at most as a suggestion; after one, leitvia/repair-links with auto points the links of other posts to the new address. For attributes or images of a block use leitvia/update-block.",
+			"description": "Updates title, excerpt, slug, date, status, author, terms, fields, featured image, comment status and the texts and button links of several blocks of one post in one operation, blocks found by their ID from the outline. Per block, url changes the one link of a text too, link_text names the part that stays linked, add_link sets a new link on a passage and caption the caption of a figure, as in leitvia/update-block. status publishes a draft, schedules it (future, with a date) or takes a post back to draft or pending; like every change it follows the autonomy level, so at a lower level it waits in a change package, and publishing needs the right to publish when it is applied. Terms, fields and featured image follow the rules of leitvia/create-content; terms replace those of their taxonomy. Instead of blocks, content replaces the whole content with block markup, for example to turn classic content into blocks; the new content may hold no classic block. Read the post with leitvia/get-page-outline first and send its hash as base_hash. A slug change is a URL change and lands at most as a suggestion; after one, leitvia/repair-links with auto points the links of other posts to the new address. For attributes or images of a block use leitvia/update-block.",
 			"category": "leitvia",
 			"group": "maintain",
 			"input_schema": {
@@ -3977,6 +4176,32 @@
 									"type": "string",
 									"maxLength": 2000,
 									"description": "Link of a button, or of the one link in a paragraph, heading or list item (mailto: and tel: work too)."
+								},
+								"add_link": {
+									"type": "object",
+									"description": "New link around a passage of a paragraph, heading, list item, citation or summary, as text with the exact words and url. Other links and inline formatting stay; the first place outside a link counts.",
+									"properties": {
+										"text": {
+											"type": "string",
+											"minLength": 1,
+											"maxLength": 500
+										},
+										"url": {
+											"type": "string",
+											"minLength": 1,
+											"maxLength": 2000
+										}
+									},
+									"required": [
+										"text",
+										"url"
+									],
+									"additionalProperties": false
+								},
+								"caption": {
+									"type": "string",
+									"maxLength": 1000,
+									"description": "Caption of an image, video, audio, gallery, table or embed as plain text; empty removes it."
 								}
 							},
 							"required": [
@@ -3994,6 +4219,16 @@
 						"type": "string",
 						"pattern": "^\\d{4}-\\d{2}-\\d{2}([T ]\\d{2}:\\d{2}(:\\d{2})?)?$",
 						"description": "Date in the time zone of the site, YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS."
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"draft",
+							"pending",
+							"publish",
+							"future"
+						],
+						"description": "New status of the post; future needs a date in the future."
 					},
 					"author": {
 						"type": "integer",
@@ -4808,6 +5043,32 @@
 									"type": "string",
 									"maxLength": 2000,
 									"description": "Link of a button, or of the one link in a paragraph, heading or list item (mailto: and tel: work too)."
+								},
+								"add_link": {
+									"type": "object",
+									"description": "New link around a passage of a paragraph, heading, list item, citation or summary, as text with the exact words and url. Other links and inline formatting stay; the first place outside a link counts.",
+									"properties": {
+										"text": {
+											"type": "string",
+											"minLength": 1,
+											"maxLength": 500
+										},
+										"url": {
+											"type": "string",
+											"minLength": 1,
+											"maxLength": 2000
+										}
+									},
+									"required": [
+										"text",
+										"url"
+									],
+									"additionalProperties": false
+								},
+								"caption": {
+									"type": "string",
+									"maxLength": 1000,
+									"description": "Caption of an image, video, audio, gallery, table or embed as plain text; empty removes it."
 								},
 								"image": {
 									"type": "object",
