@@ -66,7 +66,7 @@ Key: 2 to 20 characters, `a-z`, `0-9`, `_`, starting with a letter, not starting
 | `hasArchive` | Only with `public`: an archive at `/<slug>/`. Leave it off when a page lists the entries ([entries](../../leitvia-page/references/entries.md#slugs)). |
 | `slug` | URL part, `a-z`, `0-9`, `-`; default the key. Public types and taxonomies need different slugs. |
 | `withFront` | Only with `public`, also on taxonomies: addresses start with the prefix of the post permalinks (`/blog/<slug>/<entry>/`). Off by default, so entries sit at `/<slug>/<entry>/`. |
-| `singlePages` | Only with `public`; `false` gives entries no address of their own, no single template and no entry in search or sitemaps. Pages list them with a query loop and bindings. Link no title of such an entry: the link would lead nowhere. Use it for FAQs, testimonials, team members without a page. A type with `public` false shows nothing to visitors. |
+| `singlePages` | Only with `public`; `false` gives entries no address of their own, no single template and no entry in search or sitemaps. Pages list them with a query loop, which keeps the type, and bindings. Link no title of such an entry: the link would lead nowhere. Use it for FAQs, testimonials, team members without a page. A type with `public` false shows nothing to visitors. |
 | `hierarchical` | Entries have parents, like pages. |
 | `supports` | Any of `title`, `editor`, `author`, `thumbnail`, `excerpt`, `comments`, `revisions`, `page-attributes`. Default `title`, `editor`. A featured image needs `thumbnail`. |
 | `icon` | A Dashicon, `dashicons-<name>`. |
