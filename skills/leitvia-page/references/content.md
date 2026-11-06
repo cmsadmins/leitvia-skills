@@ -16,18 +16,20 @@ Details for `leitvia-page`. Read it before you write the edits of step 4.
 
 - Every link and button needs a real target: a page of the site, an `https` URL, `mailto:` or `tel:`. A link to `#` is rejected by the link text check; so is link text that does not name its target.
 - Button texts name the action and the target ("Book a repair by e-mail", not "Click here").
-- A text with one link, such as a contact line "Write to hello@example.com", keeps its link: send `text`, `link_text` (the part that stays linked) and `url` in one edit. A text that would drop a link with a real target is rejected with `leitvia_invalid_input`; a sample link to `#` may be replaced by plain text.
+- A text with one link, such as a contact line "Write to hello@example.com", keeps its link: send `text`, `link_text` (the part that stays linked) and `url` in one edit. The same in compose-page, update-block and `blocks` of update-content. A text that would drop a link with a real target is rejected with `leitvia_invalid_input`; a sample link to `#` may be replaced by plain text.
 - A text without a link cannot get one by an edit (`leitvia_static_markup`). For a new link, such as an e-mail address in a contact paragraph, send the whole content with `leitvia/update-content` and `content`, the paragraph written as `<p>Write to <a href="mailto:hello@example.org">hello@example.org</a>.</p>`, or use a pattern whose block already has a link.
 - Only link to pages that exist. When a target page is missing, build it first or ask.
 
 ## Images
 
+- A site without a posts page has no address that lists its posts. Show the newest posts on a page with the pattern `leitvia/teaser-posts-grid` until `leitvia/set-posts-page` sets the posts page.
 - Images come from the media library. Add one with `leitvia/add-media` (Base64 data with a file name, or a URL of this site) and an `alt` that describes it, or `decorative: true` when the text around it carries the meaning. URLs of other hosts are rejected and never fetched.
 - A file the person handed you goes over REST: a short script reads it, encodes it and posts `{"input": {"data": ..., "filename": ..., "alt": ...}}`, so the Base64 never passes through your own output.
 - Look at the image before you write its alt text; when it does not show what the briefing says, ask instead of describing the briefing.
 - Use the attachment ID in the `image` edit with the same alt text or `decorative: true` (stored as `metadata.leitviaDecorative`). An image without alt and without that flag is rejected.
 - Sample images of a pattern come with a sample alt text that describes the sample picture. Replace the image, or choose a pattern without an image slot.
 - `images` in `leitvia/list-patterns` gives aspect ratio and recommended size per slot.
+- Illustrations and diagrams show their whole motif: no overlap pattern, where a card covers them, and no slot with another aspect ratio, which crops them (`scale: contain`, or a pattern whose slot matches). On a dark band use only an image made for dark ground, never a recolored or inverted copy. No mask or wipe animation on fine line art.
 
 ## Files to download
 

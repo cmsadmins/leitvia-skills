@@ -13,6 +13,8 @@ Details for `leitvia-design`. Read "Format" before you change a `$value`, "Contr
 | `focus` | Keyboard focus ring |
 | `success`, `warning`, `danger` | Status colors |
 
+A dark set (`surface` darker than `ink`) keeps inverse bands dark, also on a light variation.
+
 ## Format
 
 Copy the `document` of `leitvia/get-tokens` and change only `$value` entries. Keep every slug; unknown slugs are rejected and missing ones too.
@@ -35,12 +37,20 @@ Findings with severity `warning` (for example `font_not_bundled`) do not block; 
 
 ## Fonts
 
-Studio ships the faces of a token set only when the theme bundles that family. Bundled today: Newsreader, Inter Tight, IBM Plex Sans and IBM Plex Mono from the theme and its style variations, Libre Franklin and Young Serif from Leitvia Studio; all are served from the site, no other host. A brand font the theme does not bundle gives the warning `font_not_bundled` and falls back to the system font. Uploading font files goes through the Font Library of WordPress (Appearance, Editor, Typography), which is a task for the person; check the font license first. Until then set the font stack with the brand family first and a generic family last.
+A token set gets font faces when its first family is available on the site. Bundled today: Newsreader, Inter Tight, IBM Plex Sans and IBM Plex Mono from the theme and its style variations, Libre Franklin and Young Serif from Leitvia Studio. A family in the Font Library of the site counts too. All of them are served from the site, no other host. Any other family gives the warning `font_not_bundled` and falls back to the system font.
+
+A brand font that is not bundled is a step of the person or the operator, no ability uploads files of this kind:
+
+1. Ask whether the license allows self-hosting and for the files as WOFF2, one per weight and style.
+2. Before the token set is activated, the person uploads them, or the operator runs the [commands](../../../workflows/new-site-operator.md#brand-fonts). Never link a font CDN.
+3. Keep the family name of the upload as the first entry of the stack and a generic family last. The name decides: `font_not_bundled` disappears from the check of the next `leitvia/create-token-set` once it matches.
+4. Fonts uploaded after the activation need the set activated again, because the faces are copied into the global styles at that moment. Then check that the front page requests fonts only from the site.
 
 ## Limits
 
 Tell the person; there is no ability for these:
 
 - Font weights per heading level and the layout widths (content and wide size) are not part of the token format. A brand that wants bold headings or another page width needs a person in the Site Editor.
-- The logo: setting the site logo is an admin setting. Before you hand over an SVG logo, read it and confirm it holds no `<script>` element and no event attribute (`onload`, `onclick` and so on). After the person set it, check on the front end that the logo image has a width and a height; SVG files without size information can render 0 px wide.
+- The logo: setting the site logo is an admin setting, and it needs a raster image. WordPress refuses SVG uploads, for administrators too, `leitvia/add-media` takes JPEG, PNG, GIF, WebP and AVIF, and Leitvia has no SVG sanitizer; do not suggest a plugin that lifts the limit. From an SVG, render a PNG with a transparent background at twice the display width or more: 400 px wide covers the header patterns (`width` up to 200), 960 px the masthead. Add it with `leitvia/add-media`, name it to the person for the site logo, and afterwards check on the front end that the logo image has a width and a height.
+- A light logo for dark bands: on an Inverse band the Site Logo block takes the block style On dark band, which draws a transparent logo in white (the pattern `leitvia/footer-mega` has it). When the brand has its own light file in several colors, add it with `leitvia/add-media` and write a `core/image` block linked to the start page in place of the Site Logo block with `leitvia/update-template-part`.
 - Brand rules about composition, for example "accent never as a section background", are not a contrast question. Pass them on to `leitvia-page` and check the front end for `has-accent-background-color` on sections.

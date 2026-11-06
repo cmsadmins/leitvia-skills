@@ -50,6 +50,7 @@ Sort the findings by area. `check` holds the name of the check with the prefix `
 | `headings`, `page-structure` | structure | skill `leitvia-a11y` |
 | `content-tokens`, `token-drift`, `content-contrast` | design | skill `leitvia-design` or a person |
 | `composition` | page composition | skill `leitvia-page` |
+| `query-context` | query filter or Load more without a working query | `leitvia/update-block` on the `core/query` block (own `queryId`, `inherit` false) |
 | `page-kind`, `block-validity` | needs a person | report only |
 
 ### 2. Broken links

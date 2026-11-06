@@ -65,6 +65,8 @@ Key: 2 to 20 characters, `a-z`, `0-9`, `_`, starting with a letter, not starting
 | `public` | Default false: no URL, only editors read the entries. True gives entry pages at `/<slug>/<entry>/`. |
 | `hasArchive` | Only with `public`: an archive at `/<slug>/`. Leave it off when a page lists the entries ([entries](../../leitvia-page/references/entries.md#slugs)). |
 | `slug` | URL part, `a-z`, `0-9`, `-`; default the key. Public types and taxonomies need different slugs. |
+| `withFront` | Only with `public`, also on taxonomies: addresses start with the prefix of the post permalinks (`/blog/<slug>/<entry>/`). Off by default, so entries sit at `/<slug>/<entry>/`. |
+| `singlePages` | Only with `public`; `false` gives entries no address of their own, no single template and no entry in search or sitemaps. Pages list them with a query loop and bindings. Link no title of such an entry: the link would lead nowhere. Use it for FAQs, testimonials, team members without a page. A type with `public` false shows nothing to visitors. |
 | `hierarchical` | Entries have parents, like pages. |
 | `supports` | Any of `title`, `editor`, `author`, `thumbnail`, `excerpt`, `comments`, `revisions`, `page-attributes`. Default `title`, `editor`. A featured image needs `thumbnail`. |
 | `icon` | A Dashicon, `dashicons-<name>`. |
@@ -78,7 +80,7 @@ Key: 3 to 64 characters, `a-z`, `0-9`, `_`, starting with a letter; prefix it wi
 
 | Type | Value in `fields` of create-content | Extra keys |
 |---|---|---|
-| `text`, `textarea` | Text | `maxLength` |
+| `text`, `textarea` | Text; a `textarea` with one item per line is the list field of an entry ([binding](../../leitvia-page/references/entries.md#values-of-fields-on-the-front-end)) | `maxLength` |
 | `email`, `url` | An e-mail address, a URL | |
 | `integer`, `number` | A number | `min`, `max` |
 | `boolean` | `true` or `false` | |
@@ -92,7 +94,7 @@ Every field takes `label` (required), `description` and `required`. A required f
 
 ### taxonomies
 
-Key: 2 to 32 characters, same characters as post types. Required: `label`, `singularLabel`, `postTypes` (post types of the model, or `post`). Optional: `public`, `hierarchical`, `slug`, `description`. Flat taxonomies (the default) get new terms by name from create-content; hierarchical ones take existing terms only.
+Key: 2 to 32 characters, same characters as post types. Required: `label`, `singularLabel`, `postTypes` (post types of the model, or `post`). Optional: `public`, `hierarchical`, `slug`, `description`. A name no term has yet creates the term with the entry in create-content and update-content, in a change package when it is applied; hierarchical terms land at the top level and need a user who may manage them. There is no ability for a term on its own or for its parent.
 
 ### relations
 

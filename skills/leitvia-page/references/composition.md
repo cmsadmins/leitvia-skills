@@ -13,7 +13,7 @@ Details for `leitvia-page`. Read "Rules" when you score an outline, "Templates a
 - a hero only as the first section and only on a template without a printed title (`heroFirstOnly`, `heroTemplate`);
 - at most `maxSections` sections; frames (header, footer) do not count.
 
-The page starts at 100 and loses the points in `compositionRules.scoring` per finding. `min_score` (80 by default) is the score below which a write is held for a person.
+The page starts at 100 and loses the points in `compositionRules.scoring` per finding. On a template that shows the title (frames `contact` and `article`, not `page-landing`) paragraphs, headings, lists and a table of contents before the first pattern are the intro and count as no section; the same blocks after a pattern count as `unknownPattern`. `min_score` (80 by default) is the score below which a write is held for a person.
 
 The narrative order of the roles is `hook`, `context`, `proof`, `detail`, `offer`, `close` (`compositionRules.narrative`): open with the promise, explain, prove, go into detail, make the offer, close with the next step. Section padding already follows the density of each pattern; do not change spacing.
 
@@ -36,7 +36,11 @@ Edits address blocks by path ID: `p:0` is the root block of the pattern, `p:0.1`
 - `text`: plain text of a paragraph, heading, list item or button. Setting the text of a paragraph that holds a link drops the link; write a sentence that stands on its own.
 - `url`: the link of a button.
 - `image`: `{ "id": <attachment>, "alt": "..." }` or `{ "id": <attachment>, "decorative": true }` for an image or cover block.
+- `remove: true`: takes the block out of its parent, for three tiles of a six-tile pattern. The outer block of a pattern and the last child of a parent stay.
+- `repeat: <n>`: adds n copies right after the block, for more people or entries than the pattern has. Blocks with an HTML anchor cannot be copied.
+
+`remove` and `repeat` go in an edit of their own and never into `leitvia/update-content`. Edits apply in order, and each one sees the IDs the one before left: remove from the last block to the first, repeat first and then write the texts of the copies by their new IDs. Never rebuild the markup of a section for this. The checks run on the result; a layout that needs a certain number of entries is a reason for another pattern.
 
 ## After the page exists
 
-Later changes go through `leitvia/update-content` (texts, title, button links of several blocks), `leitvia/update-block` (attributes, one image) and `leitvia/set-alt-text`, each with the `hash` of `leitvia/get-page-outline` as `base_hash`. To add a section, send as `content` of `leitvia/update-content` the `markup` of `leitvia/get-block` for each top-level block in order, with the new section (`leitvia/get-pattern`, root block with `"metadata":{"patternName":"<slug>"}`) where it belongs. For a new order of most sections, compose a new page and let the person swap them. New section designs belong to the skill `leitvia-pattern`.
+Later changes go through `leitvia/update-content` (texts, title and links of several blocks; per block `text`, `url` and `link_text` as in compose-page), `leitvia/update-block` (attributes, one image) and `leitvia/set-alt-text`, each with the `hash` of `leitvia/get-page-outline` as `base_hash`. To add a section, send as `content` of `leitvia/update-content` the `markup` of `leitvia/get-block` for each top-level block in order, with the new section (`leitvia/get-pattern`, root block with `"metadata":{"patternName":"<slug>"}`) where it belongs. For a new order of most sections, compose a new page and let the person swap them. New section designs belong to the skill `leitvia-pattern`.

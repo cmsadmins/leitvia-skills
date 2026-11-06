@@ -70,7 +70,7 @@ After the person applied the activation:
 
 When the person wants one of the looks of the theme and no brand of its own, take the slug from the style variations of `leitvia/get-contract` and call `leitvia/set-variation` with `variation`, empty `base_hash` and the `package` key; after `leitvia_stale_hash` repeat it once with `current_hash`. A full variation replaces the global styles, a colors or typography variation only its part. While a token set is active (`source` of `leitvia/get-tokens` is `set`), its colors and fonts win over any variation, so do not set one; tell the person. Then checkpoint "Package applied" and step 7.
 
-Fonts the theme does not bundle, heading weights, layout widths, the logo and composition rules of the brand: [token details](references/tokens.md#fonts). Tell the person what the set cannot carry.
+Brand fonts that are not bundled wait for an upload by the person or the operator, before the set is activated. Those, heading weights, layout widths, the logo and composition rules of the brand: [token details](references/tokens.md#fonts). Tell the person what the set cannot carry.
 
 ## Checkpoints
 

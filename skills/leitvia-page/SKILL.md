@@ -25,6 +25,7 @@ The result of every write says what happened in `mode`: `live`, `draft`, `packag
 
 - **Facts are never guessed.** Organization data, prices, legal texts, figures, quotes and people come only from a source you can name: the person, a page of the site or a read ability, with the source in your report. Without one, stop at a checkpoint; never write a placeholder that looks like a fact.
 - Here that covers prices, legal texts (imprint, privacy, terms, withdrawal, accessibility statement), company name, address, phone, e-mail, register numbers, opening hours, figures, testimonials and team members. Missing facts are a visible question in your report, not a placeholder on the page.
+- A section that belongs under every post, such as a closing call to action, goes once into the template part `post-closing`, not into each post: `leitvia/update-template-part` with the markup of the pattern as `content`. Empty, the part renders nothing.
 - Replace every sample text of every pattern you use, and never fill a slot with an assumption about the business ([content rules](references/content.md#texts)).
 
 ## Steps
@@ -45,7 +46,8 @@ The plan gives per section the pattern, its role, its slot, text lengths (`lengt
 
 - it needs facts nobody gave you ([patterns that need facts](references/composition.md#patterns-that-need-facts));
 - it has texts you cannot replace, for example a caption;
-- its `avoidWhen` matches your content, or it needs an image you do not have.
+- its `avoidWhen` matches your content, or it needs an image you do not have;
+- visitors should write from the page: [contact form](references/contact-form.md).
 
 Pick the replacement with the same `role` from `leitvia/list-patterns`, and prefer the one whose `tone` and `layout` differ from both neighbors. Show the outline (section, pattern, what it says) to the person before you build: checkpoint **Outline confirmed**.
 
@@ -57,7 +59,7 @@ Below `min_score`: revise the outline **once**. Use `suggestions`: each names th
 
 ### 4. Fill the sections
 
-For each section call `leitvia/get-pattern` and read its markup. Write one edit per block by path ID with `text`, `url` or `image` ([edits](references/composition.md#edits)), following the [content rules](references/content.md) for texts, links and images.
+For each section call `leitvia/get-pattern` and read its markup. Write one edit per block by path ID with `text`, `url`, `image`, or `remove` and `repeat` for fewer or more entries than the pattern ([edits](references/composition.md#edits)), following the [content rules](references/content.md) for texts, links and images.
 
 ### 5. Build the page
 

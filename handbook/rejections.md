@@ -1,6 +1,6 @@
 # Rejections
 
-Generated from Leitvia Studio 1.3.25. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
+Generated from Leitvia Studio 1.3.26. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
 
 Every rejection of Leitvia Studio with its retry rule and next ability. Messages with `%s` or `%d` get a value at run time; codes with several rows come from several places.
 
@@ -15,6 +15,7 @@ Every rejection of Leitvia Studio with its retry rule and next ability. Messages
 | `leitvia_check_failed` | 422 | `once` | `leitvia/set-alt-text` | A product image needs alt text that describes it. Set it with leitvia/set-alt-text and try again. |
 | `leitvia_check_failed` | 422 | `once` | set at run time | Checks found problems. Fix them as each finding suggests and try again. |
 | `leitvia_check_failed` | 422 | `once` | none | Checks found problems. Fix them as each finding suggests and try again. |
+| `leitvia_check_failed` | 422 | `once` | `check` or none | Checks found problems. Fix them as each finding suggests and try again. |
 | `leitvia_check_failed` | 422 | `once` | `leitvia/set-alt-text` | The featured image needs alt text that describes it. Set it with leitvia/set-alt-text, or mark the image as decorative. |
 | `leitvia_check_failed` | 422 | `once` | none | The image needs alt text that describes it, or mark it as decorative. |
 | `leitvia_cli_no_user` | 401 | `never` | none | This command acts as a user; run with --user=\<agent or admin>. |
@@ -27,6 +28,8 @@ Every rejection of Leitvia Studio with its retry rule and next ability. Messages
 | `leitvia_forbidden` | 403 | `never` | none | Your user may not assign terms of this taxonomy. |
 | `leitvia_forbidden` | 403 | `never` | none | Your user may not change this object. |
 | `leitvia_forbidden` | 403 | `never` | none | Your user may not create change packages. |
+| `leitvia_forbidden` | 403 | `never` | none | Your user may not create the term %s. Use an existing term. |
+| `leitvia_forbidden` | 403 | `never` | none | Your user may not give content to another author. |
 | `leitvia_forbidden` | 403 | `never` | none | Your user may not publish this. |
 | `leitvia_forbidden` | 403 | `never` | none | Your user may not read the versions of this site. |
 | `leitvia_forbidden` | 403 | `never` | none | Your user may not read this token set. |

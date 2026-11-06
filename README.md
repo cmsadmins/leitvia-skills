@@ -33,8 +33,8 @@ For a test or demo run on your own machine, without a server, the Playground CLI
 	"constants": { "WP_ENVIRONMENT_TYPE": "local" },
 	"siteOptions": { "permalink_structure": "/%postname%/" },
 	"steps": [
-		{ "step": "installTheme", "themeData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia/releases/download/1.2.27/leitvia-1.2.27.zip" }, "options": { "activate": true } },
-		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.25/leitvia-studio-1.3.25.zip" }, "options": { "activate": true } },
+		{ "step": "installTheme", "themeData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia/releases/download/1.2.28/leitvia-1.2.28.zip" }, "options": { "activate": true } },
+		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.26/leitvia-studio-1.3.26.zip" }, "options": { "activate": true } },
 		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://downloads.wordpress.org/plugin/mcp-adapter.0.7.1.zip" }, "options": { "activate": true } },
 		{ "step": "installPlugin", "pluginData": { "resource": "wordpress.org/plugins", "slug": "woocommerce" }, "options": { "activate": true } },
 		{ "step": "runPHP", "code": "<?php require_once '/wordpress/wp-load.php'; $id = wp_insert_user( array( 'user_login' => 'leitvia-agent', 'display_name' => 'Leitvia agent', 'user_email' => 'agent@example.org', 'user_pass' => wp_generate_password( 32 ), 'role' => 'leitvia_agent' ) ); $created = WP_Application_Passwords::create_new_application_password( $id, array( 'name' => 'leitvia agent' ) ); file_put_contents( '/leitvia-run/agent-password.txt', $created[0] );" }
@@ -193,6 +193,8 @@ For all projects use `~/.agents/` in the same way. For Claude Code without the p
 mkdir -p ~/.claude
 cp -r leitvia-skills/skills leitvia-skills/handbook leitvia-skills/workflows ~/.claude/
 ```
+
+An operator with many sites can keep one copy per site project instead, for example `<project>/.claude/skills`, `<project>/.claude/handbook` and `<project>/.claude/workflows` for Claude Code (`cp -r leitvia-skills/skills leitvia-skills/handbook leitvia-skills/workflows <project>/.claude/`). The agent started in that project reads only that copy, so each site keeps the version of the skills it was built with, and an update is one copy per project.
 
 Installers that take single skill folders, such as `npx skills add`, leave out `handbook` and `workflows`; copy those two next to the skills folder afterwards. Restart the agent after copying; it lists the skills by name, for example `leitvia-setup`.
 

@@ -1,8 +1,8 @@
 # leitvia/create-content
 
-Generated from Leitvia Studio 1.3.25. Do not edit. Group: Build. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.26. Do not edit. Group: Build. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
-**Create content.** Creates a post, a page or an entry of the content model from block markup or patterns; base_hash is empty. Post types come from leitvia/get-content-model, sections work as in leitvia/compose-page. The content runs through the same checks as leitvia/update-content. Terms take IDs, names or slugs; only tags and other flat taxonomies get new terms. Fields follow the content model; required fields must be set before publishing. The featured image needs alt text (leitvia/set-alt-text) or the decorative mark, or names the file of an image that waits in the same package from leitvia/add-media. The status is capped by the autonomy level. ai_generated adds a visible note to the text.
+**Create content.** Creates a post, a page or an entry of the content model from block markup or patterns; base_hash is empty. Post types come from leitvia/get-content-model, sections work as in leitvia/compose-page. The content runs through the same checks as leitvia/update-content. Terms take IDs, names or slugs; a name no term has yet creates the term with the content, in categories at the top level and only for a user who may manage them, and in a change package it stays a name until the package is applied. Fields follow the content model; required fields must be set before publishing. The featured image needs alt text (leitvia/set-alt-text) or the decorative mark, or names the file of an image that waits in the same package from leitvia/add-media. The status is capped by the autonomy level. ai_generated adds a visible note to the text.
 
 MCP tool `leitvia-create-content`, REST POST. Annotations: readonly false, destructive false, idempotent false.
 
@@ -18,6 +18,7 @@ MCP tool `leitvia-create-content`, REST POST. Annotations: readonly false, destr
 | `date` | string, pattern `^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?)?$` |  | Date in the time zone of the site, YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS. |
 | `template` | string |  | Template of the contract: page templates such as page-docs for pages, single templates for the other types. |
 | `kind` | one of `imprint`, `privacy`, `terms`, `withdrawal`, `accessibility`, `editorial`, `contact`, `authors` |  | Kind of a page. |
+| `author` | integer, min `1` |  | User ID of the author, as author in leitvia/list-content shows it; the user must be able to edit this post type. Without it a new post belongs to the user who writes it. An author without a display name of their own shows as the name of the site, never as the login. |
 | `terms` | object |  | Terms by taxonomy, such as {"category": ["News"], "post_tag": ["events", 12]}: IDs as numbers, names or slugs as text. They replace the terms of that taxonomy. |
 | `fields` | object |  | Values of the fields and relations of the content model by meta key; null empties a field. |
 | `featured_image` | object { id, decorative, file } |  |  |

@@ -26,6 +26,7 @@ A recipe runs whole by default. On a site that already has its design, pages and
 
 - `dryRun: true` writes nothing. Each step says `new`, `replace`, `unchanged`, `exists`, `package` or `waiting`, and `replaces` lists the parts that would overwrite something (style variation, header, footer, navigation, a setting). Show `replaces` to the person before the real run, then send the same selection without `dryRun`.
 - `parts` limits the run: `buildingBlocks`, `samples`, `design`, `header`, `footer`, `pages`, `navigation`, `frontPage`, `options`. `pages` takes recipe page slugs, `buildingBlocks` names of the blocks of the recipe.
+- `slugs` gives recipe pages other addresses, by the slug of the recipe: `{"imprint": "impressum", "contact": "kontakt"}`. Navigation, footer, reading settings and links of the recipe follow; `pages` keeps the recipe slugs. Send the same `slugs` on every later run, also the confirmation run, or a page without a kind is created again under its recipe slug.
 - One content feature on its own (events, team, services) is a building block: `leitvia/list-building-blocks` lists them with `installed`, `leitvia/add-building-block` adds one with its types, settings that are empty and sample entries as drafts. Design, header, footer, pages and front page stay. Prefer it to a recipe run on an existing site.
 
 ## Sample texts of the recipe
@@ -49,7 +50,7 @@ Tell the person about these points; there is no ability for them:
 
 - Product reviews are on in WooCommerce; whether visitors may review is the person's choice (Settings, Products).
 - Avatars come from Gravatar, a third party; recommend switching them off in Settings, Discussion.
-- A page in another language than the site needs its own document language; core has no per-page setting.
+- A page in another language than the site needs its own document language; core has no per-page setting. With Polylang the operator sets languages and links translations ([second language](../../../workflows/new-site-operator.md#a-second-language-polylang)); header and footer of a language are the parts `header-<language>` and `footer-<language>`, which `leitvia/update-template-part` writes like `header`.
 - Plugins, users, the site title and tagline, the logo and the permalink structure are admin settings for the person. Propose site title and tagline from the briefing.
 - A sticky header is off; on request see [sticky header](sticky-header.md).
 - The sample post "Hello world!" and the "Sample Page" of a new WordPress stay; no ability deletes content. Ask the person to delete them.

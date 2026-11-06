@@ -57,7 +57,7 @@ Required for every post; limits and Google News rules: [SEO and GEO](references/
 
 ### 6. Create the draft
 
-Call `leitvia/create-content` with `post_type` `post` (or the type of the content model the brief names, with its `fields`), `title`, `content`, `excerpt`, `slug`, `terms` (category and tags from the brief by name; a category must exist, new tags are created), `status` `draft`, `ai_generated` true, `sources` (the URLs), `featured_image` when step 5 found one, empty `base_hash` and the `package` key. A category that does not exist (`leitvia_invalid_input`, reason `term`): send the call once more without it and name the category in the report.
+Call `leitvia/create-content` with `post_type` `post` (or the type of the content model the brief names, with its `fields`), `title`, `content`, `excerpt`, `slug`, `terms` (category and tags from the brief by name; new ones are created with the post, in a package when it is applied), `status` `draft`, `ai_generated` true, `sources` (the URLs), `featured_image` when step 5 found one, empty `base_hash` and the `package` key. A user who may not create the category (`leitvia_forbidden`, reason `capability`): send the call once more without it and name the category in the report.
 
 ### 7. Check and report
 

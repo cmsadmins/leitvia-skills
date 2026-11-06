@@ -9,14 +9,14 @@ Chain: [leitvia-setup](../skills/leitvia-setup/SKILL.md), then [leitvia-design](
 An empty WordPress installation has neither the theme nor Leitvia Studio, and installing them is no ability: the area `admin` stays locked for agents. The operator, or the script that starts an unattended run, prepares the site once with WP-CLI on the server (WordPress 7.1 or later, PHP 8.2 or later, HTTPS):
 
 ```sh
-wp theme install https://github.com/cmsadmins/leitvia/releases/download/1.2.27/leitvia-1.2.27.zip --activate
-wp plugin install https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.25/leitvia-studio-1.3.25.zip --activate
+wp theme install https://github.com/cmsadmins/leitvia/releases/download/1.2.28/leitvia-1.2.28.zip --activate
+wp plugin install https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.26/leitvia-studio-1.3.26.zip --activate
 wp plugin install https://downloads.wordpress.org/plugin/mcp-adapter.0.7.1.zip --activate
 wp user create leitvia-agent agent@example.org --role=leitvia_agent --display_name="Leitvia agent"
 wp user application-password create leitvia-agent "leitvia agent" --porcelain
 ```
 
-Once the theme and Leitvia Studio are listed on WordPress.org, `wp theme install leitvia --activate` and `wp plugin install leitvia-studio --activate` replace the first two lines. Keep MCP Adapter at 0.7, the version Leitvia Studio supports. Leave the experiment MCP Access of the AI plugin off on this site: it installs the newest MCP Adapter from WordPress.org. The last command prints the application password once; store it as `LEITVIA_AUTH` (Base64 of `leitvia-agent:<password>`) for the agent, never in a file you commit. For a shop also `wp plugin install woocommerce --activate` before the run. The agent itself never runs WP-CLI; its first call is `leitvia/get-contract`, which proves the bootstrap worked.
+Once the theme and Leitvia Studio are listed on WordPress.org, `wp theme install leitvia --activate` and `wp plugin install leitvia-studio --activate` replace the first two lines. Keep MCP Adapter at 0.7, the version Leitvia Studio supports. Leave the experiment MCP Access of the AI plugin off on this site: it installs the newest MCP Adapter from WordPress.org. The last command prints the application password once; store it as `LEITVIA_AUTH` (Base64 of `leitvia-agent:<password>`) for the agent, never in a file you commit. For a shop also `wp plugin install woocommerce --activate` before the run. The agent itself never runs WP-CLI; its first call is `leitvia/get-contract`, which proves the bootstrap worked. Zips, server check: [operator steps](new-site-operator.md).
 
 Without a server, for a test or demo run on your own machine: [WordPress Playground](../README.md#test-site-with-wordpress-playground) from a blueprint.
 
@@ -39,10 +39,13 @@ Some steps belong to a person by design: the area `admin` is locked for agents, 
 |---|---|---|
 | Apply the change package | Inbox `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=<id>`, or `leitvia/apply-package` called by an administrator | Everything after "Package applied": entries of new types, texts on recipe pages, token set activation, checks of the live site |
 | Shop settings (recipe `leitvia/shop`) | WooCommerce, Settings: payment method, store address with state (`DE:DE-SN`), currency, taxes, a shipping zone with a shipping method, visibility "Live", vouchers "Virtual" ([recipe details](../skills/leitvia-setup/references/recipe.md#shop-sites)) | The checkout |
-| Admin settings | Settings, General: site title and tagline (the agent proposes both from the briefing); logo, avatars off (Gravatar is a third party), the sample post "Hello world!" and the "Sample Page" deleted. No ability changes them. | A finished site: header, footer and the browser tab show the site title |
+| Brand fonts that are not bundled (warning `font_not_bundled`) | Appearance, Editor, Styles, Typography, Fonts, tab Upload (WOFF2 files, license checked; not the tab with the font catalog), before the token set is activated. Operator: [commands](new-site-operator.md#brand-fonts) | The brand font; without it the site shows the system font |
+| Admin settings | Settings, General: site title and tagline (the agent proposes both from the briefing); logo (a PNG, [no SVG](../skills/leitvia-design/references/tokens.md#limits)) and site icon, avatars off (Gravatar is a third party), the sample post "Hello world!" and the "Sample Page" deleted. No ability changes them. | A finished site: header, footer and the browser tab show the site title |
 | Search visibility | Settings, Reading: untick "Discourage search engines" once the site is live | Being found; without it the report lists it as open, high |
 | Publish drafts (mode `direct`) | Pages, Publish | Pages of a run in mode `direct` |
 | Open a content type to other AI tools (`showInAbilities`) | Leitvia Studio, Content Model (`/wp-admin/admin.php?page=leitvia-studio-model`) | Only abilities outside Leitvia; Leitvia's own abilities do not need it |
+
+A second language: pages with slugs of their own, the rest is the [operator's](new-site-operator.md#a-second-language-polylang).
 
 The report lists the open ones under the heading "For the person", numbered, each with what to do, where, and which step of the workflow waits for it, for example: "1. Apply package 10 (26 operations) at `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=10`. Step 4 waits for it." The next run goes on as the section on the mode says, and checks the shop settings on the checkout page.
 
@@ -92,6 +95,13 @@ A briefing that says the site is invented (a demo, a test, a fictional brand) is
 - **Input:** every published page of the site after step 5.
 - **Writes:** fixes with the same key, a third package when there is anything to fix.
 - **Checkpoints:** "Link targets", "AI for alt text" and "Package applied" of the skill, with the questions it names.
+
+### 7. Sources against the result
+
+- **Input:** the briefing and every other source the person named, read again from the file or link, not from your memory of them. They can change during a run.
+- **Do:** compare them with the site: pages, texts, facts, brand values. Anything new or changed since you read it last is a task of its own: small corrections go into a package with the same key, the rest into the report.
+- **Writes:** fixes with the same key.
+- **Checkpoint:** "Package applied", only when there is anything to fix.
 
 ## Report
 

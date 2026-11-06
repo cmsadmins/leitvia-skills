@@ -13,6 +13,8 @@ Fields reach the page through block bindings of Leitvia Studio. A paragraph, hea
 
 Write the saved text of a bound block empty (`<p></p>`); a value that is missing then shows as an empty line, never as a sample text. Bindings only show values of published entries. `leitvia/meta` also takes `prefix` and `suffix`, text around a value that is not empty, such as `"suffix":" €"` for a price.
 
+A list of an entry, such as what a service includes, is a `textarea` field with one item per line (`"fields": {"service_scope": "Audit\nReport\nTraining"}`) and a `core/list` bound like a paragraph: `{"metadata":{"bindings":{"content":{"source":"leitvia/meta","args":{"key":"service_scope"}}}}}` on the list block, with one empty list item as saved markup. Each line becomes an item, an empty field shows no list. The editor shows the saved item, not the lines. Choose a repeater only when an item has fields of its own.
+
 A bare value such as `12` needs a label. On an entry page use the pattern `leitvia-studio/content-entry-facts` (below). In a row of the overview, put label and value side by side:
 
 ```html
@@ -49,8 +51,10 @@ A price in a `number` field is no content kind `prices` of the gateway: in mode 
 No recipe and no page frame lists entries of a type; the overview is a page you write as markup:
 
 1. `leitvia/get-pattern` with `leitvia-studio/teaser-type-entries`. Its query lists posts.
-2. In the markup set `"postType":"post"` to your type, change the heading, and replace `<!-- wp:post-excerpt {"excerptLength":30,"textColor":"ink-muted"} /-->` with the rows of the fields that matter in a list (date, level, instructor). Keep everything else as it is.
+2. In the markup set `"postType":"post"` to your type, change the heading, and replace `<!-- wp:post-excerpt {"excerptLength":30,"textColor":"ink-muted"} /-->` with the rows of the fields that matter in a list (date, level, instructor). Keep everything else as it is, `queryId` too: with a filter (`leitvia/query-filter`) or `leitvia/load-more` in the query, a query without its own `queryId` renders nothing, and the check `query-context` rejects it. Two queries on one page need two IDs.
 3. `leitvia/create-content` with `post_type` `page`, `title` (the template `page` prints it as h1; the pattern starts with an h2), `content` the changed markup and your `package` key.
+
+`leitvia/query-filter` filters in place in every query, with or without `enhancedPagination`: no page load, focus stays on the control, the status region announces the count, Back and Forward work, and the Apply button hides. Without JavaScript it stays a GET form with that button, so filtered addresses (`?qf-<queryId>-<facet>[]=<slug>`) can be shared. Add no script of your own. Put `core/query-no-results` in the query if the empty list needs more than the status message; `leitvia/load-more` and `core/query-pagination` keep working after a change.
 
 The query of a page is live: it shows every published entry, newest first, so entries added later appear without changing the page. The query cannot sort by a field such as the date of a course. When the order matters, give the entries a publication `date` in reverse order of display (the first entry the newest); the template shows no date.
 
