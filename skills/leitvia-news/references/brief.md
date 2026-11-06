@@ -54,7 +54,7 @@ Rules of Google News that the post and the site have to meet:
 
 | Field | Limit |
 |---|---|
-| Title | At most 60 characters, the news first, the same text as the h1. No site name; the SEO plugin adds it. |
+| Title | At most 60 characters, the news first, the same text as the h1. No site name; an SEO plugin adds it. |
 | Description (excerpt) | 50 to 160 characters, one or two full sentences from the post. Only numbers the post holds. |
 | First paragraph | Two or three sentences: who, what, when, where, why. It makes sense without the rest of the post, so AI answers can quote it. |
 | Headings | Each h2 names its section ("New lane between Felsenkeller and Plagwitz", not "Details"). |

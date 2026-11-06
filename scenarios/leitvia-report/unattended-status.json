@@ -75,11 +75,11 @@
 				]
 			},
 			"expect": {
-				"plugin": null,
+				"plugin.key": "leitvia",
 				"notice": {
-					"$match": "No supported SEO plugin"
+					"$match": "No SEO plugin is active"
 				},
-				"items.0.seo": null,
+				"items.0.seo.title": "",
 				"items.0.defaults.canonical": {
 					"$match": "/opening-hours/$"
 				}

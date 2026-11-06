@@ -1,8 +1,8 @@
 # Leitvia agent handbook
 
-Generated from Leitvia Studio 1.3.27. Do not edit.
+Generated from Leitvia Studio 1.3.28. Do not edit.
 
-Everything an agent needs to work on a WordPress site with Leitvia Studio through its 48 abilities. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call; it holds the rules every skill relies on and the index of all abilities.
+Everything an agent needs to work on a WordPress site with Leitvia Studio through its 49 abilities. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call; it holds the rules every skill relies on and the index of all abilities.
 
 ## Access over MCP and REST
 
@@ -145,6 +145,7 @@ Content model, design tokens, style variation, template parts, navigation and re
 | [`leitvia/apply-recipe`](abilities/leitvia-apply-recipe.md) | POST | Sets up the site from a recipe of leitvia/list-recipes: content model and building blocks, token set, style variation, header and footer, pages from patterns, navigation, reading settings and options that save data. |
 | [`leitvia/create-token-set`](abilities/leitvia-create-token-set.md) | POST | Creates a token set from a DTCG document. |
 | [`leitvia/define-content-type`](abilities/leitvia-define-content-type.md) | POST | Adds entries to the content model and keeps the others. |
+| [`leitvia/set-organization`](abilities/leitvia-set-organization.md) | POST | Sets address, phone and email of the organization. |
 | [`leitvia/set-posts-page`](abilities/leitvia-set-posts-page.md) | POST | Makes an existing page the posts page of the reading settings, the address that lists all posts; 0 clears it. |
 | [`leitvia/set-variation`](abilities/leitvia-set-variation.md) | POST | Applies a style variation of the contract to the global styles of the active theme: a full variation replaces them, a colors or typography variation replaces only its part. |
 | [`leitvia/update-navigation`](abilities/leitvia-update-navigation.md) | POST | Replaces the links of a navigation menu, by default the one published last, which headers without a chosen menu show. |

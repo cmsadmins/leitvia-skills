@@ -20,14 +20,14 @@ Only the person changes indexing, in Settings, Reading. Propose it plainly: "The
 
 | Field | Rule |
 |---|---|
-| Title | At most 60 characters, the main topic first, unique on the site. Name what the page offers, not "Home" or "Welcome". The SEO plugin usually adds the site name; do not add it twice. |
+| Title | At most 60 characters, the main topic first, unique on the site. Name what the page offers, not "Home" or "Welcome". An SEO plugin usually adds the site name; do not add it twice. Without one the title goes out as written. |
 | Description | 50 to 160 characters, one or two full sentences that say what a visitor finds and why it helps. Unique per page. No list of keywords, no quotation marks around the whole text. |
 | Language | The language of the page. A page in German gets a German title, whatever the language of the person. |
 | Numbers | Only numbers the page holds: prices, years, counts. `leitvia/update-seo` rejects the others with `unsupported_fact`. |
 
 Search engines may still show another text when theirs fits a search better; a good description makes that rarer, never impossible.
 
-Fields `leitvia/get-seo` reads but `leitvia/update-seo` does not write: canonical, Open Graph title, description and image, focus keyword and schema type. Report problems with them for the person to fix in the SEO plugin. A canonical that points to another page is often deliberate (a copy of a page); ask before you call it a mistake.
+Fields `leitvia/get-seo` reads but `leitvia/update-seo` does not write: canonical, Open Graph title, description and image, focus keyword and schema type. Report problems with them for the person to fix in the SEO plugin. Without an SEO plugin Leitvia Studio prints the canonical of archives; Open Graph needs a plugin. A canonical that points to another page is often deliberate (a copy of a page); ask before you call it a mistake.
 
 Common findings and what to do:
 
@@ -50,7 +50,7 @@ AI search (Google AI Overviews, ChatGPT search, Perplexity, Copilot) quotes shor
 - Names stay the same everywhere: the organization, products and places as on the imprint.
 - Questions people ask may become headings, answered right below, when the page really answers them. No invented FAQ.
 
-Structured data: with an SEO plugin, the plugin prints it (its settings decide the types). Without one, Leitvia Studio can print `BlogPosting` or `NewsArticle` with the organization as publisher on posts and `ProfilePage` on author pages, when its setting for structured data is on; `defaults.schema` of `leitvia/get-seo` names what a post gets. Never add JSON-LD in content blocks.
+Structured data: with an SEO plugin, the plugin prints it (its settings decide the types). Without one, Leitvia Studio prints, when its setting for structured data is on: `WebSite` with the organization on the front page, `BlogPosting` or `NewsArticle` with the organization as publisher and `BreadcrumbList` on posts, `CollectionPage` on the posts page and on archives, `ProfilePage` on author pages, and `FAQPage` from the FAQ block; `defaults.schema` of `leitvia/get-seo` names what a post gets. No `LocalBusiness`, no opening hours. Address, phone and email of the organization come from the Studio settings or `leitvia/set-organization` (only facts from the person or the imprint), `organization` of `leitvia/get-seo` shows them. With an SEO plugin Studio prints none of this. Never add JSON-LD in content blocks.
 
 ## Google News
 

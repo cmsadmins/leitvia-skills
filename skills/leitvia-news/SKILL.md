@@ -52,7 +52,7 @@ Write title, excerpt and content as block markup following the [post format](ref
 Required for every post; limits and Google News rules: [SEO and GEO](references/brief.md#seo-and-geo).
 
 - `leitvia/get-seo` with the ID of the latest news post of step 2: `indexable` false means the site is hidden from search engines (checkpoint **Site hidden from search**); `plugin` says whether an SEO plugin is active.
-- Title and excerpt within the limits: they are the SEO title and description of the draft, which has no ID until the package is applied. Without an SEO plugin say so in the report. With one, published news posts of earlier runs with an empty `seo.description` get title and description through `leitvia/update-seo` and the same `package` key, at most five per run.
+- Title and excerpt within the limits: they are the SEO title and description of the draft, which has no ID until the package is applied. Published news posts of earlier runs with an empty `seo.description` get title and description through `leitvia/update-seo` and the same `package` key, at most five per run.
 - A first paragraph that answers who, what, when, where and why; h2 that name their section; two internal links, `link` from `leitvia/list-content`; a featured image of at least 1200 px width with alt text, or an open point in the report.
 
 ### 6. Create the draft

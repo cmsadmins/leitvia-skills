@@ -25,7 +25,7 @@ MCP server `leitvia` or the REST routes of the Abilities API, as the agent user 
 - **Say only what the page says.** A title or description summarizes the page; `leitvia/update-seo` rejects numbers the post does not contain (`unsupported_fact`). Do not promise what the page does not offer.
 - **Facts are never guessed.** Organization data, prices, legal texts, figures, quotes and people come only from a source you can name: the person, a page of the site or a read ability, with the source in your report. Without one, stop at a checkpoint; never write a placeholder that looks like a fact.
 - **noindex is the person's decision.** Never set `noindex` or `nofollow` on your own; legal pages and thank-you pages are the usual cases, and the person confirms each (checkpoint **Indexing**).
-- **Without an SEO plugin** `leitvia/get-seo` returns `seo: null` and a `notice`, and `leitvia/update-seo` is rejected with `leitvia_no_seo_plugin`. Do not install one: suggest it in the report, improve excerpts and headings through `leitvia/update-content`, and list the titles and descriptions you would write.
+- **Without an SEO plugin** `plugin.key` is `leitvia`: `leitvia/update-seo` stores title, description and robots and prints them, the title as written. Never change the title of a page to change its `<title>`: it is the `h1`. With an SEO plugin Studio cannot write to the write is rejected with `leitvia_no_seo_plugin`; list the titles and descriptions you would write.
 - A rejection is corrected at most once, following `message`, `next_ability` and `retry`. If the second call is rejected too, or `retry` is `never`, stop and tell the person.
 
 ## Steps

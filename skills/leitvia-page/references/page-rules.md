@@ -9,3 +9,4 @@ Details for `leitvia-page`. Read this before you report a page as done.
 - Sections must differ visibly across the whole page, by tone, layout and image. A page of equal bands passes the score and still reads as one block: look at the full page before you report it.
 - A dark footer counts as a neighbor: after a band on ink or inverse, Footer mega shows only a hairline as a seam, so close such pages on `surface` or `surface-alt`.
 - Headings break only at soft hyphens (`hyphens: manual`). Long German words in narrow columns need `&shy;`, otherwise `overflow-wrap` breaks them in the middle of a word.
+- The button of a header stays reachable at every width, below 600 px at the end of the menu.
