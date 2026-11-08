@@ -27,6 +27,7 @@ The result of every write says what happened in `mode`: `live`, `draft`, `packag
 - Here that covers prices, legal texts (imprint, privacy, terms, withdrawal, accessibility statement), company name, address, phone, e-mail, register numbers, opening hours, figures, testimonials and team members. Missing facts are a visible question in your report, not a placeholder on the page.
 - A section that belongs under every post, such as a closing call to action, goes once into the template part `post-closing`, not into each post: `leitvia/update-template-part` with the markup of the pattern as `content`. Empty, the part renders nothing.
 - Blocks that keep their content in HTML, steps, image sizes, rows and sections: [page rules](references/page-rules.md).
+- Texts of about 1500 words or more: [long texts](references/long-texts.md).
 - Replace every sample text of every pattern you use, and never fill a slot with an assumption about the business ([content rules](references/content.md#texts)).
 
 ## Steps

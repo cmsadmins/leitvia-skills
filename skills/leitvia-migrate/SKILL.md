@@ -25,7 +25,7 @@ When the source is another site (any system, for example Wix), read its public p
 
 ## Ground rules
 
-- **Nothing gets lost.** Every sentence, list item, table cell, link and image of a post is in its block version. Compare before you write (step 4). When you cannot place something, stop and ask; never drop it quietly.
+- **Nothing gets lost.** Every sentence, list item, table cell, link and image of a post is in its block version, word for word; only the form is new. When you cannot place something, stop and ask; never drop it quietly.
 - **No classic block and no Custom HTML.** The pipeline refuses `core/freeform` and `core/html` from agents (`leitvia_unsafe_content`). Every piece of HTML becomes a registered block; the [translation details](references/translate.md#tag-to-block) name the block for each tag.
 - **Themes and plugins belong to people.** The area `admin` is locked for agents. The theme switch, activating Leitvia Studio and every plugin change are checkpoints.
 - **Same URLs.** Keep titles, slugs, parent pages and post dates. A slug change is a URL change; it is not part of a migration.
@@ -60,15 +60,15 @@ Checkpoint **Theme switch**. Then call `leitvia/get-contract`; it must answer wi
 
 ### 3. Brand as token set
 
-Hand the brand values of the inventory to the skill `leitvia-design`; it maps them to the color roles of the contract, checks contrast and puts the token set into a package. Typical mapping: page background to `surface`, text color of the old header and body to `ink`, link and button color to `accent`. A logo goes into the header through `leitvia-design` and its checkpoints. When the person wants to keep the brand for later, skip this step and say so in the report.
+Hand the brand values of the inventory to the skill `leitvia-design`; it maps them to the color roles of the contract, checks contrast and puts the token set into a package. Usually: page background to `surface`, header and body text to `ink`, links and buttons to `accent`. A logo goes into the header through `leitvia-design` and its checkpoints. When the person wants to keep the brand for later, skip this step and say so in the report.
 
 ### 4. Translate the content
 
-For each post: `leitvia/get-block` with `block: "p:0"` (keep `document_hash` and `attachments`), translate `inner_html` into block markup with the [tag to block table](references/translate.md#tag-to-block), handle [images](references/translate.md#images), [compare](references/translate.md#compare-before-you-write), write. HTML without a block in the table (scripts, forms, inline styles, shortcodes of other plugins, page builders) goes to checkpoint **Open items**, never into a Custom HTML or classic block.
+For each post: `leitvia/get-block` with `block: "p:0"` (keep `document_hash` and `attachments`), translate `inner_html` into block markup with the [tag to block table](references/translate.md#tag-to-block), handle [images](references/translate.md#images), [compare](references/translate.md#compare-before-you-write), write. HTML without a block in the table (scripts, forms, inline styles, shortcodes of other plugins, page builders) goes to checkpoint **Open items**.
 
 **Write:** `leitvia/update-content` with `post`, `content` (the whole new block markup), `base_hash` (the `document_hash`) and the `package` key. The result has `mode: package`. Rejections and their fixes: [translation details](references/translate.md#rejections).
 
-**Sample of three first:** translate and write three posts with different content (one with images, one with a table, one with an embed when the site has them), then stop at checkpoint **Sample of three**: the person checks the diff with `leitvia/get-package` or in the inbox. Change your translation where they ask, then do the rest.
+**Sample of three first:** translate and write three posts with different content (one with images, one with a table, one with an embed when the site has them), run the [text comparison](references/wording.md) and stop at checkpoint **Sample of three**: the person checks the diff with `leitvia/get-package` or in the inbox. Change your translation where they ask, then do the rest.
 
 ### 5. Navigation
 

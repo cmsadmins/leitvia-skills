@@ -36,7 +36,7 @@ MCP server `leitvia` or the REST routes of the Abilities API, as the agent user 
 
 `leitvia/list-products` returns 20 products per page with `id`, `title`, `type`, `status`, `price`, `stock_status`, `featured` and `hash`, plus `categories` with their hash; page with `page` up to `pages`, or filter with `category` or `search`. Drafts are listed too. Then `leitvia/get-product` for each product you touch: texts, `images` with `alt`, `categories` and `tags` with their hash, `attributes`, `price` (read only), `upsells`, `cross_sells`, `variations` and `hash`.
 
-A variable product lists the IDs of its variations; read each with `leitvia/get-product`. Of the product data a variation takes only image, prices, tax class and shipping class; gallery, categories, tags, tax status and merchandising belong to its parent, and a rejection names the fields it does not take.
+A variable product lists the IDs of its variations; read each with `leitvia/get-product`. Of the product data a variation takes only image, prices, tax class and shipping class; gallery, categories, tags, tax status and merchandising belong to its parent.
 
 ### 2. Plan
 
@@ -50,6 +50,8 @@ List per product what you change and the source of each fact. Checkpoint **Plan 
 
 A product image needs alt text that says what the picture shows; product images are never decorative. An image of the library without alt text gets it first with `leitvia/set-alt-text` (`image`, `alt`), a new image comes with `leitvia/add-media` and `alt`. Then `image` and `gallery` (up to 20) on `leitvia/update-product`. An image added in the same package exists only after the person applied it: set it on the product in a second package. Product images square (1:1, 800 px or more).
 
+More than three images, or a newsletter sign-up: [shop pages](references/shop-pages.md).
+
 ### 5. Categories and tags
 
 - Assign: `categories` and `tags` of `leitvia/update-product` take term IDs and replace the current lists; send the full list.
@@ -62,7 +64,7 @@ A product image needs alt text that says what the picture shows; product images 
 
 ### 7. New products
 
-`leitvia/create-product` creates a simple product with empty `base_hash`: texts, `sku`, `stock`, `categories` and an `image` with alt text. Prices, SKUs and stock come from the person, never a guess; a product with a price waits for a person. Variable products, attributes and stock changes of existing products are not in the abilities: the person makes them in WooCommerce.
+`leitvia/create-product` creates a simple product with empty `base_hash`: texts, `sku`, `stock`, `categories` and an `image` with alt text. Prices, SKUs and stock come from the person; a product with a price waits for a person. Variable products, attributes and stock changes of existing products are not in the abilities: the person makes them in WooCommerce.
 
 ### 8. The package
 
