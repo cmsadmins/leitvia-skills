@@ -1,8 +1,8 @@
 # Leitvia agent handbook
 
-Generated from Leitvia Studio 1.3.30. Do not edit.
+Generated from Leitvia Studio 1.3.31. Do not edit.
 
-Everything an agent needs to work on a WordPress site with Leitvia Studio through its 51 abilities. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call; it holds the rules every skill relies on and the index of all abilities.
+Everything an agent needs to work on a WordPress site with Leitvia Studio through its 53 abilities. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call.
 
 ## Access over MCP and REST
 
@@ -16,7 +16,7 @@ Sign in as a WordPress user that may edit posts, with an application password (H
 
 ## Read before write
 
-Read first, then write. The read abilities return what a write needs: post IDs, block IDs from `leitvia/get-page-outline`, pattern slugs from `leitvia/list-patterns`, blocks and their attributes from `leitvia/list-blocks`, page frames, color roles and template parts from `leitvia/get-contract`, and the hash of every target. Plan a page with `leitvia/plan-page` and score it with `leitvia/check-composition` before you build it. After a write, read the target again or use the `hash` of the write result for the next change.
+The read abilities return what a write needs: post IDs, block IDs from `leitvia/get-page-outline`, pattern slugs from `leitvia/list-patterns`, blocks and their attributes from `leitvia/list-blocks`, page frames, color roles and template parts from `leitvia/get-contract`, and the hash of every target. Plan a page with `leitvia/plan-page` and score it with `leitvia/check-composition` before you build it.
 
 The checks after a write (links, contrast) run as a WP-Cron event. On a site where WP-Cron does not run by itself, such as WordPress Playground, call `GET /wp-cron.php` after writes; the result lands in the audit log.
 
@@ -27,7 +27,7 @@ Every write ability requires `base_hash`: the hash of the target as you last rea
 - A new object (a new page, pattern, token set or image) has no hash: send an empty `base_hash`.
 - A post, page, attachment, navigation menu or template part: `hash` of `leitvia/get-page-outline`, which is also `document_hash` of `leitvia/get-block`. Block hashes are for comparing blocks; `base_hash` is always the hash of the whole document.
 - A product: `hash` of `leitvia/get-product` or `leitvia/list-products`. A product category or tag: the hash of the term from the same abilities.
-- Targets no read ability returns a hash for (global styles, the content model, a menu or template part whose ID you do not know): send an empty `base_hash`, take `current_hash` from the rejection `leitvia_stale_hash` and repeat the call once with it.
+- Targets no read ability returns a hash for (global styles, the content model, a menu, template part or template whose ID you do not know): send an empty `base_hash`, take `current_hash` from the rejection `leitvia_stale_hash` and repeat the call once with it.
 
 The result of a write carries the new `hash`; use it as `base_hash` of the next change of the same target.
 
@@ -96,14 +96,14 @@ A rejection carries `code`, a `message` that says how to fix it, and `data` with
 | Retry | What the agent does |
 |---|---|
 | `once` | Correct the call once, following message and `next_ability`. If the second call is rejected too, stop and ask a person. |
-| `never` | Do not repeat the call. Stop and tell the person the message; it needs a person or a different approach. |
+| `never` | Do not repeat the call. Stop and tell the person the message. |
 | `after:<seconds>` | Wait the given seconds, then repeat the same call. |
 
-All rejections of Leitvia Studio: [rejections.md](rejections.md). Read it when a rejection is unclear.
+All rejections with their messages: [rejections.md](rejections.md).
 
 ## Abilities
 
-Each ability has a page of its own with its inputs and output, named after its MCP tool: `abilities/<tool>.md`, for example [`abilities/leitvia-get-contract.md`](abilities/leitvia-get-contract.md). Read the pages of the abilities you call, not all of them.
+Each ability has a page with its inputs and output, named after its MCP tool, for example [`abilities/leitvia-get-contract.md`](abilities/leitvia-get-contract.md). Read the pages of the abilities you call, not all of them.
 
 ### Read
 
@@ -150,6 +150,7 @@ Content model, design tokens, style variation, template parts, navigation and re
 | [`leitvia/set-privacy-page`](abilities/leitvia-set-privacy-page.md) | POST | Makes an existing page the privacy policy page of the site; 0 clears it. |
 | [`leitvia/set-variation`](abilities/leitvia-set-variation.md) | POST | Applies a style variation of the contract to the global styles of the active theme: a full variation replaces them, a colors or typography variation replaces only its part. |
 | [`leitvia/update-navigation`](abilities/leitvia-update-navigation.md) | POST | Replaces the links of a navigation menu, by default the one published last, which headers without a chosen menu show. |
+| [`leitvia/update-template`](abilities/leitvia-update-template.md) | POST | Replaces a template with a template pattern made for it or with changed block markup. |
 | [`leitvia/update-template-part`](abilities/leitvia-update-template-part.md) | POST | Replaces a template part of the contract, such as header, footer or sidebar, with a pattern made for its area or with changed block markup. |
 
 ### Build
@@ -163,6 +164,7 @@ Pages from patterns, single blocks, Lab patterns and media.
 | [`leitvia/create-content`](abilities/leitvia-create-content.md) | POST | Creates a post, a page or an entry of the content model from block markup or patterns; base_hash is empty. |
 | [`leitvia/create-pattern`](abilities/leitvia-create-pattern.md) | POST | Creates a pattern in the Lab as a draft with version 0.1.0 from block markup; base_hash is empty. |
 | [`leitvia/create-product`](abilities/leitvia-create-product.md) | POST | Creates a simple product. |
+| [`leitvia/crop-media`](abilities/leitvia-crop-media.md) | POST | Crops an image of the media library into a new image. |
 | [`leitvia/update-block`](abilities/leitvia-update-block.md) | POST | Changes one block found by its ID or path ID: attributes from the block catalog and the level of a heading, the text of a paragraph, heading, list item or button, the citation of a quote, the summary of a details block, the link of a button or of the one link in a text, or the image of an image or cover block with alt text. |
 | [`leitvia/vary-pattern`](abilities/leitvia-vary-pattern.md) | POST | Creates a variant of a Lab pattern or a theme pattern as a draft in the Lab, from new markup or from the original with edits at block IDs; base_hash is empty. |
 

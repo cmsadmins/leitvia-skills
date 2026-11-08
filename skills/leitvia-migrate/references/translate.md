@@ -1,6 +1,6 @@
 # Translating classic HTML into blocks
 
-Details for step 4 of `leitvia-migrate`. Read it before you translate the first post. Markup examples for each block: [block markup](block-markup.md).
+Details for step 4 of `leitvia-migrate`. Markup examples for each block: [block markup](block-markup.md).
 
 ## Tag to block
 
@@ -8,7 +8,7 @@ Details for step 4 of `leitvia-migrate`. Read it before you translate the first 
 |---|---|
 | Text separated by an empty line, `<p>` | `core/paragraph`; a single line break inside stays as `<br>` |
 | Inline `<a>`, `<strong>`, `<em>`, `<code>`, `<br>` | Stay inside the paragraph, heading, list item or cell |
-| `<h1>` to `<h6>` | `core/heading`. The template prints the title as h1: an h1 in the content becomes h2, and a skipped level moves up (h3 after the title becomes h2). Name each changed level in the report |
+| `<h1>` to `<h6>` | `core/heading`. The template prints the title as h1: an h1 in the content becomes h2, and a skipped level moves up (h3 after the title becomes h2) |
 | `<ul>`, `<ol>` with `<li>` | `core/list` (`ordered` for `<ol>`) with one `core/list-item` per item; nested lists stay nested |
 | `<img>` | `core/image` with `id` from `attachments` of `get-block` (the entry with this `url`), `src` and `alt` as in the source, character for character (`url` of `attachments` only finds the ID), `align` from `alignleft`, `aligncenter`, `alignright` |
 | `[caption]<img> Text[/caption]` | `core/image` with the text as `<figcaption>` |
@@ -20,16 +20,17 @@ Details for step 4 of `leitvia-migrate`. Read it before you translate the first 
 | `<pre>`, `<pre><code>` | `core/preformatted` or `core/code` |
 | `<!--more-->` | `core/more` |
 
-Everything else, such as `<script>`, `<style>`, `<form>`, inline `style` attributes, shortcodes of other plugins and markup of page builders, has no block in this skill. Stop at checkpoint **Open items** and let the person decide; never wrap it in a Custom HTML or classic block.
+Everything else (`<script>`, `<style>`, `<form>`, shortcodes, page builders) has no block in this skill; inline styles and map blocks follow [inline style](inline-style.md). Stop at checkpoint **Open items** and let the person decide; never wrap it in a Custom HTML or classic block.
 
 ## Images
 
-- An image without alt text gets one: one short sentence from what the image shows and why it is on the page, using caption and text around it. An image that only decorates gets an empty alt and `"metadata":{"leitviaDecorative":true}` on the block. List every alt text you wrote in the report.
-- An image from another host is not fetched (`leitvia/add-media` refuses other hosts) and must not load from there. Ask the person for the file and add it with `leitvia/add-media` as Base64 data, or leave it out with their consent (checkpoint **Open items**).
+- An image without alt text gets one: one short sentence from what the image shows and why it is on the page, using caption and text around it. An image that only decorates gets an empty alt and `"metadata":{"leitviaDecorative":true}` on the block. List every alt text you wrote.
+- An image from another host is not fetched and must not load from there. Ask the person for the file and add it with `leitvia/add-media` as Base64 data, or leave it out with their consent (checkpoint **Open items**).
+- Text burned into an image goes into the content as text; cut the image to the part without it with `leitvia/crop-media`, never outside the abilities.
 
 ## Compare before you write
 
-Strip the tags of the source (the text of a caption counts, shortcode brackets do not) and of your block markup, collapse whitespace and compare: the two texts are the same, word for word. The images are the same attachments, in the same order. Links point to the same targets. Only alt texts you added and heading levels you moved may differ, and both go into the report.
+Strip the tags of the source (the text of a caption counts, shortcode brackets do not) and of your block markup, collapse whitespace and compare: the two texts are the same, word for word. The images are the same attachments (or their crops), in the same order. Links point to the same targets. Only alt texts you added and heading levels you moved may differ, and both go into the report.
 
 ## Rejections
 

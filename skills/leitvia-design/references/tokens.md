@@ -21,6 +21,10 @@ Copy the `document` of `leitvia/get-tokens` and change only `$value` entries. Ke
 
 Colors as `{"colorSpace": "srgb", "components": [r, g, b], "hex": "#rrggbb"}` with components from 0 to 1; dimensions as `{"value": 1.5, "unit": "rem"}`; `clamp()` values through `$extensions` `com.leitvia` `css`, fluid font sizes through `com.leitvia` `fluid`, as in the document you started from.
 
+## Extra surfaces
+
+Extra brand surfaces (pastel tiles) go in the group `color.surface-extra`: at most eight color tokens, named in lowercase letters and hyphens (`mint`), optional label in `com.leitvia` `name`. `ink` needs 4.5:1 on each. Errors: `leitvia_studio_dtcg_extra_contrast`, `leitvia_studio_dtcg_extra_limit`, `leitvia_studio_dtcg_extra_slug`. Use them for cards only, `"backgroundColor":"surface-extra-mint"`, text `ink`.
+
 ## Contrast
 
 For every entry of `pairs`, compute the WCAG 2.2 ratio of `fg` on `bg`: relative luminance L of each color (sRGB channel c from 0 to 1, linear `c / 12.92` when c is at most 0.04045, else `((c + 0.055) / 1.055) ^ 2.4`; L = 0.2126 R + 0.7152 G + 0.0722 B), ratio = (L1 + 0.05) / (L2 + 0.05) with L1 the lighter one. A pair with `ring` passes when the better of `fg` on `bg` and `ring` on `bg` reaches `min`, and `fg` on `ring` reaches 3:1 (the double focus ring).
@@ -33,7 +37,7 @@ When `leitvia/create-token-set` is rejected with `leitvia_check_failed`, each fi
 2. Keep the hue, darken on light surfaces, lighten on dark ones, in small steps until every failing pair of the finding list reaches its minimum by your own computation. One new value often fixes several findings (accent on surface, on surface-alt, on-accent on accent).
 3. Send the corrected document once. Tell the person which value replaced which and the ratios it reaches.
 
-Findings with severity `warning` (for example `font_not_bundled`) do not block; report them.
+Findings with severity `warning` (for example `font_not_bundled`) do not block; create and activate return them. Report them.
 
 ## Fonts
 

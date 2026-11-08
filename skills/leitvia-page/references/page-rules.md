@@ -11,4 +11,6 @@ Details for `leitvia-page`. Read this before you report a page as done.
 - Headings break only at soft hyphens (`hyphens: manual`). Long German words in narrow columns need `&shy;`, otherwise `overflow-wrap` breaks them in the middle of a word. Paragraphs, lists and table cells hyphenate on their own in the language of the page.
 - A full-width band as the last section meets the footer on every page template, so no strip of page background stays under it. Its own padding gives the space.
 - The button of a header stays reachable at every width, below 600 px at the end of the menu.
+- A section that belongs under every post, such as a closing call to action, goes once into the template part `post-closing`, not into each post: `leitvia/update-template-part` with the markup of the pattern as `content`. Empty, the part renders nothing.
+- A whole template (single post, archive) changes with `leitvia/update-template` and a template pattern whose `templateTypes` hold the slug; a single page or post takes another template with `template` of `leitvia/update-content`.
 - A newsletter sign-up is a newsletter block from `leitvia/list-blocks`, never a script, embed or form of the newsletter service; without such a block it is an open question.

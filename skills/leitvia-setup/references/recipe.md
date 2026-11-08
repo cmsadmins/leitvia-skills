@@ -50,6 +50,7 @@ Tell the person about these points; there is no ability for them:
 
 - Product reviews are on in WooCommerce; whether visitors may review is the person's choice (Settings, Products).
 - Avatars come from Gravatar, a third party; recommend switching them off in Settings, Discussion.
+- Plugin scripts from other hosts need consent: the operator [lists them](../../../workflows/new-site-operator.md#scripts-of-plugins-from-other-providers).
 - A page in another language than the site needs its own document language; core has no per-page setting. With Polylang the operator sets languages and links translations ([second language](../../../workflows/new-site-operator.md#a-second-language-polylang)); header and footer of a language are the parts `header-<language>` and `footer-<language>`, which `leitvia/update-template-part` writes like `header`.
 - Plugins, users, the site title and tagline, the logo and the permalink structure are admin settings for the person. Propose site title and tagline from the briefing.
 - A sticky header is off; on request see [sticky header](sticky-header.md).

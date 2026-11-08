@@ -16,7 +16,7 @@ As the agent user over MCP or REST: [handbook, Access over MCP and REST](../../h
 
 ## Source outside this site
 
-When the source is another site (any system, for example Wix), read its public pages as a visitor, never its admin or an export. Map each page to a page, a post or an entry of the content model with its fields and terms; take over no scripts, trackers, fonts or forms; add images with `leitvia/add-media` as Base64 (up to 5 MB, alt text required) in one package, create the entries with their content and the menu in a second one, and end with a reconciliation report. Steps 2 and 3 below do not apply. Details: [external source](references/external.md).
+When the source is another site (any system, for example Wix), read only its public pages as a visitor, never its admin or an export, and follow [external source](references/external.md): images first in one package, then the entries and the menu in a second one, and a reconciliation report. Steps 2 and 3 below do not apply.
 
 ## Modes
 

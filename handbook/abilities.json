@@ -1,5 +1,5 @@
 {
-	"studio": "1.3.30",
+	"studio": "1.3.31",
 	"abilities": [
 		{
 			"name": "leitvia/activate-token-set",
@@ -1451,6 +1451,132 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					},
+					"notice": {
+						"type": "string"
+					},
+					"slug_changed": {
+						"type": "object",
+						"description": "The slug asked for (requested) is taken or reserved, so the address uses slug instead, on publishing at the latest."
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": false,
+				"idempotent": false
+			}
+		},
+		{
+			"name": "leitvia/crop-media",
+			"label": "Crop media",
+			"description": "Crops an image of the media library into a new image. The rectangle is in percent of the image size; the original stays. The new image takes the alt text of the original and its title with an addition. Use it for images with text burned in: keep the part without the text band. Only JPEG, PNG, GIF, WebP and AVIF, no SVG; it needs the right to upload files. base_hash is empty. A live crop gets a change package, so leitvia/rollback deletes the new image with its files.",
+			"category": "leitvia",
+			"group": "build",
+			"input_schema": {
+				"properties": {
+					"id": {
+						"type": "integer",
+						"minimum": 1,
+						"description": "ID of the image in the media library, from leitvia/list-media."
+					},
+					"x": {
+						"type": "number",
+						"minimum": 0,
+						"maximum": 100,
+						"description": "Left edge of the rectangle in percent of the image width."
+					},
+					"y": {
+						"type": "number",
+						"minimum": 0,
+						"maximum": 100,
+						"description": "Top edge of the rectangle in percent of the image height."
+					},
+					"width": {
+						"type": "number",
+						"minimum": 0,
+						"maximum": 100,
+						"description": "Width of the rectangle in percent of the image width, above 0; x plus width is at most 100."
+					},
+					"height": {
+						"type": "number",
+						"minimum": 0,
+						"maximum": 100,
+						"description": "Height of the rectangle in percent of the image height, above 0; y plus height is at most 100."
+					},
+					"title_suffix": {
+						"type": "string",
+						"maxLength": 100,
+						"description": "Addition to the title of the original, in brackets after it; without it the addition is cropped."
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"id",
+					"x",
+					"y",
+					"width",
+					"height",
+					"base_hash"
+				],
+				"additionalProperties": false,
+				"type": "object"
 			},
 			"output_schema": {
 				"type": "object",
@@ -4127,7 +4253,7 @@
 		{
 			"name": "leitvia/update-content",
 			"label": "Update content",
-			"description": "Updates title, excerpt, slug, date, status, author, terms, fields, featured image, comment status and the texts and button links of several blocks of one post in one operation, blocks found by their ID from the outline. Per block, url changes the one link of a text too, link_text names the part that stays linked, add_link sets a new link on a passage and caption the caption of a figure, as in leitvia/update-block. status publishes a draft, schedules it (future, with a date) or takes a post back to draft or pending; like every change it follows the autonomy level, so at a lower level it waits in a change package, and publishing needs the right to publish when it is applied. Terms, fields and featured image follow the rules of leitvia/create-content; terms replace those of their taxonomy. Instead of blocks, content replaces the whole content with block markup, for example to turn classic content into blocks; the new content may hold no classic block. Read the post with leitvia/get-page-outline first and send its hash as base_hash. A slug change is a URL change and lands at most as a suggestion; after one, leitvia/repair-links with auto points the links of other posts to the new address. For attributes or images of a block use leitvia/update-block.",
+			"description": "Updates title, excerpt, slug, date, status, author, terms, fields, featured image, comment status and the texts and button links of several blocks of one post in one operation, blocks found by their ID from the outline. Per block, url changes the one link of a text too, link_text names the part that stays linked, add_link sets a new link on a passage and caption the caption of a figure, as in leitvia/update-block. status publishes a draft, schedules it (future, with a date) or takes a post back to draft or pending; like every change it follows the autonomy level, so at a lower level it waits in a change package, and publishing needs the right to publish when it is applied. Terms, fields, featured image and template follow the rules of leitvia/create-content; terms replace those of their taxonomy, and template switches the post to another template of the contract (page-landing for a page). Instead of blocks, content replaces the whole content with block markup, for example to turn classic content into blocks; the new content may hold no classic block. Read the post with leitvia/get-page-outline first and send its hash as base_hash. A slug change is a URL change and lands at most as a suggestion; after one, leitvia/repair-links with auto points the links of other posts to the new address. For attributes or images of a block use leitvia/update-block.",
 			"category": "leitvia",
 			"group": "maintain",
 			"input_schema": {
@@ -4277,6 +4403,11 @@
 							"closed"
 						],
 						"description": "Whether visitors may comment; without it a new post takes the default of the site."
+					},
+					"template": {
+						"type": "string",
+						"pattern": "^[a-z0-9-]*$",
+						"description": "Template of the contract: a page template for pages, a single template for the other types. Empty or default: the standard template."
 					},
 					"base_hash": {
 						"type": "string",
@@ -4899,6 +5030,105 @@
 			}
 		},
 		{
+			"name": "leitvia/update-template",
+			"label": "Update template",
+			"description": "Replaces a template with a template pattern made for it or with changed block markup. Slugs, such as single or single-product, come from the templates of leitvia/get-contract and the templates the theme ships; WooCommerce templates need WooCommerce. A pattern fits when its templateTypes hold the slug; the rejection leitvia_unknown_pattern lists the patterns that fit in patterns. Templates for single posts and pages keep a core/post-content block. The change publishes the template; where the area level is draft a new one waits in a change package. A rollback restores the template as it was, the one of the theme when there was no saved one. The base hash is the hash of the saved template, empty when the theme template has not been saved yet. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash.",
+			"category": "leitvia",
+			"group": "setup",
+			"input_schema": {
+				"properties": {
+					"template": {
+						"type": "string",
+						"pattern": "^[a-z0-9-]+$"
+					},
+					"pattern": {
+						"type": "string"
+					},
+					"content": {
+						"type": "string",
+						"minLength": 1
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"template",
+					"base_hash"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						]
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						]
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"package": {
+						"type": "integer"
+					},
+					"snapshot": {
+						"type": "integer"
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					},
+					"notice": {
+						"type": "string"
+					},
+					"slug_changed": {
+						"type": "object",
+						"description": "The slug asked for (requested) is taken or reserved, so the address uses slug instead, on publishing at the latest."
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": false
+			}
+		},
+		{
 			"name": "leitvia/update-template-part",
 			"label": "Update template part",
 			"description": "Replaces a template part of the contract, such as header, footer or sidebar, with a pattern made for its area or with changed block markup. Part names come from leitvia/get-contract; with Polylang <part>-<language> (header-de) is the part the theme shows for that language and is created in the area of its part. Patterns come from leitvia/list-patterns. The change publishes the part, a draft one too: core shows no draft part, so where the area level is draft it waits in a change package. The base hash is the hash of the template part. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash.",
@@ -5382,6 +5612,16 @@
 				"retry": "never"
 			},
 			{
+				"code": "leitvia_execution_failed",
+				"status": 500,
+				"reason": "execution",
+				"message": "The image could not be cropped; nothing was changed. Try again later.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
 				"code": "leitvia_forbidden",
 				"status": 403,
 				"reason": "identity",
@@ -5560,6 +5800,16 @@
 				"retry": "once"
 			},
 			{
+				"code": "leitvia_invalid_input",
+				"status": 422,
+				"reason": "option",
+				"message": "The value is not valid for this option.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
 				"code": "leitvia_invalid_package",
 				"status": 400,
 				"reason": "package",
@@ -5656,6 +5906,16 @@
 				"message": "There is no block with this ID. Read the outline for the current IDs.",
 				"next_ability": [
 					"leitvia/get-page-outline"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_not_found",
+				"status": 404,
+				"reason": "id",
+				"message": "There is no file with this ID in the media library. List the media for the current IDs.",
+				"next_ability": [
+					"leitvia/list-media"
 				],
 				"retry": "once"
 			},
@@ -5837,6 +6097,16 @@
 				"message": "There is no pattern with this name for this template part. List the patterns of its area and use one of them.",
 				"next_ability": [
 					"leitvia/list-patterns"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_unknown_pattern",
+				"status": 404,
+				"reason": "pattern",
+				"message": "There is no pattern with this name for this template. Use one of the patterns the rejection lists in patterns.",
+				"next_ability": [
+					""
 				],
 				"retry": "once"
 			},

@@ -36,3 +36,19 @@ No ability sets the language of a post or links translations. With Polylang, whi
 1. The agent builds the pages of the second language like any other page, with `leitvia/compose-page` and slugs of their own (for example `leistungen` next to `services`), in the same package.
 2. After the package was applied, the operator runs a script with WP-CLI that adds the languages, gives every post without a language the default one, sets the second language on the new pages and links each pair (`pll_set_post_language`, `pll_save_post_translations`). The model is `site/leitvia.com/polylang.php` in the Leitvia monorepo (`wp eval-file polylang.php <folder>`), which reads the pairs from a table of slugs.
 3. Header and footer: while Polylang shows a language other than its default, the theme looks for the template part `<slug>-<language>` (for example `header-de`, `footer-de`) and shows it in place of `<slug>`; without one the part of the default language stays. The agent writes them with `leitvia/update-template-part` and `part` set to `header-de` (a pattern of the area, or `content`), in the same package, once the language exists in Polylang; the part is created in the area of its base part. Without the agent the operator creates them with WP-CLI, as `site/leitvia.com/import.sh` does (`part_upsert <slug> <title> <area>`). The navigation of the second language is a menu of its own.
+
+## Scripts of plugins from other providers
+
+Leitvia Studio holds back a script until the visitor allows its category, `statistics` or `marketing`, when the filter `leitvia_studio_consent_scripts` names it by host (subdomains included) or by script handle. The script stays in the page as `type="text/plain"`, so the browser asks the host nothing; once the category is allowed, Studio runs it, its inline scripts and the scripts that depend on it in their order. Visitors allow and revoke in the block `leitvia/consent-settings` on the privacy policy page, a consent manager with the event `leitvia:consent-granted`. Find the hosts in the source of a page (`<script src=`) or the network tab of the browser, then add a small mu-plugin, for example `wp-content/mu-plugins/consent-scripts.php`:
+
+```php
+<?php
+add_filter( 'leitvia_studio_consent_scripts', fn( array $entries ) => array_merge( $entries, array(
+	array( 'host' => 'widgets.example.com', 'category' => 'marketing' ),
+	array( 'handle' => 'example-stats', 'category' => 'statistics' ),
+) ) );
+```
+
+Name every such provider, its purpose and its privacy policy in the privacy policy of the site. Load a page in a private window afterwards: the network tab shows no request to the host until the category is allowed.
+
+Not covered: scripts a plugin echoes itself instead of enqueuing them, script modules, iframes, images and fonts that a plugin loads from another host. A loader that puts the URL together at run time, or a script that calls the host with `fetch`, is caught only by its handle: enter the handle, not the host. Check the network tab; for a plugin that still asks the host, ask its vendor for a consent option, or replace it.

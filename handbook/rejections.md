@@ -1,6 +1,6 @@
 # Rejections
 
-Generated from Leitvia Studio 1.3.30. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
+Generated from Leitvia Studio 1.3.31. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
 
 Every rejection of Leitvia Studio with its retry rule and next ability. Messages with `%s` or `%d` get a value at run time; codes with several rows come from several places.
 
@@ -22,6 +22,7 @@ Every rejection of Leitvia Studio with its retry rule and next ability. Messages
 | `leitvia_deprecated_pattern` | 422 | `once` | `leitvia/get-pattern` | The pattern is deprecated. Use its replacement instead. |
 | `leitvia_execution_failed` | 500 | `never` | none | The change could not be saved; nothing was changed. Try again later. |
 | `leitvia_execution_failed` | 500 | `never` | none | The file could not be saved; nothing was changed. Try again later. |
+| `leitvia_execution_failed` | 500 | `never` | none | The image could not be cropped; nothing was changed. Try again later. |
 | `leitvia_forbidden` | 403 | `never` | none | Agents change the site through the %s abilities only. |
 | `leitvia_forbidden` | 403 | `never` | none | Sign in as a user who may edit content. |
 | `leitvia_forbidden` | 403 | `never` | `leitvia/list-packages` | This change package belongs to someone else. |
@@ -40,6 +41,7 @@ Every rejection of Leitvia Studio with its retry rule and next ability. Messages
 | `leitvia_invalid_input` | 422 | `never` | none | No link needs or allows a repair. The report lists external links and internal links that could not be resolved. |
 | `leitvia_invalid_input` | 400 | `once` | `leitvia/list-patterns` | Pass pattern slugs, or a post whose sections come from patterns. |
 | `leitvia_invalid_input` | 400 | `once` | `leitvia/get-contract` | The contract has no page frame of this type. |
+| `leitvia_invalid_input` | 422 | `never` | none | The value is not valid for this option. |
 | `leitvia_invalid_package` | 400 | `never` | none | Built at run time; read the message. |
 | `leitvia_locked` | 403 | `never` | none | Agents may not change this area. A person can change the autonomy settings. |
 | `leitvia_media_missing` | 422 | `never` | `leitvia/add-media` | The file of a new image is not on this site any more. Add the image again with leitvia/add-media, then export. |
@@ -50,6 +52,7 @@ Every rejection of Leitvia Studio with its retry rule and next ability. Messages
 | `leitvia_no_seo_plugin` | 422 | `never` | `leitvia/update-content` | No SEO plugin Leitvia Studio can write to is active (Yoast SEO, Rank Math, SEOPress or The SEO Framework). Change the excerpt with leitvia/update-content instead, or ask a person to install one. |
 | `leitvia_not_found` | 404 | `once` | `leitvia/get-page-outline` | The page has no block with this ID. Read the page outline for the current IDs. |
 | `leitvia_not_found` | 404 | `once` | `leitvia/get-page-outline` | There is no block with this ID. Read the outline for the current IDs. |
+| `leitvia_not_found` | 404 | `once` | `leitvia/list-media` | There is no file with this ID in the media library. List the media for the current IDs. |
 | `leitvia_not_found` | 404 | `once` | `leitvia/list-patterns` | There is no pattern with this slug. List the patterns for the current slugs. |
 | `leitvia_not_found` | 404 | `once` | `leitvia/get-page-outline` | There is no top-level section with this ID. Read the outline for the current IDs. |
 | `leitvia_out_of_scope` | 403 | `never` | none | Agents may not change this object. Only published or draft content of the allowed post types is open to them. |
@@ -68,6 +71,7 @@ Every rejection of Leitvia Studio with its retry rule and next ability. Messages
 | `leitvia_unknown_building_block` | 404 | `never` | none | There is no building block with this name. |
 | `leitvia_unknown_package` | 404 | `never` | `leitvia/list-packages` | There is no change package with this ID. List the packages and use one of them. |
 | `leitvia_unknown_pattern` | 404 | `once` | `leitvia/list-patterns` | There is no pattern with this name for this template part. List the patterns of its area and use one of them. |
+| `leitvia_unknown_pattern` | 404 | `once` | none | There is no pattern with this name for this template. Use one of the patterns the rejection lists in patterns. |
 | `leitvia_unknown_pattern` | 404 | `once` | `leitvia/list-patterns` | There is no pattern with this name. List the patterns and use one of them. |
 | `leitvia_unknown_recipe` | 404 | `once` | `leitvia/list-recipes` | There is no recipe with this name. List the recipes and use one of them. |
 | `leitvia_unsafe_content` | 422 | `once` | `leitvia/list-blocks` | The content holds markup agents may not write: scripts, event attributes, Custom HTML blocks, classic blocks or Base64 data. Use registered blocks and media from the library. |
