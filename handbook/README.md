@@ -1,6 +1,6 @@
 # Leitvia agent handbook
 
-Generated from Leitvia Studio 1.3.31. Do not edit.
+Generated from Leitvia Studio 1.3.32. Do not edit.
 
 Everything an agent needs to work on a WordPress site with Leitvia Studio through its 53 abilities. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call.
 
@@ -12,17 +12,17 @@ Sign in as a WordPress user that may edit posts, with an application password (H
 
 **MCP.** The server `leitvia` answers at `POST /wp-json/leitvia-studio/v1/mcp` when the plugin MCP Adapter 0.7 is active. Send `initialize` first; its response carries the header `Mcp-Session-Id`. Every further request sends that header and `MCP-Protocol-Version` (for example `2025-06-18`), otherwise the server answers with 400. `tools/list` lists the abilities; a tool is named like its ability with a hyphen in place of the slash (`leitvia-get-contract` for `leitvia/get-contract`). `tools/call` takes the input of the ability as `arguments`. A rejection comes back as a tool result with `isError` true whose text is JSON with `code`, `message` and `data`.
 
-**REST.** Every ability runs at `/wp-json/wp-abilities/v1/abilities/<name>/run`, for example `/wp-json/wp-abilities/v1/abilities/leitvia/get-contract/run`. The HTTP method follows the annotations: read only abilities take GET, abilities that are destructive and idempotent take DELETE, all others POST. GET and DELETE send the input as query arguments (`?input[post]=12`, lists as `input[upsells][]=4&input[upsells][]=7`), POST sends it as JSON body `{"input": {…}}`. Another method gets 405. A rejection is an error response with `code`, `message` and `data`; the HTTP status is `data.status`.
+**REST.** Every ability runs at `/wp-json/wp-abilities/v1/abilities/<name>/run`, for example `/wp-json/wp-abilities/v1/abilities/leitvia/get-contract/run`. The HTTP method follows the annotations: read only abilities take GET, abilities that are destructive and idempotent take DELETE, all others POST. GET and DELETE send the input as query arguments (`?input[post]=12`, lists as `input[upsells][]=4&input[upsells][]=7`), POST sends it as JSON body `{"input": {…}}`. A rejection is an error response with `code`, `message` and `data`; the HTTP status is `data.status`.
 
 ## Read before write
 
 The read abilities return what a write needs: post IDs, block IDs from `leitvia/get-page-outline`, pattern slugs from `leitvia/list-patterns`, blocks and their attributes from `leitvia/list-blocks`, page frames, color roles and template parts from `leitvia/get-contract`, and the hash of every target. Plan a page with `leitvia/plan-page` and score it with `leitvia/check-composition` before you build it.
 
-The checks after a write (links, contrast) run as a WP-Cron event. On a site where WP-Cron does not run by itself, such as WordPress Playground, call `GET /wp-cron.php` after writes; the result lands in the audit log.
+The checks after a write (links, contrast) run as a WP-Cron event. Where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after writes; the result lands in the audit log.
 
 ## Hashes and base_hash
 
-Every write ability requires `base_hash`: the hash of the target as you last read it, 16 hex characters. Before it writes, the pipeline compares it with the current hash of the target; when someone changed the target in between, the write is rejected with `leitvia_stale_hash`, which carries `current_hash`. Read the target again and repeat the change on the current state, once.
+Every write ability requires `base_hash`: the hash of the target as you last read it, 16 hex characters. When the target changed since, the write is rejected with `leitvia_stale_hash`, which carries `current_hash`. Read the target again and repeat the change on the current state, once.
 
 - A new object (a new page, pattern, token set or image) has no hash: send an empty `base_hash`.
 - A post, page, attachment, navigation menu or template part: `hash` of `leitvia/get-page-outline`, which is also `document_hash` of `leitvia/get-block`. Block hashes are for comparing blocks; `base_hash` is always the hash of the whole document.
@@ -44,7 +44,7 @@ Most write abilities return the result of the pipeline:
 | `hash` | hash of the target after the write |
 | `package` | ID of the change package, 0 for none |
 | `snapshot` | ID of the snapshot a rollback restores, 0 for none |
-| `findings` | warnings of the checks; errors reject the write. Only findings the write brings or makes worse count; findings the target already had do not block it |
+| `findings` | warnings of the checks; errors reject the write. Only findings the write brings or makes worse count |
 | `report` | further data of some abilities |
 | `slug_changed` | only when the slug you sent is taken or reserved: `requested` and the `slug` the address gets, on publishing at the latest. Tell the person and link to the real address |
 
@@ -179,7 +179,7 @@ Texts, links, alt text, deprecated patterns, products and change packages of exi
 | [`leitvia/repair-links`](abilities/leitvia-repair-links.md) | POST | Repairs internal links of one post: from pairs of old and new link, or with auto through the old slugs WordPress keeps for redirects. |
 | [`leitvia/replace-pattern`](abilities/leitvia-replace-pattern.md) | POST | Replaces the sections of one post that use a deprecated pattern with the replacement the contract names, all of them or the one section given by block. |
 | [`leitvia/rollback`](abilities/leitvia-rollback.md) | POST | Rolls back the applied operations of a change package from their snapshots. |
-| [`leitvia/set-alt-text`](abilities/leitvia-set-alt-text.md) | POST | Sets the alt text of an image: without post and block on the attachment in the media library, with post and block on one image or cover block that shows the image. |
+| [`leitvia/set-alt-text`](abilities/leitvia-set-alt-text.md) | POST | Sets the alt text of an image: without post and block on the attachment in the media library, with post and block on one image or cover block that shows it. |
 | [`leitvia/set-merchandising`](abilities/leitvia-set-merchandising.md) | POST | Sets the featured flag, the upsells, the cross-sells and the sort order of one product. |
 | [`leitvia/update-content`](abilities/leitvia-update-content.md) | POST | Updates title, excerpt, slug, date, status, author, terms, fields, featured image, comment status and the texts and button links of several blocks of one post in one operation, blocks found by their ID from the outline. |
 | [`leitvia/update-product`](abilities/leitvia-update-product.md) | POST | Updates texts, status, images, categories and tags of one product or variation, and its prices, tax and shipping class. |

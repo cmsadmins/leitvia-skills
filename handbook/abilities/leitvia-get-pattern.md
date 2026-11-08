@@ -1,8 +1,8 @@
 # leitvia/get-pattern
 
-Generated from Leitvia Studio 1.3.31. Do not edit. Group: Read. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.32. Do not edit. Group: Read. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
-**Get pattern.** Returns one pattern of the theme or of Leitvia Studio with its markup, metadata and the first 20 posts and templates that use it (more is true when there are further ones).
+**Get pattern.** Returns one pattern of the theme or of Leitvia Studio with its markup, metadata and the first 20 posts and templates that use it (more is true when there are further ones). Template patterns come with their templateTypes.
 
 MCP tool `leitvia-get-pattern`, REST GET. Annotations: readonly true, destructive false, idempotent true.
 

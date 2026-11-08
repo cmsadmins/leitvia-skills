@@ -11,3 +11,5 @@ diff <(sed 's/<[^>]*>//g' source.html | tr -s '[:space:]' ' ') <(sed 's/<[^>]*>/
 ```
 
 The only differences allowed are the headings marked as suggestions, the fact box, alt texts and the entries of the table of contents; each one goes into the report. Any other difference is fixed before the review.
+
+**Compare with the rendered page.** The source text is the public page as a visitor sees it, not `post_content`: reusable blocks (`core/block` with `ref`), ACF blocks and shortcodes add text that the saved content does not hold (a donation appeal or promo cards vanish unnoticed otherwise). Resolve each reusable block before the migration: write its content inline into the post; when it holds blocks of another plugin, rebuild them from their text with the blocks of the theme and watch for `leitvia_unregistered_block`. Compare per post, and list every part that only the rendered page had.

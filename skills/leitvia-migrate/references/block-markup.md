@@ -2,6 +2,8 @@
 
 Markup that `leitvia/update-content` accepts as `content`, one example per kind of classic HTML. Blocks are separated by an empty line. Keep the texts, link targets, image IDs and sources of the source; only the wrapping changes.
 
+Blocks of a type that is not registered (`acf/*`, blocks of a plugin that is gone) render nothing: `leitvia/audit-site` and the findings of a write report them as `leitvia_unregistered_block` with types and count. Rebuild each from the text in its saved HTML with the blocks below; never leave one in a page that goes live.
+
 ## Paragraph and heading
 
 ```html

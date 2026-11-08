@@ -17,13 +17,13 @@ A dark set (`surface` darker than `ink`) keeps inverse bands dark, also on a lig
 
 ## Format
 
-Copy the `document` of `leitvia/get-tokens` and change only `$value` entries. Keep every slug; unknown slugs are rejected and missing ones too.
+Copy the `document` of `leitvia/get-tokens` and change only `$value` entries. Keep every slug, add none; see [`radius.media`](media-radius.md).
 
 Colors as `{"colorSpace": "srgb", "components": [r, g, b], "hex": "#rrggbb"}` with components from 0 to 1; dimensions as `{"value": 1.5, "unit": "rem"}`; `clamp()` values through `$extensions` `com.leitvia` `css`, fluid font sizes through `com.leitvia` `fluid`, as in the document you started from.
 
 ## Extra surfaces
 
-Extra brand surfaces (pastel tiles) go in the group `color.surface-extra`: at most eight color tokens, named in lowercase letters and hyphens (`mint`), optional label in `com.leitvia` `name`. `ink` needs 4.5:1 on each. Errors: `leitvia_studio_dtcg_extra_contrast`, `leitvia_studio_dtcg_extra_limit`, `leitvia_studio_dtcg_extra_slug`. Use them for cards only, `"backgroundColor":"surface-extra-mint"`, text `ink`.
+Extra surfaces go in `color.surface-extra`: at most eight color tokens, names of lowercase letters and hyphens (`mint`), label in `com.leitvia` `name`. `ink` needs 4.5:1 on each. Errors: `leitvia_studio_dtcg_extra_contrast`, `leitvia_studio_dtcg_extra_limit`, `leitvia_studio_dtcg_extra_slug`. Use them for cards only, `"backgroundColor":"surface-extra-mint"`, text `ink`. Links turn `ink` where `accent` is below 4.5:1 (`accent_on_extra`). Studio sets `has-ink-links` on such groups, so the theme draws their links in `ink`.
 
 ## Contrast
 
