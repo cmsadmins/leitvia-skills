@@ -1,6 +1,6 @@
 # leitvia/set-organization
 
-Generated from Leitvia Studio 1.3.34. Do not edit. Group: Set up. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.35. Do not edit. Group: Set up. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **Set organization details.** Sets address, phone and email of the organization. Leitvia Studio adds them to its structured data while no SEO plugin is active; the name and the logo stay those of the site. Only the fields you send change, an empty string clears one. leitvia/get-seo returns the current values. base_hash is empty. Use only facts the person gave or the site shows. Like every setting it waits in a change package for a person.
 

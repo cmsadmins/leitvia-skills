@@ -23,7 +23,7 @@ Colors as `{"colorSpace": "srgb", "components": [r, g, b], "hex": "#rrggbb"}` wi
 
 ## Extra surfaces
 
-Extra surfaces go in `color.surface-extra`: at most eight color tokens, names of lowercase letters and hyphens (`mint`), label in `com.leitvia` `name`. `ink` needs 4.5:1 on each. Errors: `leitvia_studio_dtcg_extra_contrast`, `leitvia_studio_dtcg_extra_limit`, `leitvia_studio_dtcg_extra_slug`. Use them for cards only, `"backgroundColor":"surface-extra-mint"`, text `ink`. Links turn `ink` where `accent` is below 4.5:1 (`accent_on_extra`). Studio sets `has-ink-links` on such groups, so the theme draws their links in `ink`.
+Extra surfaces go in `color.surface-extra`: at most eight color tokens, names of lowercase letters and hyphens (`mint`), label in `com.leitvia` `name`. `ink` needs 4.5:1 on each. Errors: `leitvia_studio_dtcg_extra_contrast`, `leitvia_studio_dtcg_extra_limit`, `leitvia_studio_dtcg_extra_slug`. Use them for cards only, `"backgroundColor":"surface-extra-mint"`, text `ink`. Links turn `ink` where `accent` is below 4.5:1 (`accent_on_extra`, class `has-ink-links` on the group).
 
 ## Contrast
 
@@ -37,7 +37,7 @@ When `leitvia/create-token-set` is rejected with `leitvia_check_failed`, each fi
 2. Keep the hue, darken on light surfaces, lighten on dark ones, in small steps until every failing pair of the finding list reaches its minimum by your own computation. One new value often fixes several findings (accent on surface, on surface-alt, on-accent on accent).
 3. Send the corrected document once. Tell the person which value replaced which and the ratios it reaches.
 
-Findings with severity `warning` (for example `font_not_bundled`) do not block; create and activate return them. Report them.
+Findings with severity `warning` (`font_not_bundled`; `leitvia_studio_dtcg_unknown_group`, see [widths](widths.md)) do not block; create and activate return them. Report them.
 
 ## Fonts
 
