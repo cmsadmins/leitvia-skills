@@ -35,6 +35,6 @@ Strip the tags of the source (the text of a caption counts, shortcode brackets d
 ## Rejections
 
 - `leitvia_unsafe_content` with `reason` `html_block` or `classic_block`: a `core/html` or `core/freeform` block slipped into the markup (`target.block` names it). Replace it with the core block of the table and send again.
-- `leitvia_unsafe_content` with `reason` `markup`: an attribute or tag the content may not hold (an event handler, a script URL, a `style` with unsafe content). Remove it; when the content needs it, checkpoint **Open items**.
+- `leitvia_unsafe_content` with `reason` `markup`: an attribute or tag the content may not hold; `found` names block, tag, attribute and an excerpt. Remove it (`mso-*` styles and empty `o:p` of Word are dropped for you); when the content needs it, checkpoint **Open items**.
 - `leitvia_check_failed`: the findings name the block and the check (alt text, link text, heading levels). Fix them and send again.
 - `leitvia_stale_hash`: the post changed since you read it. Read it again with `leitvia/get-block`, translate the current state, send once more.

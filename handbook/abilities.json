@@ -1,5 +1,5 @@
 {
-	"studio": "1.3.32",
+	"studio": "1.3.33",
 	"abilities": [
 		{
 			"name": "leitvia/activate-token-set",
@@ -5335,14 +5335,14 @@
 		{
 			"name": "leitvia/update-template",
 			"label": "Update template",
-			"description": "Replaces a template with a template pattern made for it or with changed block markup. Slugs, such as single or single-product, come from the templates of leitvia/get-contract and the templates the theme ships; WooCommerce templates need WooCommerce. A pattern fits when its templateTypes hold the slug; the rejection leitvia_unknown_pattern lists the patterns that fit in patterns. Templates for single posts and pages keep a core/post-content block. The change publishes the template; where the area level is draft a new one waits in a change package. A rollback restores the template as it was, the one of the theme when there was no saved one. The base hash is the hash of the saved template, empty when the theme template has not been saved yet. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash.",
+			"description": "Replaces a template with a template pattern made for it or with changed block markup. Slugs, such as single, single-product or taxonomy-product_cat, come from the templates of leitvia/get-contract and the templates the theme ships; WooCommerce templates need WooCommerce. A pattern fits when its templateTypes hold the slug; the rejection leitvia_unknown_pattern lists the patterns that fit in patterns. Templates for single posts and pages keep a core/post-content block. The change publishes the template; where the area level is draft a new one waits in a change package. A rollback restores the template as it was, the one of the theme when there was no saved one. The base hash is the hash of the saved template, empty when the theme template has not been saved yet. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash.",
 			"category": "leitvia",
 			"group": "setup",
 			"input_schema": {
 				"properties": {
 					"template": {
 						"type": "string",
-						"pattern": "^[a-z0-9-]+$"
+						"pattern": "^[a-z0-9_-]+$"
 					},
 					"pattern": {
 						"type": "string"
@@ -5764,6 +5764,7 @@
 			"leitvia_check_failed",
 			"leitvia_cli_no_user",
 			"leitvia_deprecated_pattern",
+			"leitvia_empty_block",
 			"leitvia_execution_failed",
 			"leitvia_forbidden",
 			"leitvia_forbidden_field",
@@ -5924,6 +5925,16 @@
 				"message": "The pattern is deprecated. Use its replacement instead.",
 				"next_ability": [
 					"leitvia/get-pattern"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_empty_block",
+				"status": 409,
+				"reason": "empty_block",
+				"message": "The block holds no markup. Read the page outline again; if the block is still empty there, it has no content to keep.",
+				"next_ability": [
+					"leitvia/get-page-outline"
 				],
 				"retry": "once"
 			},

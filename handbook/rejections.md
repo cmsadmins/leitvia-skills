@@ -1,6 +1,6 @@
 # Rejections
 
-Generated from Leitvia Studio 1.3.32. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
+Generated from Leitvia Studio 1.3.33. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
 
 Every rejection of Leitvia Studio with its retry rule and next ability. Messages with `%s` or `%d` get a value at run time; codes with several rows come from several places.
 
@@ -20,6 +20,7 @@ Every rejection of Leitvia Studio with its retry rule and next ability. Messages
 | `leitvia_check_failed` | 422 | `once` | none | The image needs alt text that describes it, or mark it as decorative. |
 | `leitvia_cli_no_user` | 401 | `never` | none | This command acts as a user; run with --user=\<agent or admin>. |
 | `leitvia_deprecated_pattern` | 422 | `once` | `leitvia/get-pattern` | The pattern is deprecated. Use its replacement instead. |
+| `leitvia_empty_block` | 409 | `once` | `leitvia/get-page-outline` | The block holds no markup. Read the page outline again; if the block is still empty there, it has no content to keep. |
 | `leitvia_execution_failed` | 500 | `never` | none | The change could not be saved; nothing was changed. Try again later. |
 | `leitvia_execution_failed` | 500 | `never` | none | The file could not be saved; nothing was changed. Try again later. |
 | `leitvia_execution_failed` | 500 | `never` | none | The image could not be cropped; nothing was changed. Try again later. |

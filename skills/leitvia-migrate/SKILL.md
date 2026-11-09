@@ -68,7 +68,7 @@ For each post: `leitvia/get-block` with `block: "p:0"` (keep `document_hash` and
 
 **Write:** `leitvia/update-content` with `post`, `content` (the whole new block markup), `base_hash` (the `document_hash`) and the `package` key. The result has `mode: package`. Rejections and their fixes: [translation details](references/translate.md#rejections).
 
-**Sample of three first:** translate and write three posts with different content (one with images, one with a table, one with an embed when the site has them), run the [text comparison](references/wording.md) and stop at checkpoint **Sample of three**: the person checks the diff with `leitvia/get-package` or in the inbox. Change your translation where they ask, then do the rest.
+**Sample of three first:** translate and write three posts with different content (one with images, one with a table, one with an embed when the site has them), run the [text and link comparison](references/wording.md) and stop at checkpoint **Sample of three**: the person checks the diff with `leitvia/get-package` or in the inbox. Change your translation where they ask, then do the rest.
 
 ### 5. Navigation
 

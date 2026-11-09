@@ -42,4 +42,4 @@ One row per source page, after the person applied package B; `leitvia/list-conte
 | Source URL | Target page (ID, URL) | Words source | Words target | Images source | Images target | Left out |
 |---|---|---|---|---|---|---|
 
-Words target counts the text of the new content the same way as the source, and the text comparison of [wording stays, form is new](wording.md) runs per page before the person reviews package B. A difference other than 0 needs a reason in "Left out" (cookie text, a form, a script). Then the navigation (each source item and its new target) and every alt text you wrote.
+Words target counts the text of the new content the same way as the source, and the text and link comparison of [wording stays, form is new](wording.md) runs per page before the person reviews package B. A difference other than 0 needs a reason in "Left out" (cookie text, a form, a script). Then the navigation (each source item and its new target) and every alt text you wrote.
