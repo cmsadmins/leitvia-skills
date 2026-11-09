@@ -1,0 +1,5 @@
+# Photo collage
+
+Details for `leitvia-page`, read when a section shows several photos of people, trips or a group.
+
+For sections about a person, a trip or a group with three to five photos of their own next to a short text, use `leitvia/content-photo-collage`: a gallery with the block style `collage` beside an eyebrow, a heading, a lead, a paragraph and a button. Give each image an `image` edit with its own alt text and `remove` the images you lack (three at least). On a page with several such sections alternate the side and the background (`surface`, `surface-alt`, a `surface-extra` of the token set). The photos go right with the block style Media right on the `core/columns` of the section: after the page exists, send its `markup` from `leitvia/get-block` with `"className":"is-style-media-right"` in the comment and the class `is-style-media-right` on the columns element ([after the page exists](composition.md#after-the-page-exists)). Not for product shots or illustrations; for more than five photos use a gallery.

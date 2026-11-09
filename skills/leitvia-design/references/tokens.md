@@ -54,7 +54,7 @@ A brand font that is not bundled is a step of the person or the operator, no abi
 
 Tell the person; there is no ability for these:
 
-- Font weights per heading level and the layout widths (content and wide size) are not part of the token format. A brand that wants bold headings or another page width needs a person in the Site Editor.
+- Font weights per heading level are not part of the token format. A brand that wants bold headings needs a person in the Site Editor. Page widths: [widths](widths.md).
 - The logo: setting the site logo is an admin setting, and it needs a raster image. WordPress refuses SVG uploads, for administrators too, `leitvia/add-media` takes JPEG, PNG, GIF, WebP and AVIF, and Leitvia has no SVG sanitizer; do not suggest a plugin that lifts the limit. From an SVG, render a PNG with a transparent background at twice the display width or more: 400 px wide covers the header patterns (`width` up to 200), 960 px the masthead. Add it with `leitvia/add-media`, name it to the person for the site logo, and afterwards check on the front end that the logo image has a width and a height.
 - A light logo for dark bands: on an Inverse band the Site Logo block takes the block style On dark band, which draws a transparent logo in white (the pattern `leitvia/footer-mega` has it). When the brand has its own light file in several colors, add it with `leitvia/add-media` and write a `core/image` block linked to the start page in place of the Site Logo block with `leitvia/update-template-part`.
 - Brand rules about composition, for example "accent never as a section background", are not a contrast question. Pass them on to `leitvia-page` and check the front end for `has-accent-background-color` on sections.

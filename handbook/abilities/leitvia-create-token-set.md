@@ -1,8 +1,8 @@
 # leitvia/create-token-set
 
-Generated from Leitvia Studio 1.3.33. Do not edit. Group: Set up. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.34. Do not edit. Group: Set up. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
-**Create token set.** Creates a token set from a DTCG document. Start from the document leitvia/get-tokens returns; base_hash is empty for the new set. It must compile against the contract and pass every token set check; contrast findings name the failing pair and the ratio it needs. Activate it with leitvia/activate-token-set.
+**Create token set.** Creates a token set from a DTCG document. Start from the document leitvia/get-tokens returns; base_hash is empty for the new set. It must compile against the contract and pass every token set check; contrast findings name the failing pair and the ratio it needs. Optional group size: page widths. Activate it with leitvia/activate-token-set.
 
 MCP tool `leitvia-create-token-set`, REST POST. Annotations: readonly false, destructive false, idempotent false.
 

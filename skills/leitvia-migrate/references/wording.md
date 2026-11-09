@@ -14,6 +14,8 @@ The only differences allowed are the headings marked as suggestions, the fact bo
 
 **Compare with the rendered page.** The source text is the public page as a visitor sees it, not `post_content`: reusable blocks (`core/block` with `ref`), ACF blocks and shortcodes add text that the saved content does not hold (a donation appeal or promo cards vanish unnoticed otherwise). Resolve each reusable block before the migration: write its content inline into the post; when it holds blocks of another plugin, rebuild them from their text with the blocks of the theme and watch for `leitvia_unregistered_block`. Compare per post, and list every part that only the rendered page had.
 
+**No shortcode left.** Fixed step on the same `target.html`: the rendered page holds no shortcode as text; `grep -oE '\[/?[a-z][a-z0-9_-]*( [a-z_-]+=|/?\])' target.html` must find nothing besides placeholders the source shows as text. Each hit is a shortcode no plugin handles (`leitvia_unknown_shortcode`): rebuild its content with blocks, or list it as open when only a plugin can render it (a form, a list of payment methods).
+
 ## Links stay
 
 Fixed step next to the text comparison, on the same `source.html` and `target.html`: every internal link and every image link of the rendered source is in the target, with the same destination. A link whose page moved counts when the move has a redirect (old address to new one); list each such pair in the report.

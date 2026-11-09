@@ -4,6 +4,8 @@ Markup that `leitvia/update-content` accepts as `content`, one example per kind 
 
 Blocks of a type that is not registered (`acf/*`, blocks of a plugin that is gone) render nothing: `leitvia/audit-site` and the findings of a write report them as `leitvia_unregistered_block` with types and count. Rebuild each from the text in its saved HTML with the blocks below; never leave one in a page that goes live.
 
+Shortcodes that no plugin handles (rests of page builders such as `[vc_row]`, `[us_btn]`, `[et_pb_section]`, `[fusion_text]`) show as text: the findings of a write warn with `leitvia_unknown_shortcode`, name and block, and `leitvia/get-page-outline` lists them under `shortcodes`. Take their text into the blocks below and drop the shortcode tags.
+
 ## Paragraph and heading
 
 ```html
@@ -52,6 +54,22 @@ Without `{"ordered":true}` and with `<ul class="wp-block-list">` for a bulleted 
 <!-- wp:image {"id":7,"sizeSlug":"large","linkDestination":"none","metadata":{"leitviaDecorative":true}} -->
 <figure class="wp-block-image size-large"><img src="https://example.org/wp-content/uploads/divider.png" alt="" class="wp-image-7"/></figure>
 <!-- /wp:image -->
+```
+
+Leave `width` and `height` of the source out: the image then keeps its own proportions in every column. A fixed height without `aspectRatio` stretches the image (warning `leitvia_image_fixed_height`). For a crop set both, `"aspectRatio":"4/3","scale":"cover"`, and the image style `aspect-ratio:4/3;object-fit:cover`. Images already written with a fixed height: `leitvia/update-block` with `attributes` `{"height":null}` (and `"width":null`) per image block.
+
+## Columns
+
+`verticalAlignment` goes on each `core/column` as well as on `core/columns`; core aligns only columns that carry it. A write copies the value of `core/columns` to columns without one of their own, visible in the package.
+
+```html
+<!-- wp:columns {"verticalAlignment":"center"} -->
+<div class="wp-block-columns are-vertically-aligned-center"><!-- wp:column {"verticalAlignment":"center"} -->
+<div class="wp-block-column is-vertically-aligned-center"><!-- wp:paragraph -->
+<p>Text beside the image.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->
 ```
 
 ## Table
