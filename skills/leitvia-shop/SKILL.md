@@ -44,7 +44,7 @@ List per product what you change and the source of each fact. Checkpoint **Plan 
 
 ### 3. Texts and status
 
-`leitvia/update-product` with `title`, `short_description` and `description`, all changes of one product in one call. Plain text becomes paragraph blocks (a blank line starts one); send block markup for lists or headings. Keep the short description to the point of the product (what it is, for whom, the one fact that decides); details go into the description. The product page shows it as it is (lists stay lists), without one nothing. Change `status` only when the person asks; `publish` makes a draft visible to buyers.
+`leitvia/update-product` with `title`, `short_description` and `description`, all changes of one product in one call. Plain text becomes paragraph blocks (a blank line starts one); send block markup for lists or headings. The description has no fixed length, the short description up to 5,000 characters. Keep the short description to the point of the product (what it is, for whom, the one fact that decides); details go into the description. The product page shows it as it is (lists stay lists), without one nothing. Change `status` only when the person asks; `publish` makes a draft visible to buyers.
 
 ### 4. Images
 

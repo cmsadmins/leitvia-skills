@@ -119,3 +119,15 @@ For Vimeo: `"providerNameSlug":"vimeo"`, class `is-provider-vimeo wp-block-embed
 <!--more-->
 <!-- /wp:more -->
 ```
+
+## Explanation of a term
+
+A hover explanation of the source, longer than one sentence, right after the paragraph with the term.
+
+```html
+<!-- wp:details -->
+<details class="wp-block-details"><summary>What is a sourdough starter?</summary><!-- wp:paragraph -->
+<p>A mix of flour and water in which wild yeast and lactic acid bacteria live. It raises the dough and gives the bread its sour taste.</p>
+<!-- /wp:paragraph --></details>
+<!-- /wp:details -->
+```

@@ -19,6 +19,7 @@ Details for step 4 of `leitvia-migrate`. Markup examples for each block: [block 
 | `<hr>` | `core/separator` |
 | `<pre>`, `<pre><code>` | `core/preformatted` or `core/code` |
 | `<!--more-->` | `core/more` |
+| Hover-only explanation of a term (glossary tooltip, `<abbr title>`, `title` or `data-*` text) | Visible text, since keyboard and touch cannot reach hover: one sentence in brackets after the term, a longer one as `core/details` after the paragraph, summary "What is <term>?" in the language of the page ([example](block-markup.md#explanation-of-a-term)). Also in product descriptions. No `core/footnotes`: no ability writes their meta, and products keep none |
 
 Everything else (`<script>`, `<style>`, `<form>`, shortcodes, page builders) has no block in this skill; inline styles and map blocks follow [inline style](inline-style.md). Stop at checkpoint **Open items** and let the person decide; never wrap it in a Custom HTML or classic block.
 
@@ -30,7 +31,7 @@ Everything else (`<script>`, `<style>`, `<form>`, shortcodes, page builders) has
 
 ## Compare before you write
 
-Strip the tags of the source (the text of a caption counts, shortcode brackets do not) and of your block markup, collapse whitespace and compare: the two texts are the same, word for word. The images are the same attachments (or their crops), in the same order. Links point to the same targets. Only alt texts you added and heading levels you moved may differ, and both go into the report.
+Strip the tags of the source (the text of a caption and a hover explanation count, shortcode brackets do not) and of your block markup, collapse whitespace and compare: the two texts are the same, word for word. The images are the same attachments (or their crops), in the same order. Links point to the same targets. Only alt texts you added and heading levels you moved may differ, and both go into the report.
 
 ## Rejections
 

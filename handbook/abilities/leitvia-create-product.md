@@ -1,6 +1,6 @@
 # leitvia/create-product
 
-Generated from Leitvia Studio 1.3.38. Do not edit. Group: Build. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.39. Do not edit. Group: Build. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **Create product.** Creates a simple product. It takes title, slug, texts as block markup or plain text (a long description in plain text becomes paragraph blocks, one per block of text between blank lines), prices, SKU, stock, categories and an image of the media library; base_hash is empty. Categories take IDs, slugs or names; a name no category has yet creates that category. The image needs alt text (leitvia/set-alt-text). The status is capped by the autonomy level, and a product with a price lands at most as a suggestion unless a person unlocked prices.
 
@@ -10,7 +10,7 @@ MCP tool `leitvia-create-product`, REST POST. Annotations: readonly false, destr
 |---|---|---|---|
 | `title` | string, min length `1`, max length `200` | yes |  |
 | `slug` | string, pattern `^[a-z0-9-]+$` |  |  |
-| `description` | string, max length `20000` |  | Long description, block markup or plain text. Plain text without HTML becomes paragraph blocks: a blank line starts a new paragraph, the text is escaped. |
+| `description` | string |  | Long description, block markup or plain text. Plain text without HTML becomes paragraph blocks: a blank line starts a new paragraph, the text is escaped. No fixed length, as with the content of leitvia/update-content; a change package shows the comparison up to 1 MB for before and after together. |
 | `short_description` | string, max length `5000` |  | Short description next to the price, block markup or plain text. |
 | `status` | one of `draft`, `pending`, `publish` |  |  |
 | `regular_price` | string, max length `20`, pattern `^([0-9]+([.][0-9]+)?)?$` |  | Price as a decimal number with a dot, empty for none. A price change lands at most as a suggestion. |
