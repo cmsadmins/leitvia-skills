@@ -62,6 +62,8 @@ Leave `width` and `height` of the source out: the image then keeps its own propo
 
 `verticalAlignment` goes on each `core/column` as well as on `core/columns`; core aligns only columns that carry it. A write copies the value of `core/columns` to columns without one of their own, visible in the package.
 
+`align` `full` only on blocks at the top level of the content. A group, cover or band inside a column, details, tabs or a card in a grid takes no alignment: it cannot reach the edge of the window there, so theme 1.2.41 and later show it with the normal edge, older themes with the padding of the whole window.
+
 ```html
 <!-- wp:columns {"verticalAlignment":"center"} -->
 <div class="wp-block-columns are-vertically-aligned-center"><!-- wp:column {"verticalAlignment":"center"} -->
