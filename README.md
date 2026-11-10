@@ -6,7 +6,7 @@ Agent skills and workflows for WordPress sites with the theme Leitvia and the pl
 
 | Folder | Content |
 |---|---|
-| `skills/` | Eleven skills in the Agent Skills format, one folder each with a short `SKILL.md` and, under `references/`, the details it names when they are needed: `leitvia-setup`, `leitvia-design`, `leitvia-page`, `leitvia-pattern`, `leitvia-maintain`, `leitvia-a11y`, `leitvia-migrate`, `leitvia-shop`, `leitvia-news`, `leitvia-seo-geo`, `leitvia-report`. |
+| `skills/` | Eleven skills in the Agent Skills format, one folder each with a short `SKILL.md` and, under `references/`, the details it names when they are needed: `leitvia-setup`, `leitvia-design`, `leitvia-page`, `leitvia-pattern`, `leitvia-maintain`, `leitvia-a11y`, `leitvia-migrate`, `leitvia-shop`, `leitvia-news`, `leitvia-seo-geo`, `leitvia-report`. `leitvia-a11y` also brings `scripts/check-pages.mjs`, a [page check](skills/leitvia-a11y/references/page-check.md) of many public pages in one browser (widths 1920 to 320 px, axe, other hosts, squeezed text, words and links against the old site). |
 | `workflows/` | `new-site`, `maintenance-cycle` and `migrate-site`: several skills in a row with fixed checkpoints and a mode chosen at the start. |
 | `handbook/` | The agent handbook, generated from Leitvia Studio: `README.md` (rules and an index of all abilities), one page per ability under `abilities/`, every rejection in `rejections.md`, and the abilities with their schemas in `abilities.json`. A skill loads the rules and only the pages of the abilities it calls. |
 | `.claude-plugin/` | The manifests that let Claude Code install the package as a plugin. |

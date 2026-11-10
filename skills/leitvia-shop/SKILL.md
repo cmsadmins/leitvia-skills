@@ -62,7 +62,7 @@ More than three images, or a newsletter sign-up: [shop pages](references/shop-pa
 
 ### 6. Merchandising
 
-`leitvia/set-merchandising` sets `featured`, `upsells`, `cross_sells` (other products of the shop, up to 20) and `menu_order` of one product. The lists replace the current ones: start from `upsells` and `cross_sells` of `leitvia/get-product`. Upsells are a better or bigger version of the product, cross-sells what goes with it in the cart. The product page shows eight upsells at most, by title. Pick them from the catalog and say why; which products to feature comes from the person.
+`leitvia/set-merchandising` sets `featured`, `upsells`, `cross_sells` (other products of the shop, up to 20) and `menu_order` of one product. The lists replace the current ones: start from `upsells` and `cross_sells` of `leitvia/get-product`. Upsells are a better or bigger version of the product, cross-sells what goes with it in the cart. The product page shows the first eight upsells in list order. Pick them from the catalog and say why; which products to feature comes from the person.
 
 ### 7. New products
 

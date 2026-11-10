@@ -74,7 +74,7 @@ On a rejection follow its `message` and `next_ability` and correct the call **on
 - `leitvia/check-composition` with `post` set to the new page: the score must match the score of the outline.
 - `leitvia/get-page-outline` with `post`: status, template and the sections.
 - `leitvia/audit-site` for published pages: pass the ID before the page as `after` and `limit: 1`, or page through with `next`. The page needs no findings.
-- When the page is live, open its public URL and check that it answers 200 and has one h1.
+- When the page is live, run the [page check](../leitvia-a11y/references/page-check.md) on its URL: 1920 to 320 px, axe, other hosts.
 
 A post or an entry of a post type of the content model is no page: `leitvia/compose-page` creates pages only. For those, [`leitvia/create-content`](../../handbook/abilities/leitvia-create-content.md) takes `post_type`, the `sections` of the outline (or `content` as block markup), `terms` and `fields`, with the same `package` key. Entry pages with their fields and the overview page of a type: [entries](references/entries.md). Products come from `leitvia/create-product`.
 

@@ -4,6 +4,8 @@ Details for `leitvia-migrate` on texts and links, for classic content and for a 
 
 A migration keeps the words of the source and gives them a new form. Sentences are never reworded, shortened or extended, and style and spelling of the source stay, its mistakes included (list them in the report). Allowed: structure, lists and tables made from enumerations the text already has, moving sections, and the blocks of the [tag to block table](translate.md#tag-to-block). Long posts get the form of [long texts](../../leitvia-page/references/long-texts.md): table of contents, fact box from facts the source states, reading breaks. A heading you wrote yourself, where the source had none, is marked in the report as a suggestion for the person.
 
+For published pages the [page check](../../leitvia-a11y/references/page-check.md) with `--old` compares words, links and shortcodes of all pages at once; the commands below are for a single page or the preview of a package.
+
 Fixed step before the person reviews the package (checkpoints **Sample of three** and **Package applied**): compare source and target of every page as plain text, without markup and whitespace. Save the public page of the source and of the target (the preview of the package) as `source.html` and `target.html`, cut both to the main content, and run:
 
 ```bash

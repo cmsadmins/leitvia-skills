@@ -56,7 +56,7 @@ Agents cannot switch themes or activate plugins; the area `admin` is locked. Ask
 ### 6. Accessibility check
 
 - **Skill:** leitvia-a11y.
-- **Input:** every migrated page and post, after the packages of step 5 were applied.
+- **Input:** every migrated page and post, after the packages of step 5 were applied, through the [page check](../skills/leitvia-a11y/references/page-check.md) with `--old` (words, links, widths 1920 to 320, other hosts).
 - **Writes:** fixes with the same key, one more package when there is anything to fix.
 - **Checkpoints:** "Link targets", "AI for alt text" and "Package applied" of the skill.
 

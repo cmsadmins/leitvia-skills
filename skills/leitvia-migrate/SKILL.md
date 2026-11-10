@@ -87,7 +87,7 @@ Widgets do not move by themselves. For each widget of the inventory the person d
 
 - `GET /wp-cron.php` where needed, `leitvia/get-package` for conflicts.
 - `leitvia/audit-site` again: no item may still report `classic-content`, `leitvia_unknown_shortcode` or `leitvia_image_fixed_height` ([block markup](references/block-markup.md)).
-- Each migrated page in the browser: texts of the inventory, images, the consent placeholder of embeds, submenus.
+- The [page check](../leitvia-a11y/references/page-check.md) with `--old`; in the browser: embeds behind consent, submenus.
 - Run the skill `leitvia-a11y` over the migrated pages.
 
 ## Report

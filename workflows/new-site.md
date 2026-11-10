@@ -92,7 +92,7 @@ A briefing that says the site is invented (a demo, a test, a fictional brand) is
 ### 6. Accessibility check
 
 - **Skill:** leitvia-a11y.
-- **Input:** every published page of the site after step 5.
+- **Input:** every published page of the site after step 5, through the [page check](../skills/leitvia-a11y/references/page-check.md).
 - **Writes:** fixes with the same key, a third package when there is anything to fix.
 - **Checkpoints:** "Link targets", "AI for alt text" and "Package applied" of the skill, with the questions it names.
 
