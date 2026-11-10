@@ -4,17 +4,17 @@ Details for `leitvia-a11y`, used by every skill that checks public pages after a
 
 ## Run it
 
-Once per project folder, with Node.js 20 or later:
+Once per project folder, with Node.js 20 or later, in a folder of its own with a `package.json`. Without one, npm installs into the next parent folder that has a `package.json`, which may be another project. Keep the folder out of Git (`tmp/` in `.gitignore`):
 
 ```sh
-npm install --no-save playwright axe-core
-npx playwright install chromium
+mkdir -p tmp/page-check
+(cd tmp/page-check && npm init -y && npm install playwright axe-core && npx playwright install chromium)
 ```
 
-Then, from the project folder (the path of the skills folder may differ in your agent):
+Then, from the project folder (the path of the skills folder may differ in your agent), with `--modules` pointing to that folder:
 
 ```sh
-node .claude/skills/leitvia-a11y/scripts/check-pages.mjs --site https://example.org --sitemap --out check.json --shots shots
+node .claude/skills/leitvia-a11y/scripts/check-pages.mjs --modules tmp/page-check --site https://example.org --sitemap --out check.json --shots shots
 ```
 
 - **Pages:** `--sitemap` takes every address of `/wp-sitemap.xml`; or a file `--pages pages.txt` with one path per line (`/about-us/`); or the paths after `--site`. In Git Bash a path that starts with `/` becomes a Windows path: use the file, or set `MSYS_NO_PATHCONV=1`.
@@ -23,6 +23,7 @@ node .claude/skills/leitvia-a11y/scripts/check-pages.mjs --site https://example.
 - `--concurrency 4` pages at a time (default). More makes a small server slow and the timing checks unreliable.
 - Subdomains of the site count as its own hosts. `--allow <host>` for each other host the person allowed, for example the host of a payment provider on the checkout only.
 - `--shots <folder>` saves JPEG screenshots at 1920, 1440 and 390 px of each page with a finding; `--all-shots` of every page. Look at them before you report.
+- `--modules <folder>`: the folder where playwright and axe-core are installed (see above), relative to the project folder or absolute.
 
 Twelve pages take about 20 seconds; the same checks one page and one width at a time took about four minutes. Exit code 1: at least one page has a finding or an `error` (not loaded). Exit code 2: the run did not start (no pages, sitemap or pages file not readable, no browser) and wrote no report.
 
@@ -33,14 +34,15 @@ Each page loads once with reduced motion, scrolls through once (lazy images, emb
 | Finding | Width | What it means |
 |---|---|---|
 | `overflow` | all | The page is wider than the window (it scrolls sideways or cuts content off), with the innermost elements that stick out or whose text runs out of its box (a long word, an address, a button). WCAG 1.4.10 at 320. |
-| `squeezed` | 1920, 1440 | A paragraph, list item or heading in `main` narrower than 20 characters, or a paragraph or list item with fewer than 25 characters per line: a text column squeezed by a sidebar, a column or a padding. |
+| `squeezed` | 1920, 1440 | A paragraph or list item in `main` narrower than 20 characters or with fewer than 25 characters per line, or a heading with fewer than 12 characters per line: a text column squeezed by a sidebar, a column or a padding. Large headings with 15 to 20 characters per line are normal and do not count, nor do form fields (a paragraph or item holding an input, select or textarea). |
 | `axe` | 1440, 390 | Rules of axe-core for WCAG 2.2 A and AA, with the number of elements and up to three selectors. |
 | `foreignHosts` | | Requests to other hosts before any consent. |
 | `httpErrors`, `brokenImages` | | Answers 400 and above, images that did not load. |
 | `h1` | | Not exactly one h1. |
 | `redirect` | | The page ended at another address (a login, another host). |
 | `shortcodes` | | Text such as `[vc_row]` in the content: a shortcode no plugin renders. |
-| `words`, `links` | | With an old page: words (with how many are missing) and link destinations of the old page that the new one lacks, text of closed details blocks included; `old` when the old page did not answer 200. |
+| `words`, `links` | | With an old page: words (with how many are missing) and link destinations of the old page that the new one lacks. Text of closed details blocks and hidden tab panels (product tabs) counts on both pages, and so do all parts of a post split into parts (the links of its page numbers). A link of the old page to an address of the old site that redirects counts by its destination. `old` when the old page or one of its parts did not answer 200 or not at all; the new page is still checked. |
+| `parts` | | A part of the new page (post split into parts) that did not load; its text is not in the comparison. |
 
 Why 1920: some faults show only on wide screens, for example a block with full width inside a column that takes the padding of the window and squeezes its text. At 1440 they are hard to see.
 

@@ -1,6 +1,6 @@
 # leitvia/update-template
 
-Generated from Leitvia Studio 1.3.39. Do not edit. Group: Set up. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.40. Do not edit. Group: Set up. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **Update template.** Replaces a template with a template pattern made for it or with changed block markup. Slugs, such as single, single-product or taxonomy-product_cat, come from the templates of leitvia/get-contract and the templates the theme ships; WooCommerce templates need WooCommerce. A pattern fits when its templateTypes hold the slug; the rejection leitvia_unknown_pattern lists the patterns that fit in patterns. Templates for single posts and pages keep a core/post-content block. The change publishes the template; where the area level is draft a new one waits in a change package. A rollback restores the template as it was, the one of the theme when there was no saved one. The base hash is the hash of the saved template, empty when the theme template has not been saved yet. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash.
 

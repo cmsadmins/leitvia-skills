@@ -9,26 +9,32 @@
  * 1920, 1440, 390 and 320 px and checks:
  *
  * - overflow: the page is wider than the window (all widths), with the elements that stick out
- * - squeezed: p, li and headings in main with fewer than 25 characters per line or narrower than 20 ch (1920, 1440)
+ * - squeezed: p and li in main with fewer than 25 characters per line or narrower than 20 ch, headings with fewer than
+ *   12 characters per line (1920, 1440); form fields (a p or li holding an input, select or textarea) do not count
  * - axe: WCAG 2.2 A and AA rules of axe-core with reduced motion (1440 and 390)
  * - foreignHosts: requests to other hosts before any consent, after scrolling the page once (lazy images, embeds)
- * - httpErrors, brokenImages, h1 (not exactly one), shortcodes (text such as [vc_row] in the content), redirect
+ * - httpErrors, brokenImages, h1 (not exactly one), shortcodes (text such as [vc_row] in the content), redirect, parts
+ *   (a further part of a post split into parts that did not load)
  * - words, links: with --old <address> (same paths) or an old URL per line, the words and links of the old page that
- *   the new one lacks; text in closed details and text shown only on wide screens counts
+ *   the new one lacks; text in closed details, hidden tab panels (product tabs), all parts of a post split into parts
+ *   and text shown only on wide screens counts; a link of the old page that redirects counts by its destination
  *
  * Options: --pages <file>, --sitemap, --old <address>, --old-selector <css> (content of the old page, default main,
  * then #content, .entry-content, body), --allow <host> (repeatable; allowed other hosts, subdomains included; the
  * subdomains of the site count as its own), --concurrency <n> (pages in parallel, default 4), --out <file> (default
- * check-pages.json), --shots <dir> (JPEG screenshots at 1920, 1440 and 390 px of pages with findings), --all-shots.
+ * check-pages.json), --shots <dir> (JPEG screenshots at 1920, 1440 and 390 px of pages with findings), --all-shots,
+ * --modules <dir> (folder with its own package.json where playwright and axe-core are installed).
  * Folder protection: LEITVIA_HTTP_AUTH="user:password" in the environment, never on the command line; it goes only to
  * the site itself.
- * Needs playwright and axe-core: npm install --no-save playwright axe-core && npx playwright install chromium
+ * Needs playwright and axe-core in a folder with its own package.json (without one, npm installs into the next parent
+ * folder that has one): mkdir -p tmp/page-check && cd tmp/page-check && npm init -y && npm install playwright axe-core
+ * && npx playwright install chromium; then --modules tmp/page-check.
  * Exit code 0 without findings, 1 when a page has a finding or could not be checked (error), 2 when the run could not
  * start (usage, no pages, sitemap not readable, no browser); then --out is not written.
  */
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { join } from 'node:path';
+import { join, resolve as absolute } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 
@@ -45,6 +51,7 @@ const { values: opt, positionals } = parseArgs( {
 		out: { type: 'string', default: 'check-pages.json' },
 		shots: { type: 'string' },
 		'all-shots': { type: 'boolean', default: false },
+		modules: { type: 'string' },
 	},
 } );
 
@@ -59,7 +66,7 @@ if ( ! opt.site || ! URL.canParse( opt.site ) || ( opt.old && ! URL.canParse( op
 rmSync( opt.out, { force: true } );
 
 const resolve = ( name ) => {
-	for ( const base of [ join( process.cwd(), 'package.json' ), import.meta.url ] ) {
+	for ( const base of [ ...( opt.modules ? [ join( absolute( opt.modules ), 'package.json' ) ] : [] ), join( process.cwd(), 'package.json' ), import.meta.url ] ) {
 		try {
 			return createRequire( base ).resolve( name );
 		} catch {}
@@ -69,7 +76,7 @@ const resolve = ( name ) => {
 const playwright = resolve( 'playwright' ) ?? resolve( '@playwright/test' );
 const axePath = resolve( 'axe-core/axe.min.js' );
 if ( ! playwright || ! axePath ) {
-	fail( 'Needs playwright and axe-core: npm install --no-save playwright axe-core && npx playwright install chromium' );
+	fail( 'Needs playwright and axe-core: mkdir -p tmp/page-check && cd tmp/page-check && npm init -y && npm install playwright axe-core && npx playwright install chromium, then --modules tmp/page-check' );
 }
 const loaded = await import( pathToFileURL( playwright ).href );
 const { chromium } = loaded.chromium ? loaded : loaded.default;
@@ -160,8 +167,9 @@ function layout( { squeeze } ) {
 		for ( const el of document.querySelectorAll( 'main p, main li, main h1, main h2, main h3, main h4, main h5, main h6' ) ) {
 			const text = el.innerText.trim();
 			const r = el.getBoundingClientRect();
-			// Only text blocks with enough text to wrap; a list item holding blocks is checked through them.
-			if ( text.length < 40 || ! r.width || el.querySelector( block ) || el.closest( 'nav, [hidden], [aria-hidden="true"]' ) ) {
+			// Only text blocks with enough text to wrap; a list item holding blocks is checked through them. A form field
+			// is no text column: the text of a select counts all its options, a label sits above its input.
+			if ( text.length < 40 || ! r.width || el.querySelector( block ) || el.querySelector( 'input:not([type="hidden"]), select, textarea' ) || el.closest( 'nav, [hidden], [aria-hidden="true"]' ) ) {
 				continue;
 			}
 			const style = getComputedStyle( el );
@@ -175,8 +183,10 @@ function layout( { squeeze } ) {
 			const wraps = lineCount - text.split( '\n' ).length;
 			// The last line of a paragraph is short; count it as half a line.
 			const perLine = text.replace( /\n/g, '' ).length / Math.max( 1, lineCount - 0.5 );
-			// Headings run large, so for them only the width counts.
-			if ( ch < 20 || ( wraps >= 2 && perLine < 25 && ! /^H\d$/.test( el.tagName ) ) ) {
+			// Headings run large: a display heading has 15 ch in a wide hero and a card title 16 characters per line in a
+			// column of four, both as designed. A heading counts when it breaks after almost every word.
+			const squeezed = /^H\d$/.test( el.tagName ) ? wraps >= 2 && perLine < 12 : ch < 20 || ( wraps >= 2 && perLine < 25 );
+			if ( squeezed ) {
 				result.squeezed.push( `${ name( el ) } ${ Math.round( r.width ) }px ${ Math.round( ch ) }ch, ${ Math.round( perLine ) } chars per line: ${ text.slice( 0, 50 ).replace( /\s+/g, ' ' ) }` );
 			}
 		}
@@ -184,15 +194,48 @@ function layout( { squeeze } ) {
 	return result;
 }
 
-// Runs in the page: words and links of the content area, with every details block open (answers of a FAQ count).
+// Runs in the page: words and links of the content area, with every details block open (answers of a FAQ count) and
+// every tab panel shown (product tabs such as reviews and additional information). parts: addresses of the other parts
+// of a post split with core/nextpage.
 function content( selector ) {
 	document.querySelectorAll( 'details' ).forEach( ( details ) => ( details.open = true ) );
+	document.querySelectorAll( '[role="tabpanel"]' ).forEach( ( panel ) => {
+		panel.hidden = false;
+		panel.style.setProperty( 'display', 'block', 'important' );
+	} );
 	const root = selector.split( ',' ).map( ( s ) => document.querySelector( s.trim() ) ).find( Boolean ) ?? document.body;
 	return {
 		text: root.innerText,
 		links: [ ...root.querySelectorAll( 'a[href]' ) ].map( ( a ) => a.href ),
+		parts: [ ...new Set( [ ...document.querySelectorAll( 'a.post-page-numbers[href]' ) ].map( ( a ) => a.href.split( '#' )[ 0 ] ) ) ],
 	};
 }
+
+// Text and links of a page with all its parts: each further part loads once in its own tab, without images and fonts
+// (prepare). A part that does not load goes to failed, its text does not count.
+async function allParts( context, page, selector, prepare ) {
+	const first = { ...( await page.evaluate( content, selector ) ), failed: [] };
+	for ( const part of first.parts.filter( ( href ) => href !== page.url().split( '#' )[ 0 ] ) ) {
+		const tab = await context.newPage();
+		await prepare( tab );
+		try {
+			const response = await tab.goto( part, { waitUntil: 'domcontentloaded', timeout: 60000 } );
+			if ( ! response?.ok() ) {
+				throw new Error( String( response?.status() ) );
+			}
+			const more = await tab.evaluate( content, selector );
+			first.text += `\n${ more.text }`;
+			first.links.push( ...more.links );
+		} catch ( error ) {
+			first.failed.push( `${ error.message.split( '\n' )[ 0 ] } ${ part }: part not compared` );
+		}
+		await tab.close();
+	}
+	return first;
+}
+
+// Images, fonts and media of a page whose text alone counts.
+const textOnly = ( tab ) => tab.route( /\.(png|jpe?g|gif|webp|avif|svg|woff2?|ttf|mp4|webm)(\?|$)/i, ( route ) => route.abort() );
 
 const words = ( text ) => ( text.toLowerCase().match( /[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*/gu ) ?? [] );
 const count = ( list ) => list.reduce( ( map, w ) => map.set( w, ( map.get( w ) ?? 0 ) + 1 ), new Map() );
@@ -261,8 +304,10 @@ async function check( { url, old } ) {
 			}
 		}
 		// Text checks last, at 1440 and with every details block open: text hidden on phones or in closed details counts.
+		// content() leaves details and tab panels open, so screenshots must stay before this point.
 		await page.setViewportSize( { width: 1440, height: 900 } );
-		const mine = await page.evaluate( content, 'main, body' );
+		const mine = await allParts( context, page, 'main, body', textOnly );
+		add( 'parts', mine.failed );
 		const facts = await page.evaluate( () => ( {
 			h1: document.querySelectorAll( 'h1' ).length,
 			broken: [ ...document.images ].filter( ( img ) => img.complete && img.currentSrc && ! img.naturalWidth ).map( ( img ) => img.currentSrc ),
@@ -274,18 +319,28 @@ async function check( { url, old } ) {
 		add( 'foreignHosts', [ ...foreign ] );
 		if ( old ) {
 			const oldPage = await context.newPage();
-			await oldPage.route( /\.(png|jpe?g|gif|webp|avif|svg|woff2?|ttf|mp4|webm)(\?|$)/i, ( route ) => route.abort() );
-			const oldResponse = await oldPage.goto( old, { waitUntil: 'domcontentloaded', timeout: 60000 } );
-			if ( ! oldResponse?.ok() ) {
-				add( 'old', [ `${ oldResponse?.status() } ${ old }: not compared` ] );
+			await textOnly( oldPage );
+			// An old site that does not answer is a note about the old site, not an error of the new page.
+			const oldResponse = await oldPage.goto( old, { waitUntil: 'domcontentloaded', timeout: 60000 } ).catch( ( error ) => ( { failed: error.message.split( '\n' )[ 0 ] } ) );
+			if ( oldResponse?.failed || ! oldResponse?.ok() ) {
+				add( 'old', [ `${ oldResponse?.failed ?? oldResponse?.status() } ${ old }: not compared` ] );
 			} else {
-				const theirs = await oldPage.evaluate( content, opt[ 'old-selector' ] );
+				const theirs = await allParts( context, oldPage, opt[ 'old-selector' ], textOnly );
+				add( 'old', theirs.failed );
 				const have = count( words( mine.text ) );
 				const missing = [ ...count( words( theirs.text ) ) ].filter( ( [ w, n ] ) => ( have.get( w ) ?? 0 ) < n ).map( ( [ w, n ] ) => `${ w } ${ n - ( have.get( w ) ?? 0 ) }x` );
 				const hosts = [ site.hostname, new URL( old ).hostname ];
 				const links = new Set( mine.links.map( ( href ) => linkKey( href, hosts ) ) );
 				add( 'words', missing );
-				add( 'links', [ ...new Set( theirs.links.map( ( href ) => linkKey( href, hosts ) ) ) ].filter( ( key ) => ! links.has( key ) ) );
+				// A link of the old page to an address on the old site that redirects counts as its destination (an old slug).
+				// The requests run side by side, so many old slugs cost one timeout at most.
+				const keys = await Promise.all( [ ...new Map( theirs.links.map( ( href ) => [ linkKey( href, hosts ), href ] ) ) ].map( async ( [ key, href ] ) => {
+					if ( links.has( key ) || new URL( href ).hostname !== new URL( old ).hostname ) {
+						return key;
+					}
+					return linkKey( await context.request.head( href, { timeout: 15000 } ).then( ( r ) => r.url() ).catch( () => href ), hosts );
+				} ) );
+				add( 'links', [ ...new Set( keys.filter( ( key ) => ! links.has( key ) ) ) ] );
 			}
 		}
 		if ( opt.shots && ( opt[ 'all-shots' ] || Object.keys( result.findings ).length ) ) {
