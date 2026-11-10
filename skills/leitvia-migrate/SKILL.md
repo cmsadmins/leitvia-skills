@@ -44,7 +44,7 @@ Do this while the classic theme is still active: after the switch its menus, wid
 - **Content per post:** `leitvia/get-page-outline` shows classic content as one block `p:0` (`core/freeform`). `leitvia/get-block` with `block: "p:0"` returns the raw `post_content` in `inner_html` (shortcodes unrendered, no paragraphs added) and in `attachments` the `id` and `url` of each image of the site in it. The public page shows what shortcodes render.
 - **Menus:** read the navigation of the public pages, usually `<nav>` in the header with nested `<ul>`: label, target and level of each item. Note menus in the footer or sidebar separately.
 - **Widgets:** text, links and images in sidebars and footer areas of the public pages. List them; they move only where the person says (step 6).
-- **Shop:** names of product attributes ([keep them](references/shop.md#product-attributes)).
+- **Shop:** names of product attributes ([keep them](references/shop.md#product-attributes)) and the reviews of each product with their stars ([carry them over](references/shop.md#reviews)).
 - **Brand:** site title, logo (`img.custom-logo`), colors the Customizer prints into the page (`body.custom-background`, header text color, link and button colors in the theme stylesheet), fonts. Write down the values with their use.
 - **Things this skill does not move:** shortcodes, forms and blocks of other plugins, page builders, ACF blocks, custom post types without an editor. List each with the posts that use it.
 

@@ -1,8 +1,8 @@
 # Leitvia agent handbook
 
-Generated from Leitvia Studio 1.3.37. Do not edit.
+Generated from Leitvia Studio 1.3.38. Do not edit.
 
-Everything an agent needs to work on a WordPress site with Leitvia Studio through its 55 abilities. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call.
+Everything an agent needs to work on a WordPress site with Leitvia Studio through its 57 abilities. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call.
 
 ## Access over MCP and REST
 
@@ -131,6 +131,7 @@ Read abilities change nothing. Call them first: they return the IDs, block IDs a
 | [`leitvia/list-packages`](abilities/leitvia-list-packages.md) | GET | Lists your change packages, newest first: ID, title, key, state, operations per status and a preview link. |
 | [`leitvia/list-patterns`](abilities/leitvia-list-patterns.md) | GET | Lists the patterns of the theme, of Leitvia Studio and of its add-ons with composition metadata, image slots, when to use and avoid them, lab status and the replacement of deprecated ones, followed by the Lab patterns with their lab status, version and document hash, and the composition of the theme pattern they vary. |
 | [`leitvia/list-product-attributes`](abilities/leitvia-list-product-attributes.md) | GET | Lists the global product attributes with their values and hash. |
+| [`leitvia/list-product-reviews`](abilities/leitvia-list-product-reviews.md) | GET | Lists product reviews with rating and hash, 20 per page, oldest first; per review ID, product, author name, date, text, rating, verified owner and status. |
 | [`leitvia/list-products`](abilities/leitvia-list-products.md) | GET | Lists the products of the shop, 20 per page, with title, type, status, price, stock status, featured flag and hash, plus all product categories with their hash. |
 | [`leitvia/list-recipes`](abilities/leitvia-list-recipes.md) | GET | Lists the site recipes of Leitvia Studio and its add-ons with owner, pages and whether the plugins they require are active. |
 | [`leitvia/plan-page`](abilities/leitvia-plan-page.md) | GET | Proposes a page for a goal and content points: page frame, template, the patterns in page order with role, slot, text lengths and the points each section carries, and the composition score. |
@@ -186,4 +187,5 @@ Texts, links, alt text, deprecated patterns, products and change packages of exi
 | [`leitvia/update-product`](abilities/leitvia-update-product.md) | POST | Updates texts, status, images, categories and tags of one product or variation, and its prices, tax and shipping class. |
 | [`leitvia/update-product-attribute`](abilities/leitvia-update-product-attribute.md) | POST | Renames a global product attribute and its values and sorts the values, in one operation. |
 | [`leitvia/update-product-category`](abilities/leitvia-update-product-category.md) | POST | Updates name, description, parent and image of a product category, or name and description of a product tag. |
+| [`leitvia/update-product-review`](abilities/leitvia-update-product-review.md) | POST | Sets rating, verified flag or status of a product review. |
 | [`leitvia/update-seo`](abilities/leitvia-update-seo.md) | POST | Writes SEO title, meta description and robots of one post through the active SEO plugin. |

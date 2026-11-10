@@ -9,7 +9,7 @@
 	"mode": "package",
 	"unattended": true,
 	"budget": {
-		"tokens": 10050,
+		"tokens": 10300,
 		"files": [
 			"handbook/abilities/leitvia-list-products.md",
 			"handbook/abilities/leitvia-get-product.md",
