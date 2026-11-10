@@ -12,7 +12,7 @@ Read before the first call: the [agent handbook](../../handbook/README.md) (acce
 
 ## Access
 
-MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Paths start at the address of the site, not at the host. Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read: the abilities give you every ID, hash and status you need. Reading public pages of the site is fine. Where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after each write.
+MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read. Reading public pages of the site is fine. Where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after each write.
 
 If every write ends with 403 and the abilities answer 404, Leitvia Studio is not active. The role stores no capability, so without Studio the agent can change nothing on the site. Tell the person and stop; do not try core routes. The password works again once a person activates Studio. After Studio was deleted the password is gone and a person creates a new one.
 
@@ -30,7 +30,7 @@ Corrections (links, alt text) belong to the area `corrections`, which is `autono
 - **Only what a write brings counts.** Every write runs the content checks over the full post, but findings the post already had (a skipped heading level, an image without alt text elsewhere) do not block it. A write that adds a finding or makes one worse is rejected with `leitvia_check_failed` and names it.
 - A rejection is corrected at most once, following `message`, `next_ability` and `retry`. If the second call is rejected too, or `retry` is `never`, stop and tell the person.
 - **Facts are never guessed.** Organization data, prices, legal texts, figures, quotes and people come only from a source you can name: the person, a page of the site or a read ability, with the source in your report. Without one, stop at a checkpoint; never write a placeholder that looks like a fact.
-- Never change prices, legal texts or organization data on your own. The pipeline holds the content kinds `prices`, `legal` and `organization` for a person anyway.
+- Never change prices, legal texts or organization data on your own.
 - Never write review notes or HTML comments into content. Open questions go into the report.
 
 ## Steps
@@ -46,6 +46,7 @@ Sort the findings by area. `check` holds the name of the check with the prefix `
 | `broken-link` | internal links | `leitvia/repair-links` |
 | `alt-text` | alt text | `leitvia/set-alt-text` |
 | `link-text` | link texts and `#` links | `leitvia/update-block` (one link), `leitvia/update-content` (several texts) |
+| `empty-link` | links without target outside the content | part: `leitvia/update-template-part`, else report |
 | `deprecated-pattern` | sections | `leitvia/replace-pattern` |
 | `headings`, `page-structure` | structure | skill `leitvia-a11y` |
 | `content-tokens`, `token-drift`, `content-contrast` | design | skill `leitvia-design` or a person |
@@ -56,7 +57,7 @@ Sort the findings by area. `check` holds the name of the check with the prefix `
 
 ### 2. Broken links
 
-One `leitvia/repair-links` call per post, with `auto: true` for renamed posts and `from`/`to` pairs whose `to` you checked on the public site (200, the page the link text names). Header, footer and navigation are not in the audit: check their links on the public pages and report them. Details: [broken links](references/fixes.md#broken-links).
+One `leitvia/repair-links` call per post, with `auto: true` for renamed posts and `from`/`to` pairs whose `to` you checked on the public site (200, the page the link text names). The audit checks no internal links of header, footer and navigation: check them on the public pages and report them. Details: [broken links](references/fixes.md#broken-links).
 
 ### 3. Alt text
 

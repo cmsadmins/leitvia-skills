@@ -8,11 +8,11 @@ compatibility: Needs a site with the theme Leitvia, the plugin Leitvia Studio an
 
 Product care takes a shop that already sells and makes its catalog clearer: better texts, described images, tidy categories, products that lead to each other. You change the shop only through the abilities of Leitvia Studio; a person decides on prices and applies the package.
 
-Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [list-products](../../handbook/abilities/leitvia-list-products.md), [get-product](../../handbook/abilities/leitvia-get-product.md), [update-product](../../handbook/abilities/leitvia-update-product.md), [update-product-category](../../handbook/abilities/leitvia-update-product-category.md), [set-merchandising](../../handbook/abilities/leitvia-set-merchandising.md), [create-product](../../handbook/abilities/leitvia-create-product.md), [add-media](../../handbook/abilities/leitvia-add-media.md), [set-alt-text](../../handbook/abilities/leitvia-set-alt-text.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md), [get-package](../../handbook/abilities/leitvia-get-package.md).
+Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [list-products](../../handbook/abilities/leitvia-list-products.md), [get-product](../../handbook/abilities/leitvia-get-product.md), [update-product](../../handbook/abilities/leitvia-update-product.md), [update-product-category](../../handbook/abilities/leitvia-update-product-category.md), [set-merchandising](../../handbook/abilities/leitvia-set-merchandising.md), [list-product-attributes](../../handbook/abilities/leitvia-list-product-attributes.md), [update-product-attribute](../../handbook/abilities/leitvia-update-product-attribute.md), [create-product](../../handbook/abilities/leitvia-create-product.md), [add-media](../../handbook/abilities/leitvia-add-media.md), [set-alt-text](../../handbook/abilities/leitvia-set-alt-text.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md), [get-package](../../handbook/abilities/leitvia-get-package.md).
 
 ## Access
 
-MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Paths start at the address of the site, not at the host. Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI, the REST routes of WordPress core (`/wp-json/wp/v2/...`) or of WooCommerce (`/wp-json/wc/...`), not even to read. Reading public pages of the shop is fine. The product abilities exist only while WooCommerce is active; when `leitvia/list-products` is unknown, stop and tell the person.
+MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI, the REST routes of WordPress core (`/wp-json/wp/v2/...`) or of WooCommerce (`/wp-json/wc/...`), not even to read. Reading public pages of the shop is fine. The product abilities exist only while WooCommerce is active; when `leitvia/list-products` is unknown, stop and tell the person.
 
 ## Modes
 
@@ -34,7 +34,7 @@ MCP server `leitvia` or the REST routes of the Abilities API, as the agent user 
 
 ### 1. Read the catalog
 
-`leitvia/list-products` returns 20 products per page with `id`, `title`, `type`, `status`, `price`, `stock_status`, `featured` and `hash`, plus `categories` with their hash; page with `page` up to `pages`, or filter with `category` or `search`. Drafts are listed too. Then `leitvia/get-product` for each product you touch: texts, `images` with `alt`, `categories` and `tags` with their hash, `attributes`, `price` (read only), `upsells`, `cross_sells`, `variations` and `hash`.
+`leitvia/list-products` returns 20 products per page with their `hash`, plus `categories`; page with `page` up to `pages`, filter with `category` or `search`. Drafts are listed too. Then `leitvia/get-product` for each product you touch: texts, `images` with `alt`, `categories` and `tags` with their hash, `attributes`, `price` (read only), `upsells`, `cross_sells`, `variations` and `hash`.
 
 A variable product lists the IDs of its variations; read each with `leitvia/get-product`. Of the product data a variation takes only image, prices, tax class and shipping class; gallery, categories, tags, tax status and merchandising belong to its parent.
 
@@ -44,7 +44,7 @@ List per product what you change and the source of each fact. Checkpoint **Plan 
 
 ### 3. Texts and status
 
-`leitvia/update-product` with `title`, `short_description` and `description`, all changes of one product in one call. Plain text becomes paragraph blocks (a blank line starts one); send block markup for lists or headings. Keep the short description to the point of the product (what it is, for whom, the one fact that decides); details go into the description. Change `status` only when the person asks; `publish` makes a draft visible to buyers.
+`leitvia/update-product` with `title`, `short_description` and `description`, all changes of one product in one call. Plain text becomes paragraph blocks (a blank line starts one); send block markup for lists or headings. Keep the short description to the point of the product (what it is, for whom, the one fact that decides); details go into the description. The product page shows it as it is (lists stay lists), without one nothing. Change `status` only when the person asks; `publish` makes a draft visible to buyers.
 
 ### 4. Images
 
@@ -52,19 +52,20 @@ A product image needs alt text that says what the picture shows; product images 
 
 More than three images, or a newsletter sign-up: [shop pages](references/shop-pages.md).
 
-### 5. Categories and tags
+### 5. Categories, tags and attributes
 
 - Assign: `categories` and `tags` of `leitvia/update-product` take term IDs and replace the current lists; send the full list.
 - Change a term: `leitvia/update-product-category` with `term` and the term `hash` changes `name`, `description` and, for categories, `parent` (0 for top level) and `image` (with alt text, 0 to remove). Tags have neither. The slug stays, so links keep working.
 - A new category comes only with `leitvia/create-product`, as a name in `categories`; an empty category is a task for the person.
+- Global attributes (colour, size): `leitvia/update-product-attribute` renames values and sets the `order`; a new attribute name or `order_by` goes into a package.
 
 ### 6. Merchandising
 
-`leitvia/set-merchandising` sets `featured`, `upsells`, `cross_sells` (other products of the shop, up to 20) and `menu_order` of one product. The lists replace the current ones: start from `upsells` and `cross_sells` of `leitvia/get-product`. Upsells are a better or bigger version of the product, cross-sells what goes with it in the cart. Pick them from the catalog and say why; which products to feature comes from the person.
+`leitvia/set-merchandising` sets `featured`, `upsells`, `cross_sells` (other products of the shop, up to 20) and `menu_order` of one product. The lists replace the current ones: start from `upsells` and `cross_sells` of `leitvia/get-product`. Upsells are a better or bigger version of the product, cross-sells what goes with it in the cart. The product page shows eight upsells at most, by title. Pick them from the catalog and say why; which products to feature comes from the person.
 
 ### 7. New products
 
-`leitvia/create-product` creates a simple product with empty `base_hash`: texts, `sku`, `stock`, `categories` and an `image` with alt text. Prices, SKUs and stock come from the person; a product with a price waits for a person. Variable products, attributes and stock changes of existing products are not in the abilities: the person makes them in WooCommerce.
+`leitvia/create-product` creates a simple product with empty `base_hash`: texts, `sku`, `stock`, `categories` and an `image` with alt text. Prices, SKUs and stock come from the person; a product with a price waits for a person. Variable products, new attributes or values and stock changes of existing products are not in the abilities: the person makes them in WooCommerce.
 
 ### 8. The package
 

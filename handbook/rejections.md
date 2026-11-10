@@ -1,6 +1,6 @@
 # Rejections
 
-Generated from Leitvia Studio 1.3.36. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
+Generated from Leitvia Studio 1.3.37. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
 
 Every rejection of Leitvia Studio with its retry rule and next ability. Messages with `%s` or `%d` get a value at run time; codes with several rows come from several places.
 
@@ -12,6 +12,7 @@ Every rejection of Leitvia Studio with its retry rule and next ability. Messages
 | `leitvia_ai_not_approved` | 503 | `never` | set at run time | The AI provider could not be reached, or an administrator has not approved this request for the connector yet. When the AI plugin is active, an administrator approves pending connector requests under Tools, Connector Approvals; until then, call again with ai set to false. |
 | `leitvia_ai_timeout` | 504 | `once` | set at run time | The AI provider did not answer within %d seconds. Try once more, or call again with ai set to false. |
 | `leitvia_ai_unavailable` | 424 | `never` | set at run time | AI is not available on this site: it needs WordPress with the AI client, AI switched on and a connector with a text model set up by an administrator under Settings, Connectors. Call again with ai set to false for a plan without AI. |
+| `leitvia_attributes_lost` | 422 | `once` | none | Saving would drop attributes of these blocks, so nothing was changed. Send each block comment with its attributes as valid JSON, as serialize_block() writes it. |
 | `leitvia_check_failed` | 422 | `once` | `leitvia/set-alt-text` | A product image needs alt text that describes it. Set it with leitvia/set-alt-text and try again. |
 | `leitvia_check_failed` | 422 | `once` | set at run time | Checks found problems. Fix them as each finding suggests and try again. |
 | `leitvia_check_failed` | 422 | `once` | none | Checks found problems. Fix them as each finding suggests and try again. |
@@ -39,7 +40,7 @@ Every rejection of Leitvia Studio with its retry rule and next ability. Messages
 | `leitvia_foreign_host` | 422 | `once` | none | Media from other hosts is not fetched. Send the file as Base64 data instead. |
 | `leitvia_import_conflict` | 409 | `never` | none | Targets changed on this site since the package was made. Nothing was imported; compare and export again. |
 | `leitvia_invalid_input` | 422 | `once` | set at run time | Built at run time; read the message. |
-| `leitvia_invalid_input` | 422 | `never` | none | No link needs or allows a repair. The report lists external links and internal links that could not be resolved. |
+| `leitvia_invalid_input` | 422 | `never` | none | No link needs or allows a repair. The report lists external links, internal links that could not be resolved and links that lead nowhere. |
 | `leitvia_invalid_input` | 400 | `once` | `leitvia/list-patterns` | Pass pattern slugs, or a post whose sections come from patterns. |
 | `leitvia_invalid_input` | 400 | `once` | `leitvia/get-contract` | The contract has no page frame of this type. |
 | `leitvia_invalid_input` | 422 | `never` | none | The value is not valid for this option. |

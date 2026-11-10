@@ -1,18 +1,18 @@
 # Leitvia agent handbook
 
-Generated from Leitvia Studio 1.3.36. Do not edit.
+Generated from Leitvia Studio 1.3.37. Do not edit.
 
-Everything an agent needs to work on a WordPress site with Leitvia Studio through its 53 abilities. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call.
+Everything an agent needs to work on a WordPress site with Leitvia Studio through its 55 abilities. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call.
 
 ## Access over MCP and REST
 
 Sign in as a WordPress user that may edit posts, with an application password (HTTP Basic auth). Use a user of its own for the agent; every call is logged under that user.
 
-**Which site.** Every path below starts at the address of the site, not at the host. A site of a multisite network in a subdirectory has a path: on `https://example.org/club/` the MCP server is `https://example.org/club/wp-json/leitvia-studio/v1/mcp`, and `/wp-json/` straight after the host reaches another site of the network. Call `leitvia/get-contract` first: `site.url` is the address of the site the connection works on and `site.rest` its REST base. Compare `site.url` with the address of your task before the first write and stop when they differ. An application password that Leitvia Studio created in a network works on its own site only; another site answers 401.
+**Which site.** Every path below starts at the address of the site, not at the host. A site of a multisite network in a subdirectory has a path: on `https://example.org/club/` the MCP server is `https://example.org/club/wp-json/leitvia-studio/v1/mcp`, and `/wp-json/` straight after the host reaches another site of the network. Call `leitvia/get-contract` first and compare `site.url` (the site the connection works on; `site.rest` is its REST base) with the address of your task; stop when they differ. An application password that Leitvia Studio created in a network works on its own site only; another site answers 401.
 
-**MCP.** The server `leitvia` answers at `POST /wp-json/leitvia-studio/v1/mcp` when the plugin MCP Adapter 0.7 is active. Send `initialize` first; its response carries the header `Mcp-Session-Id`. Every further request sends that header and `MCP-Protocol-Version` (for example `2025-06-18`), otherwise the server answers with 400. `tools/list` lists the abilities; a tool is named like its ability with a hyphen in place of the slash (`leitvia-get-contract` for `leitvia/get-contract`). `tools/call` takes the input of the ability as `arguments`. A rejection comes back as a tool result with `isError` true whose text is JSON with `code`, `message` and `data`.
+**MCP.** The server `leitvia` answers at `POST /wp-json/leitvia-studio/v1/mcp` when the plugin MCP Adapter 0.7 is active. Send `initialize` first; its response carries the header `Mcp-Session-Id`. Every further request sends that header and `MCP-Protocol-Version` (for example `2025-06-18`), otherwise the server answers with 400. `tools/list` lists the abilities, named with a hyphen for the slash (`leitvia-get-contract`). `tools/call` takes the input of the ability as `arguments`. A rejection comes back as a tool result with `isError` true whose text is JSON with `code`, `message` and `data`.
 
-**REST.** Every ability runs at `/wp-json/wp-abilities/v1/abilities/<name>/run`, for example `/wp-json/wp-abilities/v1/abilities/leitvia/get-contract/run`. The HTTP method follows the annotations: read only abilities take GET, abilities that are destructive and idempotent take DELETE, all others POST. GET and DELETE send the input as query arguments (`?input[post]=12`, lists as `input[upsells][]=4&input[upsells][]=7`), POST sends it as JSON body `{"input": {…}}`. A rejection is an error response with `code`, `message` and `data`; the HTTP status is `data.status`.
+**REST.** Every ability runs at `/wp-json/wp-abilities/v1/abilities/<name>/run`. The HTTP method follows the annotations: read only abilities take GET, abilities that are destructive and idempotent take DELETE, all others POST. GET and DELETE send the input as query arguments (`?input[post]=12`, lists as `input[upsells][]=4&input[upsells][]=7`), POST sends it as JSON body `{"input": {…}}`. A rejection is an error response with `code`, `message` and `data`; the HTTP status is `data.status`.
 
 ## Read before write
 
@@ -26,7 +26,7 @@ Every write ability requires `base_hash`: the hash of the target as you last rea
 
 - A new object (a new page, pattern, token set or image) has no hash: send an empty `base_hash`.
 - A post, page, attachment, navigation menu or template part: `hash` of `leitvia/get-page-outline`, which is also `document_hash` of `leitvia/get-block`. Block hashes are for comparing blocks; `base_hash` is always the hash of the whole document.
-- A product: `hash` of `leitvia/get-product` or `leitvia/list-products`. A product category or tag: the hash of the term from the same abilities.
+- A product, product category or tag: its `hash` from `leitvia/get-product` or `leitvia/list-products`; an attribute: from `leitvia/list-product-attributes`.
 - Targets no read ability returns a hash for (global styles, the content model, a menu, template part or template whose ID you do not know): send an empty `base_hash`, take `current_hash` from the rejection `leitvia_stale_hash` and repeat the call once with it.
 
 The result of a write carries the new `hash`; use it as `base_hash` of the next change of the same target.
@@ -37,7 +37,7 @@ Most write abilities return the result of the pipeline:
 
 | Field | Meaning |
 |---|---|
-| `mode` | `live` (written and visible), `draft` (written as a draft), `package` (stored in a change package for a person), `unchanged` (the target already had this state; nothing was written or stored) |
+| `mode` | `live` (written and visible), `draft` (written as a draft), `package` (stored in a change package for a person), `unchanged` (nothing to write) |
 | `level` | autonomy level that applied |
 | `kinds` | content kinds the change touches |
 | `target` | the object, for example `{"post": 12}` |
@@ -46,7 +46,7 @@ Most write abilities return the result of the pipeline:
 | `snapshot` | ID of the snapshot a rollback restores, 0 for none |
 | `findings` | warnings of the checks; errors reject the write. Only findings the write brings or makes worse count |
 | `report` | further data of some abilities |
-| `slug_changed` | only when the slug you sent is taken or reserved: `requested` and the `slug` the address gets, on publishing at the latest. Tell the person and link to the real address |
+| `slug_changed` | only when the slug you sent is taken or reserved: `requested` and the `slug` the address gets. Tell the person |
 
 ## Autonomy levels and content kinds
 
@@ -68,7 +68,7 @@ Default levels per area (profile standard; the site owner can change them):
 | `structure` | `draft` | Content model, navigation, Lab patterns and sections of pages. |
 | `design` | `suggest` | Token sets, global styles and template parts. |
 | `admin` | `locked` | Plugins, users and settings. Always locked. |
-| `products` | `draft` | Products, product categories and tags of the shop. |
+| `products` | `draft` | Products, product categories, tags and attributes of the shop. |
 
 Some content kinds lower the level to at most `suggest`, whatever the area allows, unless a person unlocked the kind in the settings. The result lists them in `kinds`.
 
@@ -85,13 +85,13 @@ Changes of site options land in a change package unless the user may manage opti
 
 ## Mode package
 
-Every write ability takes `package`, a key of the task of at most 64 characters. A write with a key always ends up in the change package of that key, even where the level of its area would let it go live; the result returns the package ID in `package`, and a person reviews and applies the package in the inbox of Leitvia Studio. Send the same key on every write of one task, for example `homepage-2026-10`, so the person gets one package instead of many. Without a key the levels decide, and every write they hold back gets a package of its own. The same change sent twice is stored once. Several writes of one task to the same post, option or term build on each other: send the hash you read as usual; the later write changes the target as the earlier ones in the package left it and always waits in the package, and applying writes them in order.
+Every write ability takes `package`, a key of the task (up to 64 characters). A write with a key always lands in the change package of that key, even where its level would let it go live; the result returns the package ID, and a person applies the package in the inbox of Leitvia Studio. Send the same key on every write of one task, for example `homepage-2026-10`, so the person gets one package instead of many. Without a key the levels decide, and every write they hold back gets a package of its own. The same change sent twice is stored once. Several writes of one task to the same target build on each other in the package (send the hash you read) and are applied in order.
 
 `leitvia/list-packages` lists your packages, `leitvia/get-package` shows the diff per operation. Agents may apply (`leitvia/apply-package`) and roll back (`leitvia/rollback`) only operations whose level is `autonomous`; everything else is `leitvia_needs_human` and waits for a person.
 
 ## Rejections
 
-A rejection carries `code`, a `message` that says how to fix it, and `data` with `status` (HTTP), `reason`, `target`, `next_ability` (the ability to call next, empty for none) and `retry`, plus details such as `current_hash` or `findings` where they apply.
+A rejection carries `code`, a `message` that says how to fix it, and `data` with `status` (HTTP), `reason`, `target`, `next_ability` (empty for none) and `retry`, plus details such as `current_hash` or `findings`.
 
 | Retry | What the agent does |
 |---|---|
@@ -103,7 +103,7 @@ All rejections with their messages: [rejections.md](rejections.md).
 
 ## Abilities
 
-Each ability has a page with its inputs and output, named after its MCP tool, for example [`abilities/leitvia-get-contract.md`](abilities/leitvia-get-contract.md). Read the pages of the abilities you call, not all of them.
+Each ability has a page with its inputs and output, named after its MCP tool, for example [`abilities/leitvia-get-contract.md`](abilities/leitvia-get-contract.md). Read only those you call.
 
 ### Read
 
@@ -130,6 +130,7 @@ Read abilities change nothing. Call them first: they return the IDs, block IDs a
 | [`leitvia/list-media`](abilities/leitvia-list-media.md) | GET | Lists the media library, newest first: ID, URL, file name, MIME type, file size in bytes, alt text, width, height and hash. |
 | [`leitvia/list-packages`](abilities/leitvia-list-packages.md) | GET | Lists your change packages, newest first: ID, title, key, state, operations per status and a preview link. |
 | [`leitvia/list-patterns`](abilities/leitvia-list-patterns.md) | GET | Lists the patterns of the theme, of Leitvia Studio and of its add-ons with composition metadata, image slots, when to use and avoid them, lab status and the replacement of deprecated ones, followed by the Lab patterns with their lab status, version and document hash, and the composition of the theme pattern they vary. |
+| [`leitvia/list-product-attributes`](abilities/leitvia-list-product-attributes.md) | GET | Lists the global product attributes with their values and hash. |
 | [`leitvia/list-products`](abilities/leitvia-list-products.md) | GET | Lists the products of the shop, 20 per page, with title, type, status, price, stock status, featured flag and hash, plus all product categories with their hash. |
 | [`leitvia/list-recipes`](abilities/leitvia-list-recipes.md) | GET | Lists the site recipes of Leitvia Studio and its add-ons with owner, pages and whether the plugins they require are active. |
 | [`leitvia/plan-page`](abilities/leitvia-plan-page.md) | GET | Proposes a page for a goal and content points: page frame, template, the patterns in page order with role, slot, text lengths and the points each section carries, and the composition score. |
@@ -183,5 +184,6 @@ Texts, links, alt text, deprecated patterns, products and change packages of exi
 | [`leitvia/set-merchandising`](abilities/leitvia-set-merchandising.md) | POST | Sets the featured flag, the upsells, the cross-sells and the sort order of one product. |
 | [`leitvia/update-content`](abilities/leitvia-update-content.md) | POST | Updates title, excerpt, slug, date, status, author, terms, fields, featured image, comment status and the texts and button links of several blocks of one post in one operation, blocks found by their ID from the outline. |
 | [`leitvia/update-product`](abilities/leitvia-update-product.md) | POST | Updates texts, status, images, categories and tags of one product or variation, and its prices, tax and shipping class. |
+| [`leitvia/update-product-attribute`](abilities/leitvia-update-product-attribute.md) | POST | Renames a global product attribute and its values and sorts the values, in one operation. |
 | [`leitvia/update-product-category`](abilities/leitvia-update-product-category.md) | POST | Updates name, description, parent and image of a product category, or name and description of a product tag. |
 | [`leitvia/update-seo`](abilities/leitvia-update-seo.md) | POST | Writes SEO title, meta description and robots of one post through the active SEO plugin. |
