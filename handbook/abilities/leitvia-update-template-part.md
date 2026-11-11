@@ -1,14 +1,14 @@
 # leitvia/update-template-part
 
-Generated from Leitvia Studio 1.3.42. Do not edit. Group: Set up. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.43. Do not edit. Group: Set up. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
-**Update template part.** Replaces a template part of the contract, such as header, footer or sidebar, with a pattern made for its area or with changed block markup. Part names come from leitvia/get-contract; with Polylang \<part>-\<language> (header-de) is the part the theme shows for that language and is created in the area of its part. Patterns come from leitvia/list-patterns. The change publishes the part, a draft one too: core shows no draft part, so where the area level is draft it waits in a change package. The base hash is the hash of the template part. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash.
+**Update template part.** Replaces a template part of the contract, such as header, footer or sidebar, with a pattern made for its area or with changed block markup. Part names come from leitvia/get-contract; with Polylang \<part>-\<language> (header-de) is the part the theme shows for that language and is created in the area of its part. Patterns come from leitvia/list-patterns. The change publishes the part, a draft one too: core shows no draft part, so where the area level is draft it waits in a change package. The base hash is the hash of the template part. leitvia/get-contract returns it per part under hashes.templateParts.
 
 MCP tool `leitvia-update-template-part`, REST POST. Annotations: readonly false, destructive true, idempotent false.
 
 | Input | Type | Required | Description |
 |---|---|---|---|
-| `part` | string, pattern `^[a-z0-9-]+$` | yes |  |
+| `part` | string, pattern `^[a-z0-9-]+$` | yes | Name of a template part from leitvia/get-contract, such as header or footer. |
 | `pattern` | string |  |  |
 | `content` | string, min length `1` |  |  |
 | `base_hash` | string | yes | Hash of the target as last read; empty for a new object. |

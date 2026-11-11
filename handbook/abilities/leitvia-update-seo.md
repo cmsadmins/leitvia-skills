@@ -1,6 +1,6 @@
 # leitvia/update-seo
 
-Generated from Leitvia Studio 1.3.42. Do not edit. Group: Maintain. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.43. Do not edit. Group: Maintain. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **Update SEO data.** Writes SEO title, meta description and robots of one post through the active SEO plugin. The heading of the page stays. It covers posts, pages and entries in Yoast SEO, Rank Math, SEOPress or The SEO Framework; without an SEO plugin Leitvia Studio stores them and prints them in the head, the title as written, without the site name; with another SEO plugin it is rejected with leitvia_no_seo_plugin. Read the post with leitvia/get-seo first and send its hash as base_hash. A title has at most 60 characters, a description 50 to 160; an empty string hands the field back to the template of the plugin, without a plugin to what WordPress prints. Say only what the page says: every number in title or description must appear in the title, excerpt or content of the post. Autonomy and change packages work as for leitvia/update-content; a live write gets a change package for leitvia/rollback.
 
@@ -8,7 +8,7 @@ MCP tool `leitvia-update-seo`, REST POST. Annotations: readonly false, destructi
 
 | Input | Type | Required | Description |
 |---|---|---|---|
-| `post` | integer, min `1` | yes |  |
+| `post` | integer, min `1` | yes | Post ID from leitvia/list-content. |
 | `title` | string, max length `200` |  |  |
 | `description` | string, max length `500` |  |  |
 | `noindex` | boolean |  | Keep the page out of search results. false hands it back to the default of the plugin. |

@@ -1,16 +1,16 @@
 # leitvia/set-alt-text
 
-Generated from Leitvia Studio 1.3.42. Do not edit. Group: Maintain. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.43. Do not edit. Group: Maintain. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **Set alt text.** Sets the alt text of an image: without post and block on the attachment in the media library (base_hash of the attachment), with post and block on one image or cover block that shows it (base_hash of the post). leitvia/get-page-outline returns both hashes, for the attachment with its ID as post. Many images: items, one call and package. The alt text check applies.
 
-MCP tool `leitvia-set-alt-text`, REST POST. Annotations: readonly false, destructive false, idempotent false.
+MCP tool `leitvia-set-alt-text`, REST POST. Annotations: readonly false, destructive true, idempotent false.
 
 | Input | Type | Required | Description |
 |---|---|---|---|
 | `image` | integer, min `1` |  | Attachment ID of the image. |
-| `alt` | string, min length `1`, max length `500` |  |  |
-| `post` | integer, min `1` |  |  |
+| `alt` | string, min length `1`, max length `500` |  | Alt text that says what the image shows. |
+| `post` | integer, min `1` |  | Post ID from leitvia/list-content. |
 | `block` | string, min length `1`, max length `200` |  | Block ID or path ID of the image or cover block from the outline. |
 | `items` | array of object { image\*, alt\*, post, block, base_hash\* }, min items `1`, max items `100` |  |  |
 | `base_hash` | string |  | Hash of the target as last read; empty for a new object. |

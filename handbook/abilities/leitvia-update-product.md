@@ -1,6 +1,6 @@
 # leitvia/update-product
 
-Generated from Leitvia Studio 1.3.42. Do not edit. Group: Maintain. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.43. Do not edit. Group: Maintain. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **Update product.** Updates texts, status, images, categories and tags of one product or variation, and its prices, tax and shipping class. Read the product with leitvia/get-product first and send its hash as base_hash. Images need alt text (set it with leitvia/set-alt-text first). Changes to prices, taxes or shipping land at most as a suggestion unless a person unlocked them.
 
@@ -8,7 +8,7 @@ MCP tool `leitvia-update-product`, REST POST. Annotations: readonly false, destr
 
 | Input | Type | Required | Description |
 |---|---|---|---|
-| `product` | integer, min `1` | yes |  |
+| `product` | integer, min `1` | yes | Product or variation ID from leitvia/list-products. |
 | `title` | string, min length `1`, max length `200` |  |  |
 | `description` | string |  | Long description, block markup or plain text. Plain text without HTML becomes paragraph blocks: a blank line starts a new paragraph, the text is escaped. No fixed length, as with the content of leitvia/update-content; a change package shows the comparison up to 1 MB for before and after together. |
 | `short_description` | string, max length `5000` |  |  |

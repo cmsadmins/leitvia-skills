@@ -1,17 +1,18 @@
 {
-	"studio": "1.3.42",
+	"studio": "1.3.43",
 	"abilities": [
 		{
 			"name": "leitvia/activate-token-set",
 			"label": "Activate token set",
-			"description": "Writes the presets of a token set into the global styles of the active theme. The set ID comes from leitvia/create-token-set or the sets of leitvia/get-tokens. The base hash is the hash of the global styles. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash.",
+			"description": "Writes the presets of a token set into the global styles of the active theme. The set ID comes from leitvia/create-token-set or the sets of leitvia/get-tokens. The base hash is the hash of the global styles. leitvia/get-tokens returns it as hash.",
 			"category": "leitvia",
 			"group": "setup",
 			"input_schema": {
 				"properties": {
 					"set": {
 						"type": "integer",
-						"minimum": 1
+						"minimum": 1,
+						"description": "Token set ID from the sets of leitvia/get-tokens or from leitvia/create-token-set."
 					},
 					"base_hash": {
 						"type": "string",
@@ -32,6 +33,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -40,7 +44,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -49,7 +54,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -61,13 +67,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -101,7 +110,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": true,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -182,7 +192,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": false,
-				"idempotent": true
+				"idempotent": true,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -234,6 +245,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -242,7 +256,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -251,7 +266,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -263,13 +279,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -303,7 +322,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": false,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -319,14 +339,6 @@
 						"type": "integer",
 						"minimum": 1,
 						"description": "Change package ID."
-					},
-					"operations": {
-						"type": "array",
-						"items": {
-							"type": "integer",
-							"minimum": 1
-						},
-						"description": "Operation IDs to apply; empty or missing for every open operation."
 					}
 				},
 				"required": [
@@ -335,12 +347,60 @@
 				"additionalProperties": false
 			},
 			"output_schema": {
-				"type": "object"
+				"type": "object",
+				"required": [
+					"package",
+					"state"
+				],
+				"properties": {
+					"package": {
+						"type": "integer"
+					},
+					"state": {
+						"type": "string",
+						"enum": [
+							"open",
+							"applied",
+							"partial",
+							"rejected",
+							"rolled_back"
+						]
+					},
+					"applied": {
+						"type": "array",
+						"items": {
+							"type": "integer"
+						},
+						"description": "apply-package: IDs of the operations applied; leitvia/get-package shows the post and hash each one left."
+					},
+					"conflicts": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						},
+						"description": "apply-package: operations whose target changed since, with base_hash and current_hash; they stay open."
+					},
+					"errors": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						},
+						"description": "apply-package: operations that failed, with code, message and findings; they stay open."
+					},
+					"rolled_back": {
+						"type": "array",
+						"items": {
+							"type": "integer"
+						},
+						"description": "rollback: IDs of the operations rolled back."
+					}
+				}
 			},
 			"annotations": {
 				"readonly": false,
-				"destructive": false,
-				"idempotent": false
+				"destructive": true,
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -471,8 +531,9 @@
 			},
 			"annotations": {
 				"readonly": false,
-				"destructive": false,
-				"idempotent": true
+				"destructive": true,
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -499,7 +560,7 @@
 					}
 				},
 				"additionalProperties": false,
-				"default": []
+				"default": {}
 			},
 			"output_schema": {
 				"type": "object",
@@ -559,7 +620,7 @@
 					}
 				},
 				"additionalProperties": false,
-				"default": []
+				"default": {}
 			},
 			"output_schema": {
 				"type": "object",
@@ -622,7 +683,8 @@
 					"title": {
 						"type": "string",
 						"minLength": 1,
-						"maxLength": 200
+						"maxLength": 200,
+						"description": "Title of the new page."
 					},
 					"frame": {
 						"type": "string",
@@ -632,6 +694,7 @@
 						"type": "array",
 						"minItems": 1,
 						"maxItems": 30,
+						"description": "Sections of the page in order, each a pattern with optional edits at block IDs of its outline.",
 						"items": {
 							"type": "object",
 							"properties": {
@@ -674,12 +737,14 @@
 													"text": {
 														"type": "string",
 														"minLength": 1,
-														"maxLength": 500
+														"maxLength": 500,
+														"description": "The exact words of the passage to link, without markup."
 													},
 													"url": {
 														"type": "string",
 														"minLength": 1,
-														"maxLength": 2000
+														"maxLength": 2000,
+														"description": "Target of the link (mailto: and tel: work too)."
 													}
 												},
 												"required": [
@@ -698,7 +763,8 @@
 												"properties": {
 													"id": {
 														"type": "integer",
-														"minimum": 1
+														"minimum": 1,
+														"description": "Attachment ID of the image, from leitvia/list-media or leitvia/add-media."
 													},
 													"alt": {
 														"type": "string",
@@ -784,6 +850,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -792,7 +861,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -801,7 +871,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -813,13 +884,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -853,7 +927,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": false,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -871,7 +946,8 @@
 					"title": {
 						"type": "string",
 						"minLength": 1,
-						"maxLength": 200
+						"maxLength": 200,
+						"description": "Title of the new post."
 					},
 					"content": {
 						"type": "string",
@@ -882,6 +958,7 @@
 						"type": "array",
 						"minItems": 1,
 						"maxItems": 30,
+						"description": "Sections of the page in order, each a pattern with optional edits at block IDs of its outline.",
 						"items": {
 							"type": "object",
 							"properties": {
@@ -924,12 +1001,14 @@
 													"text": {
 														"type": "string",
 														"minLength": 1,
-														"maxLength": 500
+														"maxLength": 500,
+														"description": "The exact words of the passage to link, without markup."
 													},
 													"url": {
 														"type": "string",
 														"minLength": 1,
-														"maxLength": 2000
+														"maxLength": 2000,
+														"description": "Target of the link (mailto: and tel: work too)."
 													}
 												},
 												"required": [
@@ -948,7 +1027,8 @@
 												"properties": {
 													"id": {
 														"type": "integer",
-														"minimum": 1
+														"minimum": 1,
+														"description": "Attachment ID of the image, from leitvia/list-media or leitvia/add-media."
 													},
 													"alt": {
 														"type": "string",
@@ -1133,6 +1213,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -1141,7 +1224,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -1150,7 +1234,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -1162,13 +1247,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -1202,7 +1290,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": false,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -1216,11 +1305,13 @@
 					"title": {
 						"type": "string",
 						"minLength": 1,
-						"maxLength": 200
+						"maxLength": 200,
+						"description": "Title of the pattern in the Lab."
 					},
 					"content": {
 						"type": "string",
-						"minLength": 1
+						"minLength": 1,
+						"description": "Block markup of the pattern."
 					},
 					"synced": {
 						"type": "boolean"
@@ -1245,6 +1336,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -1253,7 +1347,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -1262,7 +1357,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -1274,13 +1370,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -1314,7 +1413,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": false,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -1328,7 +1428,8 @@
 					"title": {
 						"type": "string",
 						"minLength": 1,
-						"maxLength": 200
+						"maxLength": 200,
+						"description": "Name of the new product."
 					},
 					"slug": {
 						"type": "string",
@@ -1410,6 +1511,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -1418,7 +1522,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -1427,7 +1532,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -1439,13 +1545,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -1479,7 +1588,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": false,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			},
 			"requires": [
 				"woocommerce"
@@ -1496,7 +1606,8 @@
 					"title": {
 						"type": "string",
 						"minLength": 1,
-						"maxLength": 200
+						"maxLength": 200,
+						"description": "Name of the new token set."
 					},
 					"document": {
 						"type": "object",
@@ -1522,6 +1633,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -1530,7 +1644,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -1539,7 +1654,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -1551,13 +1667,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -1591,7 +1710,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": false,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -1659,6 +1779,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -1667,7 +1790,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -1676,7 +1800,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -1688,13 +1813,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -1728,13 +1856,14 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": false,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
 			"name": "leitvia/define-content-type",
 			"label": "Define content type",
-			"description": "Adds entries to the content model (postTypes, taxonomies, relations, settings) and keeps the others. An entry that exists is merged: the input sets its own keys and fields, fields, repeaters and supports it does not name stay, and the postTypes of a taxonomy are joined; relations and settings are replaced whole. Nothing is removed through this ability: an entry, field, repeater or supports value can only be removed by a person on the Model screen. Read the declaration with leitvia/get-content-model first. The base hash is the hash of the content model. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash. showInAbilities stays a decision of a person: agents may not set it.",
+			"description": "Adds entries to the content model (postTypes, taxonomies, relations, settings) and keeps the others. An entry that exists is merged: the input sets its own keys and fields, fields, repeaters and supports it does not name stay, and the postTypes of a taxonomy are joined; relations and settings are replaced whole. Nothing is removed through this ability: an entry, field, repeater or supports value can only be removed by a person on the Model screen. Read the declaration with leitvia/get-content-model first. The base hash is the hash of the content model. leitvia/get-content-model returns it as hash. showInAbilities stays a decision of a person: agents may not set it.",
 			"category": "leitvia",
 			"group": "setup",
 			"input_schema": {
@@ -1762,6 +1891,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -1770,7 +1902,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -1779,7 +1912,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -1791,13 +1925,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -1830,8 +1967,9 @@
 			},
 			"annotations": {
 				"readonly": false,
-				"destructive": false,
-				"idempotent": false
+				"destructive": true,
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -1871,7 +2009,7 @@
 					}
 				},
 				"additionalProperties": false,
-				"default": []
+				"default": {}
 			},
 			"output_schema": {
 				"type": "object",
@@ -2009,21 +2147,22 @@
 		{
 			"name": "leitvia/get-content-model",
 			"label": "Get content model",
-			"description": "Returns the content model declaration: post types, taxonomies, fields, relations and site settings with their definitions, never content. valid is false when the declaration fails the schema and nothing of it is registered.",
+			"description": "Returns the content model declaration: post types, taxonomies, fields, relations and site settings with their definitions, never content. valid is false when the declaration fails the schema and nothing of it is registered. hash is the base_hash of leitvia/define-content-type.",
 			"category": "leitvia",
 			"group": "read",
 			"input_schema": {
 				"type": "object",
 				"properties": [],
 				"additionalProperties": false,
-				"default": []
+				"default": {}
 			},
 			"output_schema": {
 				"type": "object",
 				"required": [
 					"declaration",
 					"valid",
-					"error"
+					"error",
+					"hash"
 				],
 				"properties": {
 					"declaration": {
@@ -2033,6 +2172,9 @@
 						"type": "boolean"
 					},
 					"error": {
+						"type": "string"
+					},
+					"hash": {
 						"type": "string"
 					}
 				}
@@ -2047,14 +2189,14 @@
 		{
 			"name": "leitvia/get-contract",
 			"label": "Get contract",
-			"description": "Returns the site this connection works on (address, REST base, name, language, whether it is part of a multisite network) and the design contract of the active theme: version, rules, color roles, contrast pairs, composition rules, page frames, template parts, templates, block styles and style variations. Compare site.url with the address of your task before the first write. Patterns come from list-patterns, blocks from list-blocks.",
+			"description": "Returns the site this connection works on (address, REST base, name, language, whether it is part of a multisite network) and the design contract of the active theme: version, rules, color roles, contrast pairs, composition rules, page frames, template parts, templates, block styles and style variations, plus the base hashes of template parts, templates and navigation menus. Compare site.url with the address of your task before the first write. Patterns come from list-patterns, blocks from list-blocks.",
 			"category": "leitvia",
 			"group": "read",
 			"input_schema": {
 				"type": "object",
 				"properties": [],
 				"additionalProperties": false,
-				"default": []
+				"default": {}
 			},
 			"output_schema": {
 				"type": "object",
@@ -2141,6 +2283,28 @@
 								"items": {
 									"type": "object"
 								}
+							},
+							"coreAliases": {
+								"type": "object",
+								"description": "Core preset slugs the theme maps to its roles, by preset type (color, spacing, font-size, font-family, shadow, border-radius): alias => role. Content is rewritten to the role on save; write the role."
+							}
+						}
+					},
+					"hashes": {
+						"type": "object",
+						"description": "Base hashes: templateParts and templates by name and slug for leitvia/update-template-part and leitvia/update-template (empty while only the file of the theme exists), navigation with id and hash per published menu, newest first, for leitvia/update-navigation.",
+						"properties": {
+							"templateParts": {
+								"type": "object"
+							},
+							"templates": {
+								"type": "object"
+							},
+							"navigation": {
+								"type": "array",
+								"items": {
+									"type": "object"
+								}
 							}
 						}
 					}
@@ -2174,6 +2338,32 @@
 				"additionalProperties": false
 			},
 			"output_schema": {
+				"properties": {
+					"id": {
+						"type": "integer"
+					},
+					"title": {
+						"type": "string"
+					},
+					"key": {
+						"type": "string"
+					},
+					"state": {
+						"type": "string",
+						"description": "open, applied, partial, rejected or rolled_back."
+					},
+					"operations": {
+						"type": "object",
+						"description": "Number of operations per status: open, conflict, applied, rolled_back."
+					},
+					"items": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						},
+						"description": "The operations with status, target, findings and, for open ones, the block diff."
+					}
+				},
 				"type": "object"
 			},
 			"annotations": {
@@ -2350,7 +2540,8 @@
 				"properties": {
 					"product": {
 						"type": "integer",
-						"minimum": 1
+						"minimum": 1,
+						"description": "Product or variation ID from leitvia/list-products."
 					}
 				},
 				"required": [
@@ -2434,6 +2625,7 @@
 						"type": "array",
 						"minItems": 1,
 						"maxItems": 50,
+						"description": "IDs of posts, pages or entries from leitvia/list-content.",
 						"items": {
 							"type": "integer",
 							"minimum": 1
@@ -2558,14 +2750,14 @@
 		{
 			"name": "leitvia/get-tokens",
 			"label": "Get tokens",
-			"description": "Returns the active design tokens as a DTCG document (of the active token set, else of the current global styles), the token sets with their status, the active style variations, whether the global styles drifted from the active set and the contrast findings of the current palette.",
+			"description": "Returns the active design tokens as a DTCG document (of the active token set, else of the current global styles), the token sets with their status, the active style variations, whether the global styles drifted from the active set, the contrast findings of the current palette and the hash of the global styles, the base_hash of leitvia/activate-token-set and leitvia/set-variation.",
 			"category": "leitvia",
 			"group": "read",
 			"input_schema": {
 				"type": "object",
 				"properties": [],
 				"additionalProperties": false,
-				"default": []
+				"default": {}
 			},
 			"output_schema": {
 				"type": "object",
@@ -2576,7 +2768,8 @@
 					"sets",
 					"variations",
 					"drift",
-					"contrast"
+					"contrast",
+					"hash"
 				],
 				"properties": {
 					"active": {
@@ -2630,6 +2823,10 @@
 						"items": {
 							"type": "object"
 						}
+					},
+					"hash": {
+						"type": "string",
+						"description": "Hash of the global styles; empty while the theme has none saved."
 					}
 				}
 			},
@@ -2656,7 +2853,7 @@
 					}
 				},
 				"additionalProperties": false,
-				"default": []
+				"default": {}
 			},
 			"output_schema": {
 				"type": "object",
@@ -2920,7 +3117,7 @@
 					}
 				},
 				"additionalProperties": false,
-				"default": []
+				"default": {}
 			},
 			"output_schema": {
 				"type": "object",
@@ -2990,7 +3187,7 @@
 					}
 				},
 				"additionalProperties": false,
-				"default": []
+				"default": {}
 			},
 			"output_schema": {
 				"type": "object",
@@ -3037,12 +3234,31 @@
 					}
 				},
 				"additionalProperties": false,
-				"default": []
+				"default": {}
 			},
 			"output_schema": {
 				"type": "array",
 				"items": {
-					"type": "object"
+					"type": "object",
+					"properties": {
+						"id": {
+							"type": "integer"
+						},
+						"title": {
+							"type": "string"
+						},
+						"key": {
+							"type": "string"
+						},
+						"state": {
+							"type": "string",
+							"description": "open, applied, partial, rejected or rolled_back."
+						},
+						"operations": {
+							"type": "object",
+							"description": "Number of operations per status: open, conflict, applied, rolled_back."
+						}
+					}
 				}
 			},
 			"annotations": {
@@ -3094,7 +3310,7 @@
 					}
 				},
 				"additionalProperties": false,
-				"default": []
+				"default": {}
 			},
 			"output_schema": {
 				"type": "object",
@@ -3184,7 +3400,7 @@
 					}
 				},
 				"additionalProperties": false,
-				"default": []
+				"default": {}
 			},
 			"output_schema": {
 				"type": "object",
@@ -3242,7 +3458,7 @@
 					}
 				},
 				"additionalProperties": false,
-				"default": []
+				"default": {}
 			},
 			"output_schema": {
 				"type": "object",
@@ -3344,7 +3560,8 @@
 					"goal": {
 						"type": "string",
 						"minLength": 1,
-						"maxLength": 500
+						"maxLength": 500,
+						"description": "What the page is for, in a sentence; a page frame type it names (home, service) picks the frame."
 					},
 					"points": {
 						"type": "array",
@@ -3356,14 +3573,14 @@
 					},
 					"frame": {
 						"type": "string",
+						"description": "Type of a page frame; without it the frame named in the goal, else home.",
 						"enum": [
 							"home",
 							"service",
 							"article",
 							"about",
 							"contact"
-						],
-						"description": "Type of a page frame; without it the frame named in the goal, else home."
+						]
 					},
 					"ai": {
 						"type": "boolean",
@@ -3419,7 +3636,7 @@
 				"readonly": true,
 				"destructive": false,
 				"idempotent": true,
-				"openWorldHint": false
+				"openWorldHint": true
 			}
 		},
 		{
@@ -3433,7 +3650,8 @@
 				"properties": {
 					"set": {
 						"type": "integer",
-						"minimum": 1
+						"minimum": 1,
+						"description": "Token set ID from the sets of leitvia/get-tokens or from leitvia/create-token-set."
 					},
 					"path": {
 						"type": "string",
@@ -3481,6 +3699,14 @@
 						"type": "integer",
 						"minimum": 1,
 						"description": "Change package ID."
+					},
+					"operations": {
+						"type": "array",
+						"items": {
+							"type": "integer",
+							"minimum": 1
+						},
+						"description": "Operation IDs to apply; empty or missing for every open operation."
 					}
 				},
 				"required": [
@@ -3489,12 +3715,60 @@
 				"additionalProperties": false
 			},
 			"output_schema": {
-				"type": "object"
+				"type": "object",
+				"required": [
+					"package",
+					"state"
+				],
+				"properties": {
+					"package": {
+						"type": "integer"
+					},
+					"state": {
+						"type": "string",
+						"enum": [
+							"open",
+							"applied",
+							"partial",
+							"rejected",
+							"rolled_back"
+						]
+					},
+					"applied": {
+						"type": "array",
+						"items": {
+							"type": "integer"
+						},
+						"description": "apply-package: IDs of the operations applied; leitvia/get-package shows the post and hash each one left."
+					},
+					"conflicts": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						},
+						"description": "apply-package: operations whose target changed since, with base_hash and current_hash; they stay open."
+					},
+					"errors": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						},
+						"description": "apply-package: operations that failed, with code, message and findings; they stay open."
+					},
+					"rolled_back": {
+						"type": "array",
+						"items": {
+							"type": "integer"
+						},
+						"description": "rollback: IDs of the operations rolled back."
+					}
+				}
 			},
 			"annotations": {
 				"readonly": false,
 				"destructive": true,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -3507,7 +3781,8 @@
 				"properties": {
 					"post": {
 						"type": "integer",
-						"minimum": 1
+						"minimum": 1,
+						"description": "Post ID from leitvia/list-content."
 					},
 					"links": {
 						"type": "array",
@@ -3518,12 +3793,14 @@
 								"from": {
 									"type": "string",
 									"minLength": 1,
-									"maxLength": 2000
+									"maxLength": 2000,
+									"description": "A link as it stands in the href of the post (from), or its new target (to)."
 								},
 								"to": {
 									"type": "string",
 									"minLength": 1,
-									"maxLength": 2000
+									"maxLength": 2000,
+									"description": "A link as it stands in the href of the post (from), or its new target (to)."
 								}
 							},
 							"required": [
@@ -3556,6 +3833,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -3564,7 +3844,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -3573,7 +3854,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -3585,13 +3867,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -3624,8 +3909,9 @@
 			},
 			"annotations": {
 				"readonly": false,
-				"destructive": false,
-				"idempotent": false
+				"destructive": true,
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -3638,7 +3924,8 @@
 				"properties": {
 					"post": {
 						"type": "integer",
-						"minimum": 1
+						"minimum": 1,
+						"description": "Post ID from leitvia/list-content."
 					},
 					"block": {
 						"type": "string",
@@ -3665,6 +3952,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -3673,7 +3963,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -3682,7 +3973,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -3694,13 +3986,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -3734,7 +4029,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": true,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -3750,6 +4046,14 @@
 						"type": "integer",
 						"minimum": 1,
 						"description": "Change package ID."
+					},
+					"operations": {
+						"type": "array",
+						"items": {
+							"type": "integer",
+							"minimum": 1
+						},
+						"description": "Operation IDs to apply; empty or missing for every open operation."
 					}
 				},
 				"required": [
@@ -3758,12 +4062,60 @@
 				"additionalProperties": false
 			},
 			"output_schema": {
-				"type": "object"
+				"type": "object",
+				"required": [
+					"package",
+					"state"
+				],
+				"properties": {
+					"package": {
+						"type": "integer"
+					},
+					"state": {
+						"type": "string",
+						"enum": [
+							"open",
+							"applied",
+							"partial",
+							"rejected",
+							"rolled_back"
+						]
+					},
+					"applied": {
+						"type": "array",
+						"items": {
+							"type": "integer"
+						},
+						"description": "apply-package: IDs of the operations applied; leitvia/get-package shows the post and hash each one left."
+					},
+					"conflicts": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						},
+						"description": "apply-package: operations whose target changed since, with base_hash and current_hash; they stay open."
+					},
+					"errors": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						},
+						"description": "apply-package: operations that failed, with code, message and findings; they stay open."
+					},
+					"rolled_back": {
+						"type": "array",
+						"items": {
+							"type": "integer"
+						},
+						"description": "rollback: IDs of the operations rolled back."
+					}
+				}
 			},
 			"annotations": {
 				"readonly": false,
 				"destructive": true,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -3782,11 +4134,13 @@
 					"alt": {
 						"type": "string",
 						"minLength": 1,
-						"maxLength": 500
+						"maxLength": 500,
+						"description": "Alt text that says what the image shows."
 					},
 					"post": {
 						"type": "integer",
-						"minimum": 1
+						"minimum": 1,
+						"description": "Post ID from leitvia/list-content."
 					},
 					"block": {
 						"type": "string",
@@ -3809,11 +4163,13 @@
 								"alt": {
 									"type": "string",
 									"minLength": 1,
-									"maxLength": 500
+									"maxLength": 500,
+									"description": "Alt text that says what the image shows."
 								},
 								"post": {
 									"type": "integer",
-									"minimum": 1
+									"minimum": 1,
+									"description": "Post ID from leitvia/list-content."
 								},
 								"block": {
 									"type": "string",
@@ -3850,6 +4206,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -3858,7 +4217,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -3867,7 +4227,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -3879,13 +4240,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -3918,8 +4282,9 @@
 			},
 			"annotations": {
 				"readonly": false,
-				"destructive": false,
-				"idempotent": false
+				"destructive": true,
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -3932,7 +4297,8 @@
 				"properties": {
 					"product": {
 						"type": "integer",
-						"minimum": 1
+						"minimum": 1,
+						"description": "Product or variation ID from leitvia/list-products."
 					},
 					"featured": {
 						"type": "boolean"
@@ -3975,6 +4341,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -3983,7 +4352,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -3992,7 +4362,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -4004,13 +4375,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -4044,7 +4418,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": true,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			},
 			"requires": [
 				"woocommerce"
@@ -4095,6 +4470,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -4103,7 +4481,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -4112,7 +4491,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -4124,13 +4504,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -4164,7 +4547,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": true,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -4177,7 +4561,8 @@
 				"properties": {
 					"page": {
 						"type": "integer",
-						"minimum": 0
+						"minimum": 0,
+						"description": "ID of a page from leitvia/list-content, 0 to clear the setting."
 					},
 					"base_hash": {
 						"type": "string",
@@ -4198,6 +4583,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -4206,7 +4594,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -4215,7 +4604,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -4227,13 +4617,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -4267,7 +4660,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": true,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -4280,7 +4674,8 @@
 				"properties": {
 					"page": {
 						"type": "integer",
-						"minimum": 0
+						"minimum": 0,
+						"description": "ID of a page from leitvia/list-content, 0 to clear the setting."
 					},
 					"base_hash": {
 						"type": "string",
@@ -4301,6 +4696,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -4309,7 +4707,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -4318,7 +4717,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -4330,13 +4730,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -4370,20 +4773,22 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": true,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
 			"name": "leitvia/set-variation",
 			"label": "Set style variation",
-			"description": "Applies a style variation of the contract to the global styles of the active theme: a full variation replaces them, a colors or typography variation replaces only its part. Names come from the style variations of leitvia/get-contract. The base hash is the hash of the global styles. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash.",
+			"description": "Applies a style variation of the contract to the global styles of the active theme: a full variation replaces them, a colors or typography variation replaces only its part. Names come from the style variations of leitvia/get-contract. The base hash is the hash of the global styles. leitvia/get-tokens returns it as hash.",
 			"category": "leitvia",
 			"group": "setup",
 			"input_schema": {
 				"properties": {
 					"variation": {
 						"type": "string",
-						"pattern": "^[a-z0-9-]+$"
+						"pattern": "^[a-z0-9-]+$",
+						"description": "Slug of a style variation from leitvia/get-contract."
 					},
 					"base_hash": {
 						"type": "string",
@@ -4404,6 +4809,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -4412,7 +4820,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -4421,7 +4830,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -4433,13 +4843,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -4473,7 +4886,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": true,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -4514,12 +4928,14 @@
 							"text": {
 								"type": "string",
 								"minLength": 1,
-								"maxLength": 500
+								"maxLength": 500,
+								"description": "The exact words of the passage to link, without markup."
 							},
 							"url": {
 								"type": "string",
 								"minLength": 1,
-								"maxLength": 2000
+								"maxLength": 2000,
+								"description": "Target of the link (mailto: and tel: work too)."
 							}
 						},
 						"required": [
@@ -4538,7 +4954,8 @@
 						"properties": {
 							"id": {
 								"type": "integer",
-								"minimum": 1
+								"minimum": 1,
+								"description": "Attachment ID of the image, from leitvia/list-media or leitvia/add-media."
 							},
 							"alt": {
 								"type": "string",
@@ -4559,7 +4976,8 @@
 					},
 					"post": {
 						"type": "integer",
-						"minimum": 1
+						"minimum": 1,
+						"description": "Post ID from leitvia/list-content."
 					},
 					"base_hash": {
 						"type": "string",
@@ -4580,6 +4998,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -4588,7 +5009,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -4597,7 +5019,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -4609,13 +5032,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -4649,7 +5075,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": true,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -4662,7 +5089,8 @@
 				"properties": {
 					"post": {
 						"type": "integer",
-						"minimum": 1
+						"minimum": 1,
+						"description": "Post ID from leitvia/list-content."
 					},
 					"title": {
 						"type": "string",
@@ -4712,12 +5140,14 @@
 										"text": {
 											"type": "string",
 											"minLength": 1,
-											"maxLength": 500
+											"maxLength": 500,
+											"description": "The exact words of the passage to link, without markup."
 										},
 										"url": {
 											"type": "string",
 											"minLength": 1,
-											"maxLength": 2000
+											"maxLength": 2000,
+											"description": "Target of the link (mailto: and tel: work too)."
 										}
 									},
 									"required": [
@@ -4830,6 +5260,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -4838,7 +5271,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -4847,7 +5281,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -4859,13 +5294,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -4899,13 +5337,14 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": true,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
 			"name": "leitvia/update-navigation",
 			"label": "Update navigation",
-			"description": "Replaces the links of a navigation menu, by default the one published last, which headers without a chosen menu show. Send items (with one level of sub items) or block markup of navigation links, submenus, page lists and mega menus. Links point to this site, use https, mailto: or tel:, and need a text that names their target. The change publishes the menu, a draft one too, since core shows no draft menu. The base hash is the hash of the menu, empty when the site has none. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash.",
+			"description": "Replaces the links of a navigation menu, by default the one published last, which headers without a chosen menu show. Send items (with one level of sub items) or block markup of navigation links, submenus, page lists and mega menus. Links point to this site, use https, mailto: or tel:, and need a text that names their target. The change publishes the menu, a draft one too, since core shows no draft menu. The base hash is the hash of the menu, empty when the site has none. leitvia/get-contract returns it per published menu under hashes.navigation.",
 			"category": "leitvia",
 			"group": "setup",
 			"input_schema": {
@@ -4924,12 +5363,14 @@
 								"label": {
 									"type": "string",
 									"minLength": 1,
-									"maxLength": 100
+									"maxLength": 100,
+									"description": "Text of the link; it names the target."
 								},
 								"url": {
 									"type": "string",
 									"minLength": 1,
-									"maxLength": 2000
+									"maxLength": 2000,
+									"description": "Address of this site, https, mailto: or tel:."
 								},
 								"items": {
 									"type": "array",
@@ -4940,12 +5381,14 @@
 											"label": {
 												"type": "string",
 												"minLength": 1,
-												"maxLength": 100
+												"maxLength": 100,
+												"description": "Text of the link; it names the target."
 											},
 											"url": {
 												"type": "string",
 												"minLength": 1,
-												"maxLength": 2000
+												"maxLength": 2000,
+												"description": "Address of this site, https, mailto: or tel:."
 											}
 										},
 										"required": [
@@ -4985,6 +5428,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -4993,7 +5439,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -5002,7 +5449,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -5014,13 +5462,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -5054,7 +5505,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": true,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -5067,7 +5519,8 @@
 				"properties": {
 					"product": {
 						"type": "integer",
-						"minimum": 1
+						"minimum": 1,
+						"description": "Product or variation ID from leitvia/list-products."
 					},
 					"title": {
 						"type": "string",
@@ -5167,6 +5620,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -5175,7 +5631,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -5184,7 +5641,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -5196,13 +5654,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -5236,7 +5697,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": true,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			},
 			"requires": [
 				"woocommerce"
@@ -5252,7 +5714,8 @@
 				"properties": {
 					"attribute": {
 						"type": "integer",
-						"minimum": 1
+						"minimum": 1,
+						"description": "Attribute ID from leitvia/list-product-attributes."
 					},
 					"name": {
 						"type": "string",
@@ -5267,12 +5730,14 @@
 							"properties": {
 								"value": {
 									"type": "integer",
-									"minimum": 1
+									"minimum": 1,
+									"description": "Value ID from leitvia/list-product-attributes."
 								},
 								"name": {
 									"type": "string",
 									"minLength": 1,
-									"maxLength": 200
+									"maxLength": 200,
+									"description": "New name of the value."
 								}
 							},
 							"required": [
@@ -5321,6 +5786,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -5329,7 +5797,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -5338,7 +5807,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -5350,13 +5820,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -5390,7 +5863,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": true,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			},
 			"requires": [
 				"woocommerce"
@@ -5406,7 +5880,8 @@
 				"properties": {
 					"term": {
 						"type": "integer",
-						"minimum": 1
+						"minimum": 1,
+						"description": "Term ID of a product category or tag from leitvia/list-products or leitvia/get-product."
 					},
 					"name": {
 						"type": "string",
@@ -5445,6 +5920,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -5453,7 +5931,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -5462,7 +5941,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -5474,13 +5954,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -5514,7 +5997,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": true,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			},
 			"requires": [
 				"woocommerce"
@@ -5530,7 +6014,8 @@
 				"properties": {
 					"review": {
 						"type": "integer",
-						"minimum": 1
+						"minimum": 1,
+						"description": "Review ID from leitvia/list-product-reviews."
 					},
 					"rating": {
 						"type": "integer",
@@ -5568,6 +6053,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -5576,7 +6064,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -5585,7 +6074,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -5597,13 +6087,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -5637,7 +6130,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": true,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			},
 			"requires": [
 				"woocommerce"
@@ -5653,7 +6147,8 @@
 				"properties": {
 					"post": {
 						"type": "integer",
-						"minimum": 1
+						"minimum": 1,
+						"description": "Post ID from leitvia/list-content."
 					},
 					"title": {
 						"type": "string",
@@ -5690,6 +6185,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -5698,7 +6196,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -5707,7 +6206,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -5719,13 +6219,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -5759,20 +6262,22 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": true,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
 			"name": "leitvia/update-template",
 			"label": "Update template",
-			"description": "Replaces a template with a template pattern made for it or with changed block markup. Slugs, such as single, single-product or taxonomy-product_cat, come from the templates of leitvia/get-contract and the templates the theme ships; WooCommerce templates need WooCommerce. A pattern fits when its templateTypes hold the slug; the rejection leitvia_unknown_pattern lists the patterns that fit in patterns. Templates for single posts and pages keep a core/post-content block. The change publishes the template; where the area level is draft a new one waits in a change package. A rollback restores the template as it was, the one of the theme when there was no saved one. The base hash is the hash of the saved template, empty when the theme template has not been saved yet. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash.",
+			"description": "Replaces a template with a template pattern made for it or with changed block markup. Slugs, such as single, single-product or taxonomy-product_cat, come from the templates of leitvia/get-contract and the templates the theme ships; WooCommerce templates need WooCommerce. A pattern fits when its templateTypes hold the slug; the rejection leitvia_unknown_pattern lists the patterns that fit in patterns. Templates for single posts and pages keep a core/post-content block. The change publishes the template; where the area level is draft a new one waits in a change package. A rollback restores the template as it was, the one of the theme when there was no saved one. The base hash is the hash of the saved template, empty when the theme template has not been saved yet. leitvia/get-contract returns it per template under hashes.templates.",
 			"category": "leitvia",
 			"group": "setup",
 			"input_schema": {
 				"properties": {
 					"template": {
 						"type": "string",
-						"pattern": "^[a-z0-9_-]+$"
+						"pattern": "^[a-z0-9_-]+$",
+						"description": "Template slug from leitvia/get-contract or of the theme, such as single or taxonomy-product_cat."
 					},
 					"pattern": {
 						"type": "string"
@@ -5800,6 +6305,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -5808,7 +6316,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -5817,7 +6326,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -5829,13 +6339,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -5869,20 +6382,22 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": true,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
 			"name": "leitvia/update-template-part",
 			"label": "Update template part",
-			"description": "Replaces a template part of the contract, such as header, footer or sidebar, with a pattern made for its area or with changed block markup. Part names come from leitvia/get-contract; with Polylang <part>-<language> (header-de) is the part the theme shows for that language and is created in the area of its part. Patterns come from leitvia/list-patterns. The change publishes the part, a draft one too: core shows no draft part, so where the area level is draft it waits in a change package. The base hash is the hash of the template part. No ability returns this hash: send base_hash empty and repeat the call once with current_hash from leitvia_stale_hash.",
+			"description": "Replaces a template part of the contract, such as header, footer or sidebar, with a pattern made for its area or with changed block markup. Part names come from leitvia/get-contract; with Polylang <part>-<language> (header-de) is the part the theme shows for that language and is created in the area of its part. Patterns come from leitvia/list-patterns. The change publishes the part, a draft one too: core shows no draft part, so where the area level is draft it waits in a change package. The base hash is the hash of the template part. leitvia/get-contract returns it per part under hashes.templateParts.",
 			"category": "leitvia",
 			"group": "setup",
 			"input_schema": {
 				"properties": {
 					"part": {
 						"type": "string",
-						"pattern": "^[a-z0-9-]+$"
+						"pattern": "^[a-z0-9-]+$",
+						"description": "Name of a template part from leitvia/get-contract, such as header or footer."
 					},
 					"pattern": {
 						"type": "string"
@@ -5910,6 +6425,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -5918,7 +6436,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -5927,7 +6446,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -5939,13 +6459,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -5979,7 +6502,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": true,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		},
 		{
@@ -5991,7 +6515,8 @@
 			"input_schema": {
 				"properties": {
 					"original": {
-						"type": "string"
+						"type": "string",
+						"description": "The pattern to vary: block:<ID> of a Lab pattern or the slug of a theme pattern from leitvia/list-patterns."
 					},
 					"title": {
 						"type": "string",
@@ -6036,12 +6561,14 @@
 										"text": {
 											"type": "string",
 											"minLength": 1,
-											"maxLength": 500
+											"maxLength": 500,
+											"description": "The exact words of the passage to link, without markup."
 										},
 										"url": {
 											"type": "string",
 											"minLength": 1,
-											"maxLength": 2000
+											"maxLength": 2000,
+											"description": "Target of the link (mailto: and tel: work too)."
 										}
 									},
 									"required": [
@@ -6060,7 +6587,8 @@
 									"properties": {
 										"id": {
 											"type": "integer",
-											"minimum": 1
+											"minimum": 1,
+											"description": "Attachment ID of the image, from leitvia/list-media or leitvia/add-media."
 										},
 										"alt": {
 											"type": "string",
@@ -6111,6 +6639,9 @@
 			},
 			"output_schema": {
 				"type": "object",
+				"required": [
+					"mode"
+				],
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -6119,7 +6650,8 @@
 							"draft",
 							"package",
 							"unchanged"
-						]
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
 					},
 					"level": {
 						"type": "string",
@@ -6128,7 +6660,8 @@
 							"suggest",
 							"draft",
 							"autonomous"
-						]
+						],
+						"description": "Autonomy level of the area that decided the mode."
 					},
 					"kinds": {
 						"type": "array",
@@ -6140,13 +6673,16 @@
 						"type": "object"
 					},
 					"hash": {
-						"type": "string"
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
 					},
 					"package": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
 					},
 					"snapshot": {
-						"type": "integer"
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
 					},
 					"findings": {
 						"type": "array",
@@ -6180,7 +6716,8 @@
 			"annotations": {
 				"readonly": false,
 				"destructive": false,
-				"idempotent": false
+				"idempotent": false,
+				"openWorldHint": false
 			}
 		}
 	],
@@ -6214,6 +6751,7 @@
 			"leitvia_package_closed",
 			"leitvia_page_missing",
 			"leitvia_pattern_not_approved",
+			"leitvia_pro_unmapped",
 			"leitvia_rate_limited",
 			"leitvia_recipe_unavailable",
 			"leitvia_rollback_conflict",
@@ -6442,6 +6980,16 @@
 			{
 				"code": "leitvia_forbidden",
 				"status": 403,
+				"reason": "license",
+				"message": "The migration readers need an active Leitvia Pro Agency or Unlimited license on this site.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_forbidden",
+				"status": 403,
 				"reason": "capability",
 				"message": "This change package belongs to someone else.",
 				"next_ability": [
@@ -6570,6 +7118,26 @@
 			{
 				"code": "leitvia_invalid_input",
 				"status": 422,
+				"reason": null,
+				"message": null,
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_invalid_input",
+				"status": 422,
+				"reason": "provider",
+				"message": "Coordinates are off on this site. Ask a person to choose a service under Sync, Coordinates; until then leave latitude and longitude empty.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_invalid_input",
+				"status": 422,
 				"reason": "nothing_to_repair",
 				"message": "No link needs or allows a repair. The report lists external links, internal links that could not be resolved and links that lead nowhere.",
 				"next_ability": [
@@ -6589,6 +7157,16 @@
 			},
 			{
 				"code": "leitvia_invalid_input",
+				"status": 422,
+				"reason": "package",
+				"message": "Send a package key: a migration always goes into a change package.",
+				"next_ability": [
+					""
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_invalid_input",
 				"status": 400,
 				"reason": "input",
 				"message": "The contract has no page frame of this type.",
@@ -6596,6 +7174,16 @@
 					"leitvia/get-contract"
 				],
 				"retry": "once"
+			},
+			{
+				"code": "leitvia_invalid_input",
+				"status": 422,
+				"reason": "source",
+				"message": "The post holds no WPBakery or Impreza shortcodes, ACF blocks or ACF fields. Classic content moves with leitvia/update-content.",
+				"next_ability": [
+					"leitvia/update-content"
+				],
+				"retry": "never"
 			},
 			{
 				"code": "leitvia_invalid_input",
@@ -6805,6 +7393,14 @@
 				"next_ability": [
 					"leitvia/list-patterns"
 				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_pro_unmapped",
+				"status": 422,
+				"reason": "unmapped",
+				"message": "Some content does not carry over, see unmapped. Show it to the person; send accept_unmapped only when they agree to lose it.",
+				"next_ability": [],
 				"retry": "once"
 			},
 			{

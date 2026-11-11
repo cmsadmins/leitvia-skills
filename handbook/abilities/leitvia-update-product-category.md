@@ -1,6 +1,6 @@
 # leitvia/update-product-category
 
-Generated from Leitvia Studio 1.3.42. Do not edit. Group: Maintain. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.43. Do not edit. Group: Maintain. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **Update product category.** Updates name, description, parent and image of a product category, or name and description of a product tag. Use the hash of the term from list-products or get-product as base_hash. The image needs alt text.
 
@@ -8,7 +8,7 @@ MCP tool `leitvia-update-product-category`, REST POST. Annotations: readonly fal
 
 | Input | Type | Required | Description |
 |---|---|---|---|
-| `term` | integer, min `1` | yes |  |
+| `term` | integer, min `1` | yes | Term ID of a product category or tag from leitvia/list-products or leitvia/get-product. |
 | `name` | string, min length `1`, max length `200` |  |  |
 | `description` | string, max length `5000` |  |  |
 | `parent` | integer, min `0` |  |  |

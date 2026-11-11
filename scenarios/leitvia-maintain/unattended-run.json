@@ -6,7 +6,7 @@
 	"mode": "package",
 	"unattended": true,
 	"budget": {
-		"tokens": 12350,
+		"tokens": 12600,
 		"files": [
 			"skills/leitvia-maintain/references/fixes.md",
 			"handbook/abilities/leitvia-audit-site.md",

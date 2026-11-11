@@ -6,7 +6,7 @@
 	"mode": "package",
 	"unattended": true,
 	"budget": {
-		"tokens": 12050,
+		"tokens": 12300,
 		"files": [
 			"skills/leitvia-setup/references/recipe.md",
 			"handbook/abilities/leitvia-list-recipes.md",

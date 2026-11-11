@@ -1,8 +1,10 @@
 # Rejections
 
-Generated from Leitvia Studio 1.3.42. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
+Generated from Leitvia Studio 1.3.43. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
 
 Every rejection of Leitvia Studio with its retry rule and next ability. Messages with `%s` or `%d` get a value at run time; codes with several rows come from several places.
+
+Leitvia uses one code per kind of failure, not one per field as in the error vocabulary of the WordPress agent skills (`<plugin>_missing_<field>`, `<plugin>_invalid_<field>`). A missing or invalid input is `leitvia_invalid_input` with the field in `data.target` and the cause in `data.reason`; an unknown object is `leitvia_not_found` or one of the `leitvia_unknown_*` codes; a missing permission is `leitvia_forbidden`, `leitvia_out_of_scope`, `leitvia_locked` or `leitvia_needs_human`.
 
 | Code | HTTP | Retry | Next ability | Message |
 |---|---|---|---|---|
@@ -28,6 +30,7 @@ Every rejection of Leitvia Studio with its retry rule and next ability. Messages
 | `leitvia_forbidden` | 403 | `never` | none | Agents change the site through the %s abilities only. |
 | `leitvia_forbidden` | 403 | `never` | none | Previews of token sets need the right to edit theme options. |
 | `leitvia_forbidden` | 403 | `never` | none | Sign in as a user who may edit content. |
+| `leitvia_forbidden` | 403 | `never` | none | The migration readers need an active Leitvia Pro Agency or Unlimited license on this site. |
 | `leitvia_forbidden` | 403 | `never` | `leitvia/list-packages` | This change package belongs to someone else. |
 | `leitvia_forbidden` | 403 | `never` | none | Your user may not assign terms of this taxonomy. |
 | `leitvia_forbidden` | 403 | `never` | none | Your user may not change this object. |
@@ -41,9 +44,13 @@ Every rejection of Leitvia Studio with its retry rule and next ability. Messages
 | `leitvia_foreign_host` | 422 | `once` | none | Media from other hosts is not fetched. Send the file as Base64 data instead. |
 | `leitvia_import_conflict` | 409 | `never` | none | Targets changed on this site since the package was made. Nothing was imported; compare and export again. |
 | `leitvia_invalid_input` | 422 | `once` | set at run time | Built at run time; read the message. |
+| `leitvia_invalid_input` | 422 | `never` | none | Built at run time; read the message. |
+| `leitvia_invalid_input` | 422 | `never` | none | Coordinates are off on this site. Ask a person to choose a service under Sync, Coordinates; until then leave latitude and longitude empty. |
 | `leitvia_invalid_input` | 422 | `never` | none | No link needs or allows a repair. The report lists external links, internal links that could not be resolved and links that lead nowhere. |
 | `leitvia_invalid_input` | 400 | `once` | `leitvia/list-patterns` | Pass pattern slugs, or a post whose sections come from patterns. |
+| `leitvia_invalid_input` | 422 | `once` | none | Send a package key: a migration always goes into a change package. |
 | `leitvia_invalid_input` | 400 | `once` | `leitvia/get-contract` | The contract has no page frame of this type. |
+| `leitvia_invalid_input` | 422 | `never` | `leitvia/update-content` | The post holds no WPBakery or Impreza shortcodes, ACF blocks or ACF fields. Classic content moves with leitvia/update-content. |
 | `leitvia_invalid_input` | 422 | `never` | none | The value is not valid for this option. |
 | `leitvia_invalid_package` | 400 | `never` | none | Built at run time; read the message. |
 | `leitvia_locked` | 403 | `never` | none | Agents may not change this area. A person can change the autonomy settings. |
@@ -65,6 +72,7 @@ Every rejection of Leitvia Studio with its retry rule and next ability. Messages
 | `leitvia_package_closed` | 409 | `never` | `leitvia/get-package` | The change package is %s; this step is not possible in that state. |
 | `leitvia_page_missing` | 409 | `never` | none | The page this setting points to is not applied yet. Apply the page first. |
 | `leitvia_pattern_not_approved` | 422 | `once` | `leitvia/list-patterns` | The Lab pattern is not approved yet. Use an approved pattern, or ask a person to approve this one in the Lab. |
+| `leitvia_pro_unmapped` | 422 | `once` | set at run time | Some content does not carry over, see unmapped. Show it to the person; send accept_unmapped only when they agree to lose it. |
 | `leitvia_rate_limited` | 429 | `after:<seconds>` | none | Too many calls. Try again in %d seconds. |
 | `leitvia_recipe_unavailable` | 422 | `never` | `leitvia/list-recipes` | Built at run time; read the message. |
 | `leitvia_rollback_conflict` | 409 | `never` | `leitvia/get-package` | Someone changed the content after the package was applied. Nothing was rolled back; compare the changes and decide by hand. |
@@ -81,7 +89,7 @@ Every rejection of Leitvia Studio with its retry rule and next ability. Messages
 
 ## Codes of other plugins
 
-Other plugins may replace a rejection of Leitvia Studio with their own code. Over MCP, call Leitvia tools on the server `leitvia`: another plugin (MCP Access of the AI plugin) can list them on the default server of the adapter too, with the same checks but rejections without hash, next ability and retry rule. Known codes:
+Other plugins may replace a rejection of Leitvia Studio with their own code. Over MCP, the server `leitvia` and the default server of the MCP Adapter (`mcp-adapter/execute-ability`) both return a rejection of a Leitvia ability in full, as JSON with code, message and data. Another plugin (MCP Access of the AI plugin) can list Leitvia tools on a server of its own, with the same checks but rejections without hash, next ability and retry rule. Rejections of the input or permission checks of WordPress core arrive before Leitvia Studio runs and carry only their message. Known codes:
 
 | Code | HTTP | Retry | Plugin | What to do |
 |---|---|---|---|---|

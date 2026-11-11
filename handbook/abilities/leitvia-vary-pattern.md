@@ -1,6 +1,6 @@
 # leitvia/vary-pattern
 
-Generated from Leitvia Studio 1.3.42. Do not edit. Group: Build. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.43. Do not edit. Group: Build. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **Vary pattern.** Creates a variant of a Lab pattern (block:\<ID>) or a theme pattern (slug) as a draft in the Lab, from new markup or from the original with edits at block IDs; base_hash is empty. Originals come from leitvia/list-patterns, block IDs for edits from leitvia/get-pattern.
 
@@ -8,7 +8,7 @@ MCP tool `leitvia-vary-pattern`, REST POST. Annotations: readonly false, destruc
 
 | Input | Type | Required | Description |
 |---|---|---|---|
-| `original` | string | yes |  |
+| `original` | string | yes | The pattern to vary: block:\<ID> of a Lab pattern or the slug of a theme pattern from leitvia/list-patterns. |
 | `title` | string, max length `200` |  |  |
 | `content` | string, min length `1` |  |  |
 | `edits` | array of object { block\*, text, link_text, url, add_link, caption, image, remove, repeat }, max items `50` |  |  |

@@ -1,6 +1,7 @@
 ---
 name: leitvia-setup
 description: Sets up a WordPress site with the Leitvia theme and Leitvia Studio from a briefing, through the leitvia abilities only. Picks a site recipe (company, shop, blog, publication, documentation), applies content model, style variation, header, footer, navigation and base pages, and hands everything to a person as a change package. Use it for a new site or a fresh start of an existing one; brand colors and fonts belong to leitvia-design, single pages to leitvia-page.
+compatibility: Needs a site with the theme Leitvia and the plugin Leitvia Studio, reached over the MCP server leitvia or the REST routes of the Abilities API with an application password. The recipe for a shop also needs WooCommerce.
 ---
 
 # leitvia-setup
@@ -11,7 +12,7 @@ Read before the first call: the [agent handbook](../../handbook/README.md) (acce
 
 ## Ground rules
 
-- Write only through `leitvia/*` abilities. No SQL, no WP-CLI, no REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read. Reading public pages of the site and of the operator's other sites is allowed.
+- Write only through `leitvia/*` abilities. No SQL, no WP-CLI, no REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read. Reading public pages of the site and of the operator's other sites is allowed. On a Leitvia site these abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`, and you never write files in the theme.
 - The site is the one at the address of your task, which in a multisite network can have a path (`https://example.org/club/`); every path starts there, not at the host. Call `leitvia/get-contract` first and compare `site.url` with that address; when they differ, write nothing and ask the person.
 - Mode `package` is the default for a live site: send the same `package` key on every write of the task, for example `setup-2026-10`. Use mode `direct` only when a person is present and says the site is not live yet; the drafts it leaves are theirs to publish.
 - **Facts are never guessed.** Organization data, prices, legal texts, figures, quotes and people come only from a source you can name: the person, a page of the site or a read ability, with the source in your report. Without one, stop at a checkpoint; never write a placeholder that looks like a fact.

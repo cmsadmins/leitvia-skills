@@ -6,7 +6,7 @@
 	"mode": "package",
 	"unattended": true,
 	"budget": {
-		"tokens": 11900,
+		"tokens": 12100,
 		"files": [
 			"skills/leitvia-migrate/references/translate.md",
 			"handbook/abilities/leitvia-audit-site.md",

@@ -29,20 +29,20 @@ For a test or demo run on your own machine, without a server, the Playground CLI
 ```json
 {
 	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
-	"preferredVersions": { "php": "8.3", "wp": "latest" },
+	"preferredVersions": { "php": "8.4", "wp": "7.1" },
 	"constants": { "WP_ENVIRONMENT_TYPE": "local" },
 	"siteOptions": { "permalink_structure": "/%postname%/" },
 	"steps": [
-		{ "step": "installTheme", "themeData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia/releases/download/1.2.43/leitvia-1.2.43.zip" }, "options": { "activate": true } },
-		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.42/leitvia-studio-1.3.42.zip" }, "options": { "activate": true } },
+		{ "step": "installTheme", "themeData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia/releases/download/1.2.44/leitvia-1.2.44.zip" }, "options": { "activate": true } },
+		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.43/leitvia-studio-1.3.43.zip" }, "options": { "activate": true } },
 		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://downloads.wordpress.org/plugin/mcp-adapter.0.7.1.zip" }, "options": { "activate": true } },
-		{ "step": "installPlugin", "pluginData": { "resource": "wordpress.org/plugins", "slug": "woocommerce" }, "options": { "activate": true } },
-		{ "step": "runPHP", "code": "<?php require_once '/wordpress/wp-load.php'; $id = wp_insert_user( array( 'user_login' => 'leitvia-agent', 'display_name' => 'Leitvia agent', 'user_email' => 'agent@example.org', 'user_pass' => wp_generate_password( 32 ), 'role' => 'leitvia_agent' ) ); $created = WP_Application_Passwords::create_new_application_password( $id, array( 'name' => 'leitvia agent' ) ); file_put_contents( '/leitvia-run/agent-password.txt', $created[0] );" }
+		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://downloads.wordpress.org/plugin/woocommerce.11.2.1.zip" }, "options": { "activate": true } },
+		{ "step": "runPHP", "code": "<?php require_once '/wordpress/wp-load.php'; $id = wp_insert_user( array( 'user_login' => 'leitvia-agent', 'display_name' => 'Leitvia agent', 'user_email' => 'agent@example.org', 'user_pass' => wp_generate_password( 32 ), 'role' => 'leitvia_agent' ) ); $created = is_wp_error( $id ) ? $id : WP_Application_Passwords::create_new_application_password( $id, array( 'name' => 'leitvia agent' ) ); if ( is_wp_error( $created ) ) { throw new Exception( $created->get_error_message() ); } wp_mkdir_p( '/leitvia-run' ); file_put_contents( '/leitvia-run/agent-password.txt', $created[0] . \"\n\" );" }
 	]
 }
 ```
 
-Leave out the WooCommerce step for a site without a shop. Then start the server with an empty folder `run` next to the blueprint; the application password lands in `run/agent-password.txt`:
+The versions of WordPress, PHP, MCP Adapter and WooCommerce are the ones Leitvia is tested with. Leave out the WooCommerce step for a site without a shop. If the agent user cannot be created, the run stops with the error instead of starting a site without a password. Then start the server with an empty folder `run` next to the blueprint; the application password lands in `run/agent-password.txt`:
 
 ```sh
 npx @wp-playground/cli@latest server --port=9481 --blueprint=blueprint.json --mount-dir ./run /leitvia-run --login
@@ -148,6 +148,18 @@ curl -H "Authorization: Basic $LEITVIA_AUTH" "https://example.org/wp-json/wp-abi
 
 The agent handbook explains the method of each ability. Tell the agent to use REST when it has no MCP server `leitvia`; the skills describe both ways.
 
+### Core REST without the leitvia MCP server
+
+Without the MCP server `leitvia`, for example when an agent works with the WordPress skills alone, every Leitvia ability runs over the REST API of the Abilities API in WordPress core. Sign in as the agent user with its application password (HTTP Basic auth). Checks, autonomy levels, change packages and the rate limit are the same as over MCP.
+
+- **Discovery:** `GET /wp-json/wp-abilities/v1/abilities?category=leitvia` lists the abilities with their input and output schemas and annotations; `GET /wp-json/wp-abilities/v1/abilities/<name>` returns one.
+- **Reads:** read only abilities run with GET at `/wp-json/wp-abilities/v1/abilities/<name>/run`, the input as query arguments: `?input[post]=12`, lists as `input[ids][]=4&input[ids][]=7`.
+- **Writes:** run with POST and the JSON body `{"input": {...}}`; destructive abilities that are idempotent take DELETE with the input as query arguments. The page of each ability names its method.
+- **`mode` `package`:** the write was not carried out. It waits in a change package until a person decides in the inbox of Leitvia Studio. Report the package ID and do not try to get the change through another way.
+- **409:** `leitvia_stale_hash` means the target changed since you read it. Read it again, or take `data.current_hash` when no read ability returns its hash, and repeat the call once.
+- **429:** `leitvia_rate_limited` comes with the header `Retry-After`. Wait that many seconds, then send the same call again.
+- **MCP Adapter:** from Leitvia Studio 1.3.43 its default server lists the Leitvia abilities as well, with the same checks.
+
 ## 3. Install the skills
 
 The skills link to the handbook at `../../handbook/README.md`, so `handbook` and `workflows` must sit next to the folder that holds the skills. Both ways below keep that layout.
@@ -206,6 +218,12 @@ Each workflow asks for the mode at the start:
 
 - **package:** every write of the task goes into one change package, whatever the autonomy levels allow. Nothing changes on the site until a person reviews the package in **Leitvia Studio, Agents, tab Inbox** (block diff and preview) and applies it.
 - **direct:** only with a person present; the autonomy levels of the site decide what goes live, and with the default levels new pages, header, footer and navigation stay drafts the person publishes. Legal texts, prices, slugs and organization data still wait in a package for a person. Unattended runs always use mode package.
+
+## WordPress standards
+
+Leitvia supports the standards WordPress sets for AI agents and will keep supporting them: the skills of [WordPress/agent-skills](https://github.com/WordPress/agent-skills), the Abilities API with its REST routes under `/wp-json/wp-abilities/v1` and the default server of the MCP Adapter. An agent that only has the WordPress skills works on a Leitvia site through these, see [Core REST without the leitvia MCP server](#core-rest-without-the-leitvia-mcp-server).
+
+The skills of this package add to the WordPress skills. On a Leitvia site the Leitvia abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`, and the agent never writes files in the theme; every skill here says so. Core preset slugs that agents know from the default themes, such as the colors `base` and `contrast` or spacing `50`, are mapped to the roles of the Leitvia design contract. The table is in `design.md` of the theme and in `coreAliases` of its `leitvia-contract.json`.
 
 ## Privacy
 

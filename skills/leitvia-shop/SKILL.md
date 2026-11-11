@@ -12,7 +12,7 @@ Read before the first call: the [agent handbook](../../handbook/README.md) (acce
 
 ## Access
 
-MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI, the REST routes of WordPress core (`/wp-json/wp/v2/...`) or of WooCommerce (`/wp-json/wc/...`), not even to read. Reading public pages of the shop is fine. The product abilities exist only while WooCommerce is active; when `leitvia/list-products` is unknown, stop and tell the person.
+MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI, the REST routes of WordPress core (`/wp-json/wp/v2/...`) or of WooCommerce (`/wp-json/wc/...`), not even to read. Reading public pages of the shop is fine. The product abilities exist only while WooCommerce is active; when `leitvia/list-products` is unknown, stop and tell the person. On a Leitvia site these abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`, and you never write files in the theme.
 
 ## Modes
 

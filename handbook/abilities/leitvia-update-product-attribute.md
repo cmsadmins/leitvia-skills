@@ -1,6 +1,6 @@
 # leitvia/update-product-attribute
 
-Generated from Leitvia Studio 1.3.42. Do not edit. Group: Maintain. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.43. Do not edit. Group: Maintain. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **Update product attribute.** Renames a global product attribute and its values and sorts the values, in one operation. Read the attribute with leitvia/list-product-attributes and send its hash as base_hash. Values are named by their ID; order lists every value ID in the new order and sorts the attribute by it (order_by menu_order). Slugs stay, so filters and links keep working.
 
@@ -8,7 +8,7 @@ MCP tool `leitvia-update-product-attribute`, REST POST. Annotations: readonly fa
 
 | Input | Type | Required | Description |
 |---|---|---|---|
-| `attribute` | integer, min `1` | yes |  |
+| `attribute` | integer, min `1` | yes | Attribute ID from leitvia/list-product-attributes. |
 | `name` | string, min length `1`, max length `200` |  |  |
 | `values` | array of object { value\*, name\* }, max items `200` |  | New names of values: value is the ID from leitvia/list-product-attributes. |
 | `order` | array of integer, min `1`, max items `200` |  | Every value ID of the attribute, in the new order. |

@@ -1,6 +1,6 @@
 # leitvia/compose-page
 
-Generated from Leitvia Studio 1.3.42. Do not edit. Group: Build. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.43. Do not edit. Group: Build. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **Compose page.** Creates a page from patterns in the order of a page frame of the contract. Plan it with leitvia/plan-page first; base_hash is empty for the new page. Per section texts (also quote citations and details summaries), links and images at block IDs of the pattern outline can change, and remove and repeat take blocks from a parent or add copies, for fewer or more entries than the pattern; a text that would drop a link is refused. Edits apply in order. Each section keeps metadata.patternName (core/block/\<ID> for a Lab pattern). Unknown patterns are rejected with a pointer to leitvia/list-patterns, deprecated ones with their replacement, Lab patterns that are not approved (also through a part) with leitvia_pattern_not_approved. Later changes go through leitvia/update-content and leitvia/update-block.
 
@@ -8,9 +8,9 @@ MCP tool `leitvia-compose-page`, REST POST. Annotations: readonly false, destruc
 
 | Input | Type | Required | Description |
 |---|---|---|---|
-| `title` | string, min length `1`, max length `200` | yes |  |
+| `title` | string, min length `1`, max length `200` | yes | Title of the new page. |
 | `frame` | string | yes | Type of a page frame from pageFrames in the contract, for example home or service. |
-| `sections` | array of object { pattern\*, edits }, min items `1`, max items `30` | yes |  |
+| `sections` | array of object { pattern\*, edits }, min items `1`, max items `30` | yes | Sections of the page in order, each a pattern with optional edits at block IDs of its outline. |
 | `kind` | one of `imprint`, `privacy`, `terms`, `withdrawal`, `accessibility`, `editorial`, `contact`, `authors` |  |  |
 | `slug` | string, pattern `^[a-z0-9-]+$` |  |  |
 | `parent` | integer, min `1` |  | ID of the parent page. |

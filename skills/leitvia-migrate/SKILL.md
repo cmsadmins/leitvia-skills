@@ -12,7 +12,7 @@ Read before the first call: the [agent handbook](../../handbook/README.md). Read
 
 ## Access
 
-As the agent user over MCP or REST: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). While the classic theme is active, `leitvia/get-contract` answers `leitvia_no_contract`; compare the address of your task with `home` of the public `GET /wp-json/` instead, after the switch with `site.url` of `leitvia/get-contract`. When they differ, write nothing and ask. No SQL, WP-CLI or core REST routes (`/wp-json/wp/v2/...`), not even to read; public pages are fine and part of the inventory.
+As the agent user over MCP or REST: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). While the classic theme is active, `leitvia/get-contract` answers `leitvia_no_contract`; compare the address of your task with `home` of the public `GET /wp-json/` instead, after the switch with `site.url` of `leitvia/get-contract`. When they differ, write nothing and ask. No SQL, WP-CLI or core REST routes (`/wp-json/wp/v2/...`), not even to read; public pages are fine and part of the inventory. On a Leitvia site these abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`, and you never write files in the theme.
 
 ## Source outside this site
 

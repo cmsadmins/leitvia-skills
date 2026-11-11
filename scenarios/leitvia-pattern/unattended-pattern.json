@@ -6,7 +6,7 @@
 	"mode": "package",
 	"unattended": true,
 	"budget": {
-		"tokens": 10150,
+		"tokens": 10600,
 		"files": [
 			"skills/leitvia-pattern/references/markup.md",
 			"handbook/abilities/leitvia-list-patterns.md",
