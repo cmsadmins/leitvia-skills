@@ -225,9 +225,9 @@ Each workflow asks for the mode at the start:
 
 ## WordPress standards
 
-Leitvia supports the standards WordPress sets for AI agents and will keep supporting them: the skills of [WordPress/agent-skills](https://github.com/WordPress/agent-skills), the Abilities API with its REST routes under `/wp-json/wp-abilities/v1` and the default server of the MCP Adapter. An agent that only has the WordPress skills works on a Leitvia site through these, see [Core REST without the leitvia MCP server](#core-rest-without-the-leitvia-mcp-server).
+Leitvia supports the standards WordPress sets for AI agents and will keep supporting them: the skills of [WordPress/agent-skills](https://github.com/WordPress/agent-skills), the Abilities API with its REST routes under `/wp-json/wp-abilities/v1` and the default server of the MCP Adapter. An agent that only has the WordPress skills works on a Leitvia site through these, see [Core REST without the leitvia MCP server](#core-rest-without-the-leitvia-mcp-server). The [developer guide](https://leitvia.com/docs/developers/) on leitvia.com shows these calls with real answers.
 
-The skills of this package add to the WordPress skills. On a Leitvia site the Leitvia abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`, and the agent never writes files in the theme `leitvia`; every skill here says so. Files that no ability can replace (workflows of `wp-block-themes` and `wp-patterns`, work of a developer) go only into the child theme `leitvia-child`, whose patterns follow the contract. A person switches to it, and Leitvia Studio carries over Global Styles and customized templates. Core preset slugs that agents know from the default themes, such as the colors `base` and `contrast` or spacing `50`, are mapped to the roles of the Leitvia design contract. The table is in `design.md` of the theme and in `coreAliases` of its `leitvia-contract.json`.
+The skills of this package add to the WordPress skills. On a Leitvia site the Leitvia abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`, and the agent never writes files in the theme `leitvia`; every skill here says so. Files that no ability can replace (workflows of `wp-block-themes` and `wp-patterns`, work of a developer) go only into the child theme `leitvia-child`, whose patterns follow the contract. A person switches to it, and Leitvia Studio carries over Global Styles and customized templates. A custom block goes into a plugin of its own, built from [Leitvia Block Starter](https://github.com/cmsadmins/leitvia-block-starter), never into the theme or the child theme; agents build it with the WordPress skill `wp-block-development`. Core preset slugs that agents know from the default themes, such as the colors `base` and `contrast` or spacing `50`, are mapped to the roles of the Leitvia design contract. The table is in `design.md` of the theme and in `coreAliases` of its `leitvia-contract.json`.
 
 ## Privacy
 
@@ -242,6 +242,6 @@ Leitvia Studio and these skills send nothing to anyone. The agent reads content 
 
 ## Documentation and license
 
-Documentation: https://leitvia.com/docs/
+Documentation: https://leitvia.com/docs/ (for developers: https://leitvia.com/docs/developers/)
 
 GPL 2.0 or later, like the theme and the plugin; see `LICENSE`. Made by CMS ADMINS.
