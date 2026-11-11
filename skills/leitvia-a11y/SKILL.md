@@ -1,18 +1,23 @@
 ---
 name: leitvia-a11y
 description: Checks a WordPress site with the Leitvia theme and Leitvia Studio against WCAG 2.2 AA and BITV 2.0 as far as abilities and public pages allow, fixes what the leitvia abilities can fix (alt text, link texts, empty headings, heading levels, decorative images) in a change package, and reports in three parts what was fixed, what stays open and why, and what only a person can test (screen readers, plain language, videos, forms of other plugins). Never declares a site accessible. Use it after a site or page was built or changed, before a release, or when someone asks for an accessibility check; colors of the palette belong to leitvia-design.
-compatibility: Needs a site with the theme Leitvia and the plugin Leitvia Studio, reached over the MCP server leitvia or the REST routes of the Abilities API with an application password.
+compatibility: WordPress 7.1+, PHP 8.2+. Needs the theme Leitvia and the plugin Leitvia Studio, reached over the MCP server leitvia or the REST routes of the Abilities API with an application password.
 ---
 
 # leitvia-a11y
 
 You check a site for barriers, remove the ones the abilities can remove and say clearly which ones remain and which ones no tool can judge. You change the site only through the abilities of Leitvia Studio.
 
-Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [audit-site](../../handbook/abilities/leitvia-audit-site.md), [get-tokens](../../handbook/abilities/leitvia-get-tokens.md), [get-page-outline](../../handbook/abilities/leitvia-get-page-outline.md), [get-block](../../handbook/abilities/leitvia-get-block.md), [set-alt-text](../../handbook/abilities/leitvia-set-alt-text.md), [update-block](../../handbook/abilities/leitvia-update-block.md), [update-content](../../handbook/abilities/leitvia-update-content.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md), [get-package](../../handbook/abilities/leitvia-get-package.md). Fixes, manual tests and the accessibility statement: [check details](references/checks.md).
+## When to use
 
-## Access
+- After a site or page was built or changed, before a release, or when someone asks for an accessibility check.
+- Not for the colors of the palette (leitvia-design) or texts for search (leitvia-seo-geo).
 
-MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Paths start at the address of the site, not at the host. Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read: the abilities give you every ID, hash and status you need. Reading public pages of the site is fine and part of the check. Where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after each write. On a Leitvia site these abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`, and you never write files in the theme.
+## Inputs required
+
+- Access: MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Paths start at the address of the site, not at the host.
+- The scope of step 1 and the language of each page.
+- Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of each ability before you first call it (the handbook index links them): `audit-site`, `get-tokens`, `get-page-outline`, `get-block`, `set-alt-text`, `update-block`, `update-content`, `list-packages`, `get-package`. Fixes, manual tests and the accessibility statement: [check details](references/checks.md).
 
 ## Modes
 
@@ -23,6 +28,7 @@ In mode `package` every fix waits in the package, alt text included. In mode `di
 
 ## Ground rules
 
+- Call `leitvia/get-contract` first` and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read: the abilities give you every ID, hash and status you need. Reading public pages of the site is fine and part of the check. Where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after each write. On a Leitvia site these abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`, and you never write files in the theme.
 - **Never call a site accessible, barrier free or compliant.** Automated checks find a part of the barriers. Without the tests of a person (see step 6) the report says "no automatically detectable barriers on the checked pages", nothing more.
 - **Several writes to one post** in the same package build on each other: each write sends the `hash` of `leitvia/get-page-outline` as usual, changes the post as your earlier writes in the package left it, and the person applies them in order. Several text fixes of one post still fit into one `leitvia/update-content` call.
 - **Only what a write brings counts.** Every write runs the content checks over the full post, but findings the post already had do not block it. A write that adds a finding or makes one worse is rejected with `leitvia_check_failed` and names it.
@@ -30,7 +36,7 @@ In mode `package` every fix waits in the package, alt text included. In mode `di
 - **Facts are never guessed.** Organization data, prices, legal texts, figures, quotes and people come only from a source you can name: the person, a page of the site or a read ability, with the source in your report. Without one, stop at a checkpoint; never write a placeholder that looks like a fact.
 - The theme comes with its own test report; it covers the theme, not the content of this site. Judge the site by what you find on the site.
 
-## Steps
+## Procedure
 
 ### 1. Scope
 
@@ -73,6 +79,20 @@ Screen readers, keyboard and focus, the meaning of your texts, plain and easy-to
 
 The page kind `accessibility` is a legal text; its content and legal statements come from the person ([accessibility statement](references/checks.md#accessibility-statement)).
 
+## Verification
+
+- The "after" of step 5: `leitvia/get-package` shows no conflicts, and `leitvia/audit-site` and the public pages no longer show the findings you fixed.
+- Every fix you report as live is in the result of its write as `live`; everything else waits in the package.
+
+## Failure modes / debugging
+
+Every code with its retry rule: [rejections](../../handbook/rejections.md).
+
+- `leitvia_check_failed`: the write adds a finding or makes one worse; the message names it. Correct once.
+- `leitvia_stale_hash` on a second write to the same post: read `leitvia/get-page-outline` again and send its `hash`.
+- `leitvia_needs_human` from `leitvia/apply-package`: expected; `data.inbox` is the link for the person.
+- A finding in header, footer or navigation: it sits in a template part; report it, a person decides.
+
 ## Report
 
 Write the report in the chat, in the language of the person, in three parts, after the package and the checked pages:
@@ -83,9 +103,9 @@ Write the report in the chat, in the language of the person, in three parts, aft
 
 End with the scope (pages, date, language) and the sentence that the report covers automated checks only.
 
-## Checkpoints
+## Escalation
 
-Stop and ask the person, then continue with the answer:
+Stop and ask the person at these checkpoints, then continue with the answer:
 
 - **Scope:** pages to check when the request does not say it.
 - **Link targets:** a link to `#` or a vague link whose target you cannot tell.

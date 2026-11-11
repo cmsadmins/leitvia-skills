@@ -1,21 +1,27 @@
 ---
 name: leitvia-report
 description: Writes a report on a WordPress site with the Leitvia theme and Leitvia Studio for the person who owns or runs it, from read abilities only (audit-site, get-site-health, get-seo, get-tokens, list-packages) and the public pages. Covers content quality and accessibility findings, search data, versions and updates, design contrast and open change packages, each figure with its source and date, in plain language with the most important points first, and on request a JSON export of pages, menus and token sets for a handover. Changes nothing. Use it when someone asks for a status, health, quality or SEO report, a monthly summary or a handover document; fixing belongs to leitvia-maintain, leitvia-a11y and leitvia-seo-geo.
-compatibility: Needs a site with the theme Leitvia and the plugin Leitvia Studio, reached over the MCP server leitvia or the REST routes of the Abilities API with an application password.
+compatibility: WordPress 7.1+, PHP 8.2+. Needs the theme Leitvia and the plugin Leitvia Studio, reached over the MCP server leitvia or the REST routes of the Abilities API with an application password.
 ---
 
 # leitvia-report
 
 You read a site and tell its owner, in their words, how it stands and what to do next. Every statement rests on a source you name. You change nothing.
 
-Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [audit-site](../../handbook/abilities/leitvia-audit-site.md), [get-site-health](../../handbook/abilities/leitvia-get-site-health.md), [list-content](../../handbook/abilities/leitvia-list-content.md), [get-seo](../../handbook/abilities/leitvia-get-seo.md), [get-tokens](../../handbook/abilities/leitvia-get-tokens.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md), for an export [export](../../handbook/abilities/leitvia-export.md). Layout, severity and wording: [report format](references/format.md).
+## When to use
 
-## Access
+- A status report for the owner, an agency or a handover, or an export of the content; read only.
+- Not for fixing what it finds: leitvia-maintain, leitvia-a11y, leitvia-seo-geo and leitvia-design do that.
 
-MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Paths start at the address of the site, not at the host. Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, ask the person. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read. Reading public pages of the site is fine and part of the report.
+## Inputs required
+
+- Access: MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Paths start at the address of the site, not at the host.
+- Reader, purpose and format of the report (step 1).
+- Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of each ability before you first call it (the handbook index links them): `audit-site`, `get-site-health`, `list-content`, `get-seo`, `get-tokens`, `list-packages`, for an export `export`. Layout, severity and wording: [report format](references/format.md).
 
 ## Ground rules
 
+- Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, ask the person. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read. Reading public pages of the site is fine and part of the report.
 - **Read only.** This skill calls no write ability and sends no `package` key. A problem you find goes into the report with the skill that fixes it.
 - **Facts are never guessed.** Organization data, prices, legal texts, figures, quotes and people come only from a source you can name: the person, a page of the site or a read ability, with the source in your report. Without one, stop at a checkpoint; never write a placeholder that looks like a fact.
 - **Every figure has a source:** the ability or public URL and the date you read it. A count you did not finish (paging stopped, a rejection) is marked as partial.
@@ -23,7 +29,7 @@ MCP server `leitvia` or the REST routes of the Abilities API, as the agent user 
 - **No personal data in the report** beyond what the person gave you: no user names, emails or comments. Plugin and theme names are fine.
 - A rejection is corrected at most once, following `message`, `next_ability` and `retry`. If the second call is rejected too, or `retry` is `never`, that source is missing; say so in the report.
 
-## Steps
+## Procedure
 
 ### 1. Reader and purpose
 
@@ -51,13 +57,27 @@ Use the [layout](references/format.md#layout): summary, key figures, findings by
 
 For a handover or a copy of the content, call `leitvia/export`: pages (block markup), navigation menus and token sets come as `items`, the first call also brings template parts and the content model. Call again with `offset` set to `next` until `next` is `null`; `parts` narrows it. Save the items of all calls in one JSON file and name its counts in the report. Say what it lacks: media files, posts, products and settings; drafts are in it, and it restores nothing by itself.
 
+## Verification
+
+- Every figure in the report names its ability or URL and the date; partial counts are marked.
+- Every point of the summary names the skill or the person that fixes it.
+- An export file holds the items of all calls, and its counts match the report.
+
+## Failure modes / debugging
+
+Every code with its retry rule: [rejections](../../handbook/rejections.md).
+
+- `leitvia_forbidden` from `leitvia/get-site-health`: the agent user may not read versions; note it as missing.
+- `leitvia_rate_limited`: wait the seconds of `after:<seconds>` and read again.
+- `leitvia_no_contract`: the active theme is not Leitvia, or its contract is broken; say so in the report.
+
 ## Report
 
 The report itself is the result. Deliver it in the format of step 1 and end the chat message with the date, the scope (pages and sources read) and the sentence that the report is based on automated reads and does not replace a review by a person.
 
-## Checkpoints
+## Escalation
 
-Stop and ask the person, then continue with the answer:
+Stop and ask the person at these checkpoints, then continue with the answer:
 
 - **Reader:** who reads the report and what for, when the request does not say it.
 - **Format:** chat, a Markdown file or another format the person needs.

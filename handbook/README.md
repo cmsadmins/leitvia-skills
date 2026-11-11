@@ -1,6 +1,6 @@
 # Leitvia agent handbook
 
-Generated from Leitvia Studio 1.3.43. Do not edit.
+Generated from Leitvia Studio 1.3.44. Do not edit.
 
 Everything an agent needs to work on a WordPress site with Leitvia Studio through its 58 abilities. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call.
 

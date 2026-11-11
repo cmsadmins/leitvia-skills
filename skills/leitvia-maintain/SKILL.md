@@ -1,20 +1,23 @@
 ---
 name: leitvia-maintain
 description: Maintains an existing WordPress site with the Leitvia theme and Leitvia Studio through the leitvia abilities only. Audits the published content, repairs broken internal links, sets missing alt text, replaces deprecated patterns and fixes outdated texts, bundles every write of one maintenance run into one change package and reports the findings before and after with a link to the package. Rolls a package back only when a person asks. Use it for a regular maintenance run or when someone reports broken links, missing alt text or outdated sections; accessibility beyond these checks belongs to leitvia-a11y.
-compatibility: Needs a site with the theme Leitvia and the plugin Leitvia Studio, reached over the MCP server leitvia or the REST routes of the Abilities API with an application password.
+compatibility: WordPress 7.1+, PHP 8.2+. Needs the theme Leitvia and the plugin Leitvia Studio, reached over the MCP server leitvia or the REST routes of the Abilities API with an application password.
 ---
 
 # leitvia-maintain
 
 A maintenance run takes a site that already works and leaves it in a better state: audit, fixes per area, one change package for a person, a report with the findings before and after. You change the site only through the abilities of Leitvia Studio.
 
-Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [audit-site](../../handbook/abilities/leitvia-audit-site.md), [get-page-outline](../../handbook/abilities/leitvia-get-page-outline.md), [get-block](../../handbook/abilities/leitvia-get-block.md), [repair-links](../../handbook/abilities/leitvia-repair-links.md), [set-alt-text](../../handbook/abilities/leitvia-set-alt-text.md), [update-block](../../handbook/abilities/leitvia-update-block.md), [update-content](../../handbook/abilities/leitvia-update-content.md), [replace-pattern](../../handbook/abilities/leitvia-replace-pattern.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md), [get-package](../../handbook/abilities/leitvia-get-package.md), [rollback](../../handbook/abilities/leitvia-rollback.md). How to fix each area and how to roll back: [fix details](references/fixes.md).
+## When to use
 
-## Access
+- A regular maintenance run, or a report of broken links, missing alt text or outdated sections.
+- Not for accessibility beyond these checks (leitvia-a11y), new pages (leitvia-page) or the catalog of a shop (leitvia-shop).
 
-MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read. Reading public pages of the site is fine. Where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after each write. On a Leitvia site these abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`, and you never write files in the theme.
+## Inputs required
 
-If every write ends with 403 and the abilities answer 404, Leitvia Studio is not active. The role stores no capability, so without Studio the agent can change nothing on the site. Tell the person and stop; do not try core routes. The password works again once a person activates Studio. After Studio was deleted the password is gone and a person creates a new one.
+- Access: MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest).
+- The package key of the run; for outdated content, the sources the person names.
+- Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of each ability before you first call it (the handbook index links them): `audit-site`, `get-page-outline`, `get-block`, `repair-links`, `set-alt-text`, `update-block`, `update-content`, `replace-pattern`, `list-packages`, `get-package`, `rollback`. How to fix each area and how to roll back: [fix details](references/fixes.md).
 
 ## Modes
 
@@ -25,6 +28,7 @@ Corrections (links, alt text) belong to the area `corrections`, which is `autono
 
 ## Ground rules
 
+- Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read. Reading public pages of the site is fine. Where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after each write. On a Leitvia site these abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`, and you never write files in the theme.
 - Read before write. Take post IDs, block IDs and hashes from the abilities, never from memory.
 - **Several writes to one post** in the same package build on each other: each write sends the `hash` of `leitvia/get-page-outline` as usual, changes the post as your earlier writes in the package left it, and the person applies them in order. Combine the changes of one post in one call where the ability allows it anyway (`leitvia/update-content` takes up to 50 blocks; `leitvia/repair-links` repairs all links of a post at once).
 - **Only what a write brings counts.** Every write runs the content checks over the full post, but findings the post already had (a skipped heading level, an image without alt text elsewhere) do not block it. A write that adds a finding or makes one worse is rejected with `leitvia_check_failed` and names it.
@@ -33,7 +37,7 @@ Corrections (links, alt text) belong to the area `corrections`, which is `autono
 - Never change prices, legal texts or organization data on your own.
 - Never write review notes or HTML comments into content. Open questions go into the report.
 
-## Steps
+## Procedure
 
 ### 1. Audit
 
@@ -84,22 +88,30 @@ Every write of the run carries the same `package` key. After the last write:
 
 The person reviews the package in the inbox of Leitvia Studio: `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=<id>`. Checkpoint **Package applied**.
 
-### 7. After the person applied it
+## Speed
+
+The target on mobile is 100 in PageSpeed in all four categories; what the theme does and what stays with the person: [speed](references/fixes.md#speed).
+
+## Rollback
+
+Only when a person asks for it, never to tidy up your own run: confirm the package with them, then `leitvia/rollback`. A `leitvia_rollback_conflict` means a person changed a post since; show the diff and stop. Steps: [rollback](references/fixes.md#rollback).
+
+## Verification
+
+After the person applied the package:
 
 - `GET /wp-cron.php` where WP-Cron does not run by itself.
 - `leitvia/list-packages` with `state: applied`, and `leitvia/get-package`: operations with a `conflict` were not written because someone changed the post in between. Read the post again and repeat that change once in a new run; never force it.
 - `leitvia/audit-site` again over all pages: the "after" of your report.
 - Request the repaired links again; each answers 200.
 
-## Speed
+## Failure modes / debugging
 
-The target on mobile is 100 in PageSpeed for performance, accessibility, best practices and SEO. The theme prints block styles inside the document and preloads only the body, heading and button fonts in the weight they use; Studio loads its script modules last, at low priority. Up to 150 KB of stylesheets go inside the document, smallest first, also those of plugins with files on this site. A `link rel="stylesheet"` that remains is a large plugin stylesheet (WooCommerce keeps a few on shop pages) or one from another host: name it in the report. Scores vary between runs, so judge from the render-blocking list and the filmstrip, not from one number.
+Every code with its retry rule: [rejections](../../handbook/rejections.md).
 
-What stays with the site, for the person to decide: font files uploaded without a Latin subset (one file above 30 KB delays the first paint) and missing cache lifetimes for static files on the server. List both when you find them.
-
-## Rollback
-
-Only when a person asks for it, never to tidy up your own run: confirm the package with them, then `leitvia/rollback`. A `leitvia_rollback_conflict` means a person changed a post since; show the diff and stop. Steps: [rollback](references/fixes.md#rollback).
+- Every write ends with 403 and the abilities answer 404: Leitvia Studio is not active. The role stores no capability, so without Studio the agent can change nothing on the site. Tell the person and stop; do not try core routes. The password works again once a person activates Studio. After Studio was deleted the password is gone and a person creates a new one.
+- `leitvia_check_failed`: the write adds a finding or makes one worse; the message names it. Correct once.
+- `leitvia_needs_human` from `leitvia/apply-package`: expected; `data.inbox` is the link for the person.
 
 ## Report
 
@@ -111,9 +123,9 @@ Write the report in the chat, in the language of the person:
 4. **Open with reason:** findings no ability can fix, broken links in template parts, external links not checked, conflicts.
 5. **Questions for the person:** link targets, facts, open markers.
 
-## Checkpoints
+## Escalation
 
-Stop and ask the person, then continue with the answer:
+Stop and ask the person at these checkpoints, then continue with the answer:
 
 - **Link targets:** a broken link has no address that clearly fits its text.
 - **Section without replacement:** `leitvia_no_replacement`.

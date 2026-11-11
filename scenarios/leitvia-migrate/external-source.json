@@ -5,7 +5,7 @@
 	"briefing": "Move our old site builder site at {{source}} to this Leitvia site: every page with its texts, the workshop photo and the menu. Leave out cookie banners, trackers and fonts of the old site. Put everything into change packages for us.",
 	"mode": "package",
 	"budget": {
-		"tokens": 15000,
+		"tokens": 15050,
 		"files": [
 			"skills/leitvia-migrate/references/external.md",
 			"skills/leitvia-migrate/references/translate.md",

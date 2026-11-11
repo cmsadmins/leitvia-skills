@@ -6,7 +6,7 @@
 	"mode": "package",
 	"unattended": true,
 	"budget": {
-		"tokens": 11200,
+		"tokens": 11250,
 		"files": [
 			"skills/leitvia-seo-geo/references/seo.md",
 			"handbook/abilities/leitvia-list-content.md",

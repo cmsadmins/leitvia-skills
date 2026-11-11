@@ -1,18 +1,23 @@
 ---
 name: leitvia-shop
 description: Looks after the catalog of a WooCommerce shop on a WordPress site with the Leitvia theme and Leitvia Studio, through the leitvia abilities only. Reads products and categories, improves product texts, images with alt text, categories and tags, sets featured products, upsells, cross-sells and the sort order, and adds simple products, all in one change package for a person. Prices, tax and shipping change only with a value from the person and always wait for a person; orders, coupons and customers stay out of reach. Use it for product care in an existing shop; setting up a new shop belongs to leitvia-setup, shop pages to leitvia-page.
-compatibility: Needs a site with the theme Leitvia, the plugin Leitvia Studio and WooCommerce, reached over the MCP server leitvia or the REST routes of the Abilities API with an application password.
+compatibility: WordPress 7.1+, PHP 8.2+. Needs the theme Leitvia, the plugin Leitvia Studio and WooCommerce, reached over the MCP server leitvia or the REST routes of the Abilities API with an application password.
 ---
 
 # leitvia-shop
 
 Product care takes a shop that already sells and makes its catalog clearer: better texts, described images, tidy categories, products that lead to each other. You change the shop only through the abilities of Leitvia Studio; a person decides on prices and applies the package.
 
-Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [list-products](../../handbook/abilities/leitvia-list-products.md), [get-product](../../handbook/abilities/leitvia-get-product.md), [update-product](../../handbook/abilities/leitvia-update-product.md), [update-product-category](../../handbook/abilities/leitvia-update-product-category.md), [set-merchandising](../../handbook/abilities/leitvia-set-merchandising.md), [list-product-attributes](../../handbook/abilities/leitvia-list-product-attributes.md), [update-product-attribute](../../handbook/abilities/leitvia-update-product-attribute.md), [list-product-reviews](../../handbook/abilities/leitvia-list-product-reviews.md), [update-product-review](../../handbook/abilities/leitvia-update-product-review.md), [create-product](../../handbook/abilities/leitvia-create-product.md), [add-media](../../handbook/abilities/leitvia-add-media.md), [set-alt-text](../../handbook/abilities/leitvia-set-alt-text.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md), [get-package](../../handbook/abilities/leitvia-get-package.md).
+## When to use
 
-## Access
+- Care of the catalog of a shop that already sells: texts, images, categories, attributes, reviews, merchandising and new simple products.
+- Not for setting up a shop (leitvia-setup, recipe `leitvia/shop`), shop pages (leitvia-page) or shop settings, which are the person's.
 
-MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI, the REST routes of WordPress core (`/wp-json/wp/v2/...`) or of WooCommerce (`/wp-json/wc/...`), not even to read. Reading public pages of the shop is fine. The product abilities exist only while WooCommerce is active; when `leitvia/list-products` is unknown, stop and tell the person. On a Leitvia site these abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`, and you never write files in the theme.
+## Inputs required
+
+- Access: MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest).
+- WooCommerce is active. Prices, product facts and the products to feature come from the person or a source they name.
+- Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of each ability before you first call it (the handbook index links them): `list-products`, `get-product`, `update-product`, `update-product-category`, `set-merchandising`, `list-product-attributes`, `update-product-attribute`, `list-product-reviews`, `update-product-review`, `create-product`, `add-media`, `set-alt-text`, `list-packages`, `get-package`.
 
 ## Modes
 
@@ -21,6 +26,7 @@ MCP server `leitvia` or the REST routes of the Abilities API, as the agent user 
 
 ## Ground rules
 
+- Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI, the REST routes of WordPress core (`/wp-json/wp/v2/...`) or of WooCommerce (`/wp-json/wc/...`), not even to read. Reading public pages of the shop is fine. The product abilities exist only while WooCommerce is active; when `leitvia/list-products` is unknown, stop and tell the person. On a Leitvia site these abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`, and you never write files in the theme.
 - Read before write. Take product IDs, term IDs and hashes from `leitvia/list-products` and `leitvia/get-product`, never from memory. A product sends the `hash` of `leitvia/get-product` as `base_hash`, a category or tag the `hash` of its term.
 - **Facts are never guessed.** Organization data, prices, legal texts, figures, quotes and people come only from a source you can name: the person, a page of the site or a read ability, with the source in your report. Without one, stop at a checkpoint; never write a placeholder that looks like a fact.
 - Product facts are facts too: material, size, weight, origin, care, certificates, delivery times and claims such as "handmade" or "organic" come from the product data (`attributes`, the current texts), a page of the site or the person. Better wording of a known fact is your work; a new fact is not.
@@ -30,7 +36,7 @@ MCP server `leitvia` or the REST routes of the Abilities API, as the agent user 
 - A rejection is corrected at most once, following `message`, `next_ability` and `retry`. If the second call is rejected too, or `retry` is `never`, stop and tell the person.
 - Never write review notes or HTML comments into product texts. Open questions go into the report.
 
-## Steps
+## Procedure
 
 ### 1. Read the catalog
 
@@ -70,7 +76,20 @@ More than three images, or a newsletter sign-up: [shop pages](references/shop-pa
 
 ### 8. The package
 
-After the last write: `leitvia/list-packages` with `state: open`, then `leitvia/get-package` with `id`, and check each diff. Do not call `leitvia/apply-package`: the area `products` and the kinds `prices`, `tax` and `shipping` are not `autonomous` by default, and the person reviews the package at `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=<id>`. Checkpoint **Package applied**. Afterwards read each product again with `leitvia/get-product` and request its `link`: it answers 200 and shows the new texts.
+After the last write: `leitvia/list-packages` with `state: open`, then `leitvia/get-package` with `id`, and check each diff. Do not call `leitvia/apply-package`: the area `products` and the kinds `prices`, `tax` and `shipping` are not `autonomous` by default, and the person reviews the package at `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=<id>`. Checkpoint **Package applied**.
+
+## Verification
+
+After the person applied the package, read each product again with `leitvia/get-product` and request its `link`: it answers 200 and shows the new texts.
+
+## Failure modes / debugging
+
+Every code with its retry rule: [rejections](../../handbook/rejections.md).
+
+- `leitvia/list-products` is unknown: WooCommerce is not active; stop and tell the person.
+- `leitvia_check_failed` with `next_ability` `leitvia/set-alt-text`: a product image has no alt text; set it first.
+- `leitvia_out_of_scope`: orders, refunds, coupons and customers are out of reach (`retry: never`).
+- `leitvia_media_missing`: the image waits in a package; set it on the product in a second package.
 
 ## Report
 
@@ -81,9 +100,9 @@ Write the report in the chat, in the language of the person:
 3. **Open with reason:** products without image alt text, facts without a source, stock or variable products for the person.
 4. **Questions for the person:** prices, facts, products to feature.
 
-## Checkpoints
+## Escalation
 
-Stop and ask the person, then continue with the answer:
+Stop and ask the person at these checkpoints, then continue with the answer:
 
 - **Plan confirmed:** the products and changes of step 2, before the first write.
 - **Facts from the person:** prices, product facts or claims without a source, and every computed sale price.

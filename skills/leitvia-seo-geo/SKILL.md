@@ -1,18 +1,23 @@
 ---
 name: leitvia-seo-geo
 description: Improves how a WordPress site with the Leitvia theme and Leitvia Studio is found in search engines and cited in AI answers (ChatGPT, Perplexity, Google AI Overviews), without tricks. Reads titles, meta descriptions, robots and structured data of every page through the active SEO plugin (Yoast SEO, Rank Math, SEOPress, The SEO Framework), writes better titles and descriptions from what the pages say in a change package, suggests clearer structure and drafts an llms.txt for the person to publish. Checks first that the whole site is visible to search engines and fit for Google News. Use it after a site went live, after new pages, or when someone asks about SEO, rankings, AI search or llms.txt; a full report on a site belongs to leitvia-report.
-compatibility: Needs a site with the theme Leitvia and the plugin Leitvia Studio, reached over the MCP server leitvia or the REST routes of the Abilities API with an application password. Writing SEO data needs one of the four SEO plugins; without one the skill reads and suggests only.
+compatibility: WordPress 7.1+, PHP 8.2+. Needs the theme Leitvia and the plugin Leitvia Studio, reached over the MCP server leitvia or the REST routes of the Abilities API with an application password. Writing SEO data needs one of the four SEO plugins; without one the skill reads and suggests only.
 ---
 
 # leitvia-seo-geo
 
 You make each page say clearly, in its title, description and first lines, what it offers, so search engines list it and AI answers can quote it. You change the site only through the abilities of Leitvia Studio and never with tricks.
 
-Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [list-content](../../handbook/abilities/leitvia-list-content.md), [get-seo](../../handbook/abilities/leitvia-get-seo.md), [update-seo](../../handbook/abilities/leitvia-update-seo.md), [get-page-outline](../../handbook/abilities/leitvia-get-page-outline.md), [update-content](../../handbook/abilities/leitvia-update-content.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md), [get-package](../../handbook/abilities/leitvia-get-package.md). Rules for site visibility, titles, descriptions, structure, structured data, Google News and llms.txt: [SEO and GEO details](references/seo.md).
+## When to use
 
-## Access
+- Titles, descriptions, indexing and structure of existing pages for search engines and AI answers, or an llms.txt draft.
+- Not for new pages (leitvia-page), news posts (leitvia-news) or accessibility (leitvia-a11y).
 
-MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Paths start at the address of the site, not at the host. Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read. Reading public pages of the site, `robots.txt` and `llms.txt` is fine and part of the work. Where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after each write. On a Leitvia site these abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`, and you never write files in the theme.
+## Inputs required
+
+- Access: MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Paths start at the address of the site, not at the host.
+- The pages that matter and who should find them (step 1).
+- Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of each ability before you first call it (the handbook index links them): `list-content`, `get-seo`, `update-seo`, `get-page-outline`, `update-content`, `list-packages`, `get-package`. Rules for site visibility, titles, descriptions, structure, structured data, Google News and llms.txt: [SEO and GEO details](references/seo.md).
 
 ## Modes
 
@@ -21,6 +26,7 @@ MCP server `leitvia` or the REST routes of the Abilities API, as the agent user 
 
 ## Ground rules
 
+- Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read. Reading public pages of the site, `robots.txt` and `llms.txt` is fine and part of the work. Where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after each write. On a Leitvia site these abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`, and you never write files in the theme.
 - **No tricks.** No keyword lists, no repeated phrases, no hidden text, no texts written for machines rather than people, no structured data for content the page does not show, no fake reviews, ratings or FAQ. They do not help and they can cost the site its place in search.
 - **Say only what the page says.** A title or description summarizes the page; `leitvia/update-seo` rejects numbers the post does not contain (`unsupported_fact`). Do not promise what the page does not offer.
 - **Facts are never guessed.** Organization data, prices, legal texts, figures, quotes and people come only from a source you can name: the person, a page of the site or a read ability, with the source in your report. Without one, stop at a checkpoint; never write a placeholder that looks like a fact.
@@ -28,7 +34,7 @@ MCP server `leitvia` or the REST routes of the Abilities API, as the agent user 
 - **Without an SEO plugin** `plugin.key` is `leitvia`: `leitvia/update-seo` stores title, description and robots and prints them, the title as written. Never change the title of a page to change its `<title>`: it is the `h1`. With an SEO plugin Studio cannot write to the write is rejected with `leitvia_no_seo_plugin`; list the titles and descriptions you would write.
 - A rejection is corrected at most once, following `message`, `next_ability` and `retry`. If the second call is rejected too, or `retry` is `never`, stop and tell the person.
 
-## Steps
+## Procedure
 
 ### 1. Scope and goal
 
@@ -59,9 +65,17 @@ AI answers quote passages that stand on their own. Suggest, per page, what would
 
 Leitvia Studio writes no files. Draft an `llms.txt` from the pages you read ([llms.txt](references/seo.md#llmstxt)) and put it in the report for the person to publish. Whether AI crawlers may read the site (`robots.txt`) is the person's decision (checkpoint **AI crawlers**); report what `robots.txt` says today.
 
-### 7. After the person applied the package
+## Verification
 
 `leitvia/list-packages` with `state: open` gives your package; the person applies it in the inbox (checkpoint **Package applied**). Then `leitvia/get-package` for conflicts, `leitvia/get-seo` and the public pages again: the "after" of your report.
+
+## Failure modes / debugging
+
+Every code with its retry rule: [rejections](../../handbook/rejections.md).
+
+- `leitvia_invalid_input`, reason `unsupported_fact`: the title or description names a number the post does not hold; write it from the page.
+- `leitvia_no_seo_plugin`: no plugin Studio can write to; list what you would write.
+- `leitvia_stale_hash`: the SEO data changed since `leitvia/get-seo`; read it again and repeat once.
 
 ## Report
 
@@ -74,9 +88,9 @@ In the chat, in the language of the person:
 
 End with the scope, the SEO plugin and the date. Promise no rankings: search engines and AI services decide what they show.
 
-## Checkpoints
+## Escalation
 
-Stop and ask the person, then continue with the answer:
+Stop and ask the person at these checkpoints, then continue with the answer:
 
 - **Goal:** pages and audience when the request does not say it.
 - **Indexing:** any change of `noindex` or `nofollow`, and a site hidden from search engines.

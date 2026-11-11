@@ -1,18 +1,23 @@
 ---
 name: leitvia-news
 description: Writes a regular news post for the blog of a WordPress site with the Leitvia theme and Leitvia Studio, for example once a week, through the leitvia abilities only. Takes topics and sources from a news brief of the operator, checks candidates against the posts the site already has, writes the post from sources it lists under the post, makes it fit for search, Google News and AI answers (SEO and GEO: title, description, first paragraph, internal links, image, a site visible to search engines), marks it as written by AI and leaves it as a draft in a change package for a person. Use it for scheduled news runs or when someone asks for a news post from given sources; pages belong to leitvia-page.
-compatibility: Needs a site with the theme Leitvia and the plugin Leitvia Studio, reached over the MCP server leitvia or the REST routes of the Abilities API with an application password. Steps 2 and 6 need leitvia/list-content and leitvia/create-content (Leitvia Studio after 1.0.0), step 5 leitvia/get-seo.
+compatibility: WordPress 7.1+, PHP 8.2+. Needs the theme Leitvia and the plugin Leitvia Studio, reached over the MCP server leitvia or the REST routes of the Abilities API with an application password. Steps 2 and 6 need leitvia/list-content and leitvia/create-content (Leitvia Studio after 1.0.0), step 5 leitvia/get-seo.
 ---
 
 # leitvia-news
 
 One run, at most one post: find what is new in the sources of the brief, drop what the site already covered, write a short post with its sources and an AI notice, make it fit for search and AI answers, and leave it as a draft in a change package. Nothing is published by this skill.
 
-Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [get-contract](../../handbook/abilities/leitvia-get-contract.md), [list-content](../../handbook/abilities/leitvia-list-content.md), [create-content](../../handbook/abilities/leitvia-create-content.md), [get-seo](../../handbook/abilities/leitvia-get-seo.md), [update-seo](../../handbook/abilities/leitvia-update-seo.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md), [get-package](../../handbook/abilities/leitvia-get-package.md). The brief, the duplicate check, the sources, the post format and the limits for SEO and GEO: [news details](references/brief.md). Overview, archives and post page come from the theme; setting up the blog itself: [blog or journal](../leitvia-page/references/blog.md).
+## When to use
 
-## Access
+- A regular news post from the sources of a news brief, as a draft for a person.
+- Not for pages (leitvia-page), SEO of existing pages (leitvia-seo-geo) or setting up the blog (leitvia-setup).
 
-MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Paths start at the address of the site, not at the host. Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read. Reading public pages of the site and of the sources in the brief is fine. Where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after each write. On a Leitvia site these abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`, and you never write files in the theme.
+## Inputs required
+
+- Access: MCP server `leitvia` or the REST routes of the Abilities API, as the agent user with its application password: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). Paths start at the address of the site, not at the host.
+- The news brief of the operator (step 1).
+- Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of each ability before you first call it (the handbook index links them): `get-contract`, `list-content`, `create-content`, `get-seo`, `update-seo`, `list-packages`, `get-package`. The brief, the duplicate check, the sources, the post format and the limits for SEO and GEO: [news details](references/brief.md). Overview, archives and post page come from the theme; setting up the blog itself: [blog or journal](../leitvia-page/references/blog.md).
 
 ## Modes
 
@@ -20,6 +25,7 @@ MCP server `leitvia` or the REST routes of the Abilities API, as the agent user 
 
 ## Ground rules
 
+- Call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person. Never use SQL, WP-CLI or the REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read. Reading public pages of the site and of the sources in the brief is fine. Where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after each write. On a Leitvia site these abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`, and you never write files in the theme.
 - **Facts are never guessed.** Organization data, prices, legal texts, figures, quotes and people come only from a source you can name: the person, a page of the site or a read ability, with the source in your report. Without one, stop at a checkpoint; never write a placeholder that looks like a fact.
 - In a news post the source of every fact is a source item of the brief, listed under the post. Quotes are short, marked and attributed; the rest is your own wording.
 - At most one post per run, and never one that covers what the site already has (duplicate check).
@@ -27,7 +33,7 @@ MCP server `leitvia` or the REST routes of the Abilities API, as the agent user 
 - Never publish, never change or delete existing posts, never schedule.
 - A rejection is corrected at most once, following `message`, `next_ability` and `retry`. If the second call is rejected too, or `retry` is `never`, stop and tell the person.
 
-## Steps
+## Procedure
 
 ### 1. Read the brief
 
@@ -59,15 +65,26 @@ Required for every post; limits and Google News rules: [SEO and GEO](references/
 
 Call `leitvia/create-content` with `post_type` `post` (or the type of the content model the brief names, with its `fields`), `title`, `content`, `excerpt`, `slug`, `terms` (category and tags from the brief by name; new ones are created with the post, in a package when it is applied), `status` `draft`, `ai_generated` true, `sources` (the URLs), `featured_image` when step 5 found one, empty `base_hash` and the `package` key. A user who may not create the category (`leitvia_forbidden`, reason `capability`): send the call once more without it and name the category in the report.
 
-### 7. Check and report
+## Verification
 
 - `leitvia/list-packages` with `state: open` and `leitvia/get-package`: the package holds the draft and the SEO writes of step 5, nothing else.
 - Open the preview link of the package from `leitvia/list-packages`: the post shows date and author, and its JSON-LD has `@type` `NewsArticle`, or `BlogPosting` when `news_categories` of Studio leaves out the category of the post. Anything else goes into the report.
-- Report: a hidden site first, as high. Then package ID, Inbox link `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=<id>`, title, sources, the duplicates you dropped with the post they match, the SEO title and description, and open questions (image, SEO plugin, editorial page).
 
-## Checkpoints
+## Failure modes / debugging
 
-Stop and ask the person, then continue with the answer:
+Every code with its retry rule: [rejections](../../handbook/rejections.md).
+
+- `leitvia_forbidden`, reason `capability`, on a new category: step 6 sends the call once more without it.
+- `leitvia_check_failed`: the featured image needs alt text; set it with `leitvia/set-alt-text` or mark the image as decorative.
+- `leitvia_out_of_scope`: a status other than `draft`; this skill never sets one.
+
+## Report
+
+A hidden site first, as high. Then package ID, Inbox link `/wp-admin/admin.php?page=leitvia-studio-agents&tab=inbox&package=<id>`, title, sources, the duplicates you dropped with the post they match, the SEO title and description, and open questions (image, SEO plugin, editorial page).
+
+## Escalation
+
+Stop and ask the person at these checkpoints, then continue with the answer:
 
 - **Brief:** topics or sources are missing, or a source asks for a login.
 - **No news:** every candidate is a duplicate, or the cadence says it is too early. Report it; nothing to write.

@@ -14,6 +14,10 @@ Agent skills and workflows for WordPress sites with the theme Leitvia and the pl
 
 Each skill stops at checkpoints and asks the person: before the first write, before anything goes live, for facts only the person knows (legal texts, prices, organization data), and after a rejection it could not fix in one attempt. When no person answers (a scheduled or hosted run), the section Unattended of each skill gives every checkpoint its answer: writes only into a change package, facts only from a named source, open questions in the report, nothing live.
 
+## Skill format
+
+Each `SKILL.md` is built like the skills of [WordPress/agent-skills](https://github.com/WordPress/agent-skills): frontmatter with `name`, `description` and `compatibility` (minimum versions of WordPress and PHP first), then When to use, Inputs required, Procedure, Verification, Failure modes / debugging and Escalation, in this order. The sections of Leitvia sit between them where they belong: Modes and Ground rules before the procedure, Report after the checks, Unattended and Limits at the end. Escalation lists the checkpoints, and Unattended gives each one its answer for a run without a person. Details stay in `references/`, so a `SKILL.md` stays short.
+
 ## 1. Prepare the site
 
 - WordPress 7.1 or later and PHP 8.2 or later, with HTTPS. Application passwords of WordPress work only over HTTPS (or on a local development site).
@@ -34,7 +38,7 @@ For a test or demo run on your own machine, without a server, the Playground CLI
 	"siteOptions": { "permalink_structure": "/%postname%/" },
 	"steps": [
 		{ "step": "installTheme", "themeData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia/releases/download/1.2.44/leitvia-1.2.44.zip" }, "options": { "activate": true } },
-		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.43/leitvia-studio-1.3.43.zip" }, "options": { "activate": true } },
+		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.44/leitvia-studio-1.3.44.zip" }, "options": { "activate": true } },
 		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://downloads.wordpress.org/plugin/mcp-adapter.0.7.1.zip" }, "options": { "activate": true } },
 		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://downloads.wordpress.org/plugin/woocommerce.11.2.1.zip" }, "options": { "activate": true } },
 		{ "step": "runPHP", "code": "<?php require_once '/wordpress/wp-load.php'; $id = wp_insert_user( array( 'user_login' => 'leitvia-agent', 'display_name' => 'Leitvia agent', 'user_email' => 'agent@example.org', 'user_pass' => wp_generate_password( 32 ), 'role' => 'leitvia_agent' ) ); $created = is_wp_error( $id ) ? $id : WP_Application_Passwords::create_new_application_password( $id, array( 'name' => 'leitvia agent' ) ); if ( is_wp_error( $created ) ) { throw new Exception( $created->get_error_message() ); } wp_mkdir_p( '/leitvia-run' ); file_put_contents( '/leitvia-run/agent-password.txt', $created[0] . \"\n\" );" }
@@ -223,7 +227,7 @@ Each workflow asks for the mode at the start:
 
 Leitvia supports the standards WordPress sets for AI agents and will keep supporting them: the skills of [WordPress/agent-skills](https://github.com/WordPress/agent-skills), the Abilities API with its REST routes under `/wp-json/wp-abilities/v1` and the default server of the MCP Adapter. An agent that only has the WordPress skills works on a Leitvia site through these, see [Core REST without the leitvia MCP server](#core-rest-without-the-leitvia-mcp-server).
 
-The skills of this package add to the WordPress skills. On a Leitvia site the Leitvia abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`, and the agent never writes files in the theme; every skill here says so. Core preset slugs that agents know from the default themes, such as the colors `base` and `contrast` or spacing `50`, are mapped to the roles of the Leitvia design contract. The table is in `design.md` of the theme and in `coreAliases` of its `leitvia-contract.json`.
+The skills of this package add to the WordPress skills. On a Leitvia site the Leitvia abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`, and the agent never writes files in the theme `leitvia`; every skill here says so. Files that no ability can replace (workflows of `wp-block-themes` and `wp-patterns`, work of a developer) go only into the child theme `leitvia-child`, whose patterns follow the contract. A person switches to it, and Leitvia Studio carries over Global Styles and customized templates. Core preset slugs that agents know from the default themes, such as the colors `base` and `contrast` or spacing `50`, are mapped to the roles of the Leitvia design contract. The table is in `design.md` of the theme and in `coreAliases` of its `leitvia-contract.json`.
 
 ## Privacy
 

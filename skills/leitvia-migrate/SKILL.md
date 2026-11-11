@@ -1,18 +1,23 @@
 ---
 name: leitvia-migrate
 description: Moves a WordPress site from a classic theme to the Leitvia theme through the leitvia abilities only. Takes an inventory of pages, posts, menus, widgets and brand, leaves the theme switch to a person, hands the brand to leitvia-design, translates the classic HTML of every page and post into core blocks (paragraph, heading, list, image with alt text, table, quote, embed behind the consent placeholder) without losing a word or an image, rebuilds the main menu with its submenus and bundles every write into one change package. Also moves the public pages of a site outside WordPress (Wix, Squarespace, static HTML) page by page into blocks, with images, navigation and a reconciliation report. Use it when a site with classic content (no blocks) or another site moves to Leitvia; readers for page builders and ACF blocks are not part of it.
-compatibility: Needs a site with the plugin Leitvia Studio, before the switch with its classic theme and after it with the theme Leitvia, reached over the MCP server leitvia or the REST routes of the Abilities API with an application password.
+compatibility: WordPress 7.1+, PHP 8.2+. Needs the plugin Leitvia Studio, before the switch with its classic theme and after it with the theme Leitvia, reached over the MCP server leitvia or the REST routes of the Abilities API with an application password.
 ---
 
 # leitvia-migrate
 
 A migration takes a site built with a classic theme and the classic editor and leaves it on Leitvia with the same content as blocks: same pages, same URLs, same texts and images, the same menu, the brand as a token set. You change the site only through the abilities of Leitvia Studio.
 
-Read before the first call: the [agent handbook](../../handbook/README.md). Read the page of an ability before you first call it: [audit-site](../../handbook/abilities/leitvia-audit-site.md), [get-page-outline](../../handbook/abilities/leitvia-get-page-outline.md), [get-block](../../handbook/abilities/leitvia-get-block.md), [get-contract](../../handbook/abilities/leitvia-get-contract.md), [get-content-model](../../handbook/abilities/leitvia-get-content-model.md), [compose-page](../../handbook/abilities/leitvia-compose-page.md), [update-content](../../handbook/abilities/leitvia-update-content.md), [add-media](../../handbook/abilities/leitvia-add-media.md), [update-navigation](../../handbook/abilities/leitvia-update-navigation.md), [update-template-part](../../handbook/abilities/leitvia-update-template-part.md), [list-packages](../../handbook/abilities/leitvia-list-packages.md), [get-package](../../handbook/abilities/leitvia-get-package.md). Tag to block, images, the comparison and rejections of step 4: [translation details](references/translate.md); markup examples: [block markup](references/block-markup.md).
+## When to use
 
-## Access
+- A site with a classic theme and the classic editor moves to Leitvia, or content comes over from another site.
+- Not for a fresh site (leitvia-setup) or content of page builders and other plugins, which stays an open item.
 
-As the agent user over MCP or REST: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest). While the classic theme is active, `leitvia/get-contract` answers `leitvia_no_contract`; compare the address of your task with `home` of the public `GET /wp-json/` instead, after the switch with `site.url` of `leitvia/get-contract`. When they differ, write nothing and ask. No SQL, WP-CLI or core REST routes (`/wp-json/wp/v2/...`), not even to read; public pages are fine and part of the inventory. On a Leitvia site these abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`, and you never write files in the theme.
+## Inputs required
+
+- Access as the agent user over MCP or REST: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest).
+- The person who switches the theme, and the source site when it is another one.
+- Read before the first call: the [agent handbook](../../handbook/README.md). Read the page of each ability before you first call it (the handbook index links them): `audit-site`, `get-page-outline`, `get-block`, `get-contract`, `get-content-model`, `compose-page`, `update-content`, `add-media`, `update-navigation`, `update-template-part`, `list-packages`, `get-package`. Tag to block, images, the comparison and rejections of step 4: [translation details](references/translate.md); markup examples: [block markup](references/block-markup.md).
 
 ## Source outside this site
 
@@ -25,6 +30,7 @@ When the source is another site (any system, for example Wix), read only its pub
 
 ## Ground rules
 
+- While the classic theme is active, `leitvia/get-contract` answers `leitvia_no_contract`; compare the address of your task with `home` of the public `GET /wp-json/` instead, after the switch with `site.url` of `leitvia/get-contract`. When they differ, write nothing and ask. No SQL, WP-CLI or core REST routes (`/wp-json/wp/v2/...`), not even to read; public pages are fine and part of the inventory. On a Leitvia site these abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`, and you never write files in the theme.
 - **Nothing gets lost.** Every sentence, list item, table cell, link and image of a post is in its block version, word for word; only the form is new. When you cannot place something, stop and ask; never drop it quietly.
 - **No classic block and no Custom HTML.** The pipeline refuses `core/freeform` and `core/html` from agents (`leitvia_unsafe_content`). Every piece of HTML becomes a registered block; the [translation details](references/translate.md#tag-to-block) name the block for each tag.
 - **Themes and plugins belong to people.** The area `admin` is locked for agents. The theme switch, activating Leitvia Studio and every plugin change are checkpoints.
@@ -35,7 +41,7 @@ When the source is another site (any system, for example Wix), read only its pub
 - Never write review notes or HTML comments into content. Open questions go into the report.
 - Texts you write (alt texts, titles, excerpts, menu labels) pass the [text gates](../leitvia-page/references/text-gates.md); moved wording stays as it was, its findings go into the report.
 
-## Steps
+## Procedure
 
 ### 1. Inventory
 
@@ -84,12 +90,22 @@ Widgets do not move by themselves. For each widget of the inventory the person d
 
 ### 7. After the person applied the package
 
-`leitvia/list-packages` with `state: open` gives your package; the person applies it in the inbox (checkpoint **Package applied**). Then:
+`leitvia/list-packages` with `state: open` gives your package; the person applies it in the inbox (checkpoint **Package applied**). Then run the checks of the verification.
+
+## Verification
 
 - `GET /wp-cron.php` where needed, `leitvia/get-package` for conflicts.
 - `leitvia/audit-site` again: no item may still report `classic-content`, `leitvia_unknown_shortcode` or `leitvia_image_fixed_height` ([block markup](references/block-markup.md)).
 - The [page check](../leitvia-a11y/references/page-check.md) with `--old`; in the browser: embeds behind consent, submenus.
 - Run the skill `leitvia-a11y` over the migrated pages.
+
+## Failure modes / debugging
+
+Every code with its retry rule: [rejections](../../handbook/rejections.md); those of the translation: [translation details](references/translate.md#rejections).
+
+- `leitvia_no_contract` before the switch: expected; compare the address with `home` of `GET /wp-json/`.
+- `leitvia_unsafe_content`: a classic block or Custom HTML is left; translate it with the [tag to block table](references/translate.md#tag-to-block).
+- `leitvia_stale_hash` on the menu: the protocol of step 5.
 
 ## Report
 
@@ -100,9 +116,9 @@ Write the report in the chat, in the language of the person:
 3. **Open:** per post or widget what did not move and why (shortcode of a plugin, form, image from another host, page builder, decision of the person pending).
 4. **Next:** the `leitvia-a11y` report, and what only a person can test (videos, forms of other plugins).
 
-## Checkpoints
+## Escalation
 
-Stop and ask the person, then continue with the answer:
+Stop and ask the person at these checkpoints, then continue with the answer:
 
 - **Inventory confirmed:** pages, posts, menus, widgets, brand values and open items are complete.
 - **Theme switch:** the person activates Leitvia (and Leitvia Studio); you check with `leitvia/get-contract`.
