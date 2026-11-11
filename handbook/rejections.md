@@ -1,6 +1,6 @@
 # Rejections
 
-Generated from Leitvia Studio 1.3.40. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
+Generated from Leitvia Studio 1.3.41. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
 
 Every rejection of Leitvia Studio with its retry rule and next ability. Messages with `%s` or `%d` get a value at run time; codes with several rows come from several places.
 
@@ -26,6 +26,7 @@ Every rejection of Leitvia Studio with its retry rule and next ability. Messages
 | `leitvia_execution_failed` | 500 | `never` | none | The file could not be saved; nothing was changed. Try again later. |
 | `leitvia_execution_failed` | 500 | `never` | none | The image could not be cropped; nothing was changed. Try again later. |
 | `leitvia_forbidden` | 403 | `never` | none | Agents change the site through the %s abilities only. |
+| `leitvia_forbidden` | 403 | `never` | none | Previews of token sets need the right to edit theme options. |
 | `leitvia_forbidden` | 403 | `never` | none | Sign in as a user who may edit content. |
 | `leitvia_forbidden` | 403 | `never` | `leitvia/list-packages` | This change package belongs to someone else. |
 | `leitvia_forbidden` | 403 | `never` | none | Your user may not assign terms of this taxonomy. |

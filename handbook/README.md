@@ -1,8 +1,8 @@
 # Leitvia agent handbook
 
-Generated from Leitvia Studio 1.3.40. Do not edit.
+Generated from Leitvia Studio 1.3.41. Do not edit.
 
-Everything an agent needs to work on a WordPress site with Leitvia Studio through its 57 abilities. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call.
+Everything an agent needs to work on a WordPress site with Leitvia Studio through its 58 abilities. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call.
 
 ## Access over MCP and REST
 
@@ -135,6 +135,7 @@ Read abilities change nothing. Call them first: they return the IDs, block IDs a
 | [`leitvia/list-products`](abilities/leitvia-list-products.md) | GET | Lists the products of the shop, 20 per page, with title, type, status, price, stock status, featured flag and hash, plus all product categories with their hash. |
 | [`leitvia/list-recipes`](abilities/leitvia-list-recipes.md) | GET | Lists the site recipes of Leitvia Studio and its add-ons with owner, pages and whether the plugins they require are active. |
 | [`leitvia/plan-page`](abilities/leitvia-plan-page.md) | GET | Proposes a page for a goal and content points: page frame, template, the patterns in page order with role, slot, text lengths and the points each section carries, and the composition score. |
+| [`leitvia/preview-token-set`](abilities/leitvia-preview-token-set.md) | GET | Returns a signed address that shows the site with a token set, for that request only. |
 
 ### Set up
 

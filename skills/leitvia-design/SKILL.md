@@ -7,7 +7,7 @@ description: Derives a Leitvia token set from a brand (colors, fonts, radii, spa
 
 Bring a brand onto a Leitvia site as a token set: one DTCG document with every role of the design contract, checked for contrast, activated by a person. You change the site only through the abilities of Leitvia Studio.
 
-Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [get-contract](../../handbook/abilities/leitvia-get-contract.md), [get-tokens](../../handbook/abilities/leitvia-get-tokens.md), [create-token-set](../../handbook/abilities/leitvia-create-token-set.md), [activate-token-set](../../handbook/abilities/leitvia-activate-token-set.md), [set-variation](../../handbook/abilities/leitvia-set-variation.md), [audit-site](../../handbook/abilities/leitvia-audit-site.md). Roles, token format, the contrast formula, fonts and what a token set cannot carry: [token details](references/tokens.md).
+Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of an ability before you first call it: [get-contract](../../handbook/abilities/leitvia-get-contract.md), [get-tokens](../../handbook/abilities/leitvia-get-tokens.md), [create-token-set](../../handbook/abilities/leitvia-create-token-set.md), [preview-token-set](../../handbook/abilities/leitvia-preview-token-set.md), [activate-token-set](../../handbook/abilities/leitvia-activate-token-set.md), [set-variation](../../handbook/abilities/leitvia-set-variation.md), [audit-site](../../handbook/abilities/leitvia-audit-site.md). Roles, token format, the contrast formula, fonts and what a token set cannot carry: [token details](references/tokens.md).
 
 ## Ground rules
 
@@ -50,15 +50,21 @@ When it is rejected with `leitvia_check_failed`, correct exactly once: change th
 
 Checkpoint "Contrast correction accepted" whenever you changed a brand value.
 
-### 6. Activate
+### 6. Preview
 
-The new set exists only after the person applied the package of step 5 (checkpoint "Package applied"). Then:
+The new set exists only after the person applied the package of step 5 (checkpoint "Package applied"). Show it before anything is activated: `leitvia/preview-token-set` with `set` and the `path` of a page (front page when empty) returns a signed `url`, valid for an hour, that opens without signing in and changes nothing for visitors. Take screenshots there or give the addresses to the person. To compare style variants, create one set per variant and preview each; never activate a set just to look at it, visitors would see it.
+
+The warning `font_no_italic` names a role whose family has no italic cut: italic text in it gets slanted upright letters. Keep italics out of that role or choose another family, and tell the person.
+
+### 7. Activate
+
+When the person chose a set:
 
 1. `leitvia/get-tokens`: take the `id` of the new set from `sets` (status `inactive`).
 2. `leitvia/activate-token-set` with `set`, empty `base_hash` and the same `package` key. When the site already has global styles the call is rejected with `leitvia_stale_hash`; repeat it once with `current_hash` from the rejection.
 3. The activation lands in a new package. Checkpoint "Package applied" again.
 
-### 7. Verify on the front end
+### 8. Verify on the front end
 
 After the person applied the activation:
 
@@ -68,7 +74,7 @@ After the person applied the activation:
 
 ### Style variation instead of a brand
 
-When the person wants one of the looks of the theme and no brand of its own, take the slug from the style variations of `leitvia/get-contract` and call `leitvia/set-variation` with `variation`, empty `base_hash` and the `package` key; after `leitvia_stale_hash` repeat it once with `current_hash`. A full variation replaces the global styles, a colors or typography variation only its part. While a token set is active (`source` of `leitvia/get-tokens` is `set`), its colors and fonts win over any variation, so do not set one; tell the person. Then checkpoint "Package applied" and step 7.
+When the person wants one of the looks of the theme and no brand of its own, take the slug from the style variations of `leitvia/get-contract` and call `leitvia/set-variation` with `variation`, empty `base_hash` and the `package` key; after `leitvia_stale_hash` repeat it once with `current_hash`. A full variation replaces the global styles, a colors or typography variation only its part. While a token set is active (`source` of `leitvia/get-tokens` is `set`), its colors and fonts win over any variation, so do not set one; tell the person. Then checkpoint "Package applied" and step 8.
 
 Brand fonts that are not bundled wait for an upload by the person or the operator, before the set is activated. Those, heading weights, the logo and composition rules of the brand: [token details](references/tokens.md#fonts). A brand with many photos may widen the text to the image bands: [widths](references/widths.md). Tell the person what the set cannot carry.
 

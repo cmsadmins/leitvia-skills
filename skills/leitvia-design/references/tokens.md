@@ -41,7 +41,7 @@ Findings with severity `warning` (`font_not_bundled`; `leitvia_studio_dtcg_unkno
 
 ## Fonts
 
-A token set gets font faces when its first family is available on the site. Bundled today: Newsreader, Inter Tight, IBM Plex Sans and IBM Plex Mono from the theme and its style variations, Libre Franklin and Young Serif from Leitvia Studio. A family in the Font Library of the site counts too. All of them are served from the site, no other host. Any other family gives the warning `font_not_bundled` and falls back to the system font.
+A token set gets font faces when its first family is available on the site. Bundled today: Newsreader, Inter Tight, IBM Plex Sans and IBM Plex Mono from the theme and its style variations, Libre Franklin and Young Serif from Leitvia Studio. A family in the Font Library of the site counts too. All of them are served from the site, no other host. Any other family gives the warning `font_not_bundled` and falls back to the system font. Young Serif and some display fonts have no italic cut: a body or heading role with such a family gives the warning `font_no_italic`, because the browser slants the upright letters for italic text. Upload the italic files with the brand font (step 1 below) when the brand uses italics.
 
 A brand font that is not bundled is a step of the person or the operator, no ability uploads files of this kind:
 
