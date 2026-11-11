@@ -6,7 +6,7 @@
 	"mode": "package",
 	"unattended": true,
 	"budget": {
-		"tokens": 13600,
+		"tokens": 14500,
 		"files": [
 			"skills/leitvia-page/references/composition.md",
 			"skills/leitvia-page/references/content.md",
@@ -14,7 +14,8 @@
 			"handbook/abilities/leitvia-list-patterns.md",
 			"handbook/abilities/leitvia-check-composition.md",
 			"handbook/abilities/leitvia-compose-page.md",
-			"handbook/abilities/leitvia-apply-package.md"
+			"handbook/abilities/leitvia-apply-package.md",
+			"skills/leitvia-page/references/text-gates.md"
 		]
 	},
 	"attachments": [

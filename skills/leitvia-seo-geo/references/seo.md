@@ -21,7 +21,7 @@ Only the person changes indexing, in Settings, Reading. Propose it plainly: "The
 | Field | Rule |
 |---|---|
 | Title | At most 60 characters, the main topic first, unique on the site. Name what the page offers, not "Home" or "Welcome". An SEO plugin usually adds the site name; do not add it twice. Without one the title goes out as written. |
-| Description | 50 to 160 characters, one or two full sentences that say what a visitor finds and why it helps. Unique per page. No list of keywords, no quotation marks around the whole text. |
+| Description | 120 to 160 characters, one or two full sentences that say what a visitor finds and why it helps. Unique per page. No list of keywords, no quotation marks around the whole text. |
 | Language | The language of the page. A page in German gets a German title, whatever the language of the person. |
 | Numbers | Only numbers the page holds: prices, years, counts. `leitvia/update-seo` rejects the others with `unsupported_fact`. |
 

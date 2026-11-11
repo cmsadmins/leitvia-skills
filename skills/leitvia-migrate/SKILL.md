@@ -33,6 +33,7 @@ When the source is another site (any system, for example Wix), read only its pub
 - **Facts are never guessed.** Organization data, prices, legal texts, figures, quotes and people come only from a source you can name: the person, a page of the site or a read ability, with the source in your report. Without one, stop at a checkpoint; never write a placeholder that looks like a fact.
 - A rejection is corrected at most once, following `message`, `next_ability` and `retry`. If the second call is rejected too, or `retry` is `never`, stop and tell the person.
 - Never write review notes or HTML comments into content. Open questions go into the report.
+- Texts you write (alt texts, titles, excerpts, menu labels) pass the [text gates](../leitvia-page/references/text-gates.md); moved wording stays as it was, its findings go into the report.
 
 ## Steps
 

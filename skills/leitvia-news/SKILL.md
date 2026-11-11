@@ -45,7 +45,7 @@ Read the sources of the brief and note items newer than the latest post that fit
 
 ### 4. Write the post
 
-Write title, excerpt and content as block markup following the [post format](references/brief.md#post-format): the news first, short paragraphs, a list of sources with links. Check every fact against its source item once more before you write. A post of about 1500 words or more gets the form of [long texts](../leitvia-page/references/long-texts.md): table of contents, fact box, a heading at least every 300 words, reading breaks with the author tip, many images in a scroll gallery.
+Write title, excerpt and content as block markup following the [post format](references/brief.md#post-format): the news first, short paragraphs, a list of sources with links. Check every fact against its source item once more, and the post against the [text gates](../leitvia-page/references/text-gates.md) (anti-AI, SEO and GEO), before you write. A post of about 1500 words or more gets the form of [long texts](../leitvia-page/references/long-texts.md): table of contents, fact box, a heading at least every 300 words, reading breaks with the author tip, many images in a scroll gallery.
 
 ### 5. SEO and GEO
 

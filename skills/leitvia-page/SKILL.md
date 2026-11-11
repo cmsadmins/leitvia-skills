@@ -27,6 +27,7 @@ The result of every write says what happened in `mode`: `live`, `draft`, `packag
 - Here that covers prices, legal texts (imprint, privacy, terms, withdrawal, accessibility statement), company name, address, phone, e-mail, register numbers, opening hours, figures, testimonials and team members. Missing facts are a visible question in your report, not a placeholder on the page.
 - Blocks that keep their content in HTML, steps, image sizes, rows, sections and a section under every post: [page rules](references/page-rules.md).
 - Texts of about 1500 words or more: [long texts](references/long-texts.md).
+- Every text you write passes the anti-AI gate and the SEO and GEO gate before you send it: [text gates](references/text-gates.md).
 - Replace every sample text of every pattern you use, and never fill a slot with an assumption about the business ([content rules](references/content.md#texts)).
 
 ## Steps

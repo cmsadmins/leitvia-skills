@@ -49,7 +49,7 @@ Per page: title missing, too long or the same as another page; description missi
 
 ### 4. Titles and descriptions
 
-For each page that needs it, write a title (at most 60 characters) and a description (50 to 160) from the text of the page, in its language: `leitvia/update-seo` with `post`, `title`, `description`, `base_hash` from `leitvia/get-seo` and the `package` key. Keep the brand name out of the title when the plugin adds it already (look at the public `<title>`). An empty string hands a field back to the template of the plugin.
+For each page that needs it, write a title (at most 60 characters) and a description (120 to 160, see the [text gates](../leitvia-page/references/text-gates.md)) from the text of the page, in its language: `leitvia/update-seo` with `post`, `title`, `description`, `base_hash` from `leitvia/get-seo` and the `package` key. Keep the brand name out of the title when the plugin adds it already (look at the public `<title>`). An empty string hands a field back to the template of the plugin.
 
 ### 5. Structure for search and AI answers
 

@@ -40,7 +40,7 @@ A topic or a source outside the brief is not used. A brief without topics or sou
 - Body: short paragraphs with h2 subheadings where the post is longer than 300 words; only core blocks (`core/paragraph`, `core/heading`, `core/list`, `core/quote`, `core/image` from the media library, `core/video`, `core/embed`).
 - Sources: a heading "Sources" and a list with one link per source item (title of the item, publisher, date).
 - AI notice: `ai_generated` true on `leitvia/create-content`. Studio then shows a note before the text that AI wrote it, in the language of the site; a person removes it after their own review by deleting the custom field `leitvia_ai_generated`. Do not add a notice of your own to the content.
-- Excerpt: one or two sentences, 50 to 160 characters. It is the meta description of the post.
+- Excerpt: one or two sentences, 120 to 160 characters. It is the meta description of the post.
 - Images only from the brief: images the operator may use; an image from a news source is never copied. Featured image: `featured_image`, with alt text. Screenshots: one or two real screens, no mockups, with alt text and caption. Video: only with its script; `core/video` with `controls` and caption, then `core/details` "Transcript of the video", one list item per scene, as in `leitvia/content-video`.
 
 Rules of Google News that the post and the site have to meet:
@@ -55,8 +55,8 @@ Rules of Google News that the post and the site have to meet:
 | Field | Limit |
 |---|---|
 | Title | At most 60 characters, the news first, the same text as the h1. No site name; an SEO plugin adds it. |
-| Description (excerpt) | 50 to 160 characters, one or two full sentences from the post. Only numbers the post holds. |
-| First paragraph | Two or three sentences: who, what, when, where, why. It makes sense without the rest of the post, so AI answers can quote it. |
+| Description (excerpt) | 120 to 160 characters, one or two full sentences from the post. Only numbers the post holds. |
+| First paragraph | Two or three sentences, at most 60 words with a figure or date: who, what, when, where, why. It makes sense without the rest of the post, so AI answers can quote it. |
 | Headings | Each h2 names its section ("New lane between Felsenkeller and Plagwitz", not "Details"). |
 | Internal links | Two links in the text to pages or posts of the site on the same topic, `link` from `leitvia/list-content`. None fits: none, and say so in the report. |
 | Image | Featured image of at least 1200 px width with alt text. |
