@@ -37,8 +37,8 @@ For a test or demo run on your own machine, without a server, the Playground CLI
 	"constants": { "WP_ENVIRONMENT_TYPE": "local" },
 	"siteOptions": { "permalink_structure": "/%postname%/" },
 	"steps": [
-		{ "step": "installTheme", "themeData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia/releases/download/1.2.45/leitvia-1.2.45.zip" }, "options": { "activate": true } },
-		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.45/leitvia-studio-1.3.45.zip" }, "options": { "activate": true } },
+		{ "step": "installTheme", "themeData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia/releases/download/1.2.46/leitvia-1.2.46.zip" }, "options": { "activate": true } },
+		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.46/leitvia-studio-1.3.46.zip" }, "options": { "activate": true } },
 		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://downloads.wordpress.org/plugin/mcp-adapter.0.7.1.zip" }, "options": { "activate": true } },
 		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://downloads.wordpress.org/plugin/woocommerce.11.2.1.zip" }, "options": { "activate": true } },
 		{ "step": "runPHP", "code": "<?php require_once '/wordpress/wp-load.php'; $id = wp_insert_user( array( 'user_login' => 'leitvia-agent', 'display_name' => 'Leitvia agent', 'user_email' => 'agent@example.org', 'user_pass' => wp_generate_password( 32 ), 'role' => 'leitvia_agent' ) ); $created = is_wp_error( $id ) ? $id : WP_Application_Passwords::create_new_application_password( $id, array( 'name' => 'leitvia agent' ) ); if ( is_wp_error( $created ) ) { throw new Exception( $created->get_error_message() ); } wp_mkdir_p( '/leitvia-run' ); file_put_contents( '/leitvia-run/agent-password.txt', $created[0] . \"\n\" );" }
