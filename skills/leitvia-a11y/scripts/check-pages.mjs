@@ -196,7 +196,7 @@ function layout( { squeeze } ) {
 
 // Runs in the page: words and links of the content area, with every details block open (answers of a FAQ count) and
 // every tab panel shown (product tabs such as reviews and additional information). parts: addresses of the other parts
-// of a post split with core/nextpage.
+// of a post split with core/nextpage. prose: the text without code, kbd and samp, which may show brackets on purpose.
 function content( selector ) {
 	document.querySelectorAll( 'details' ).forEach( ( details ) => ( details.open = true ) );
 	document.querySelectorAll( '[role="tabpanel"]' ).forEach( ( panel ) => {
@@ -204,8 +204,11 @@ function content( selector ) {
 		panel.style.setProperty( 'display', 'block', 'important' );
 	} );
 	const root = selector.split( ',' ).map( ( s ) => document.querySelector( s.trim() ) ).find( Boolean ) ?? document.body;
+	const text = root.innerText;
+	root.querySelectorAll( 'code, pre, kbd, samp' ).forEach( ( el ) => el.style.setProperty( 'display', 'none', 'important' ) );
 	return {
-		text: root.innerText,
+		text,
+		prose: root.innerText,
 		links: [ ...root.querySelectorAll( 'a[href]' ) ].map( ( a ) => a.href ),
 		parts: [ ...new Set( [ ...document.querySelectorAll( 'a.post-page-numbers[href]' ) ].map( ( a ) => a.href.split( '#' )[ 0 ] ) ) ],
 	};
@@ -225,6 +228,7 @@ async function allParts( context, page, selector, prepare ) {
 			}
 			const more = await tab.evaluate( content, selector );
 			first.text += `\n${ more.text }`;
+			first.prose += `\n${ more.prose }`;
 			first.links.push( ...more.links );
 		} catch ( error ) {
 			first.failed.push( `${ error.message.split( '\n' )[ 0 ] } ${ part }: part not compared` );
@@ -304,7 +308,7 @@ async function check( { url, old } ) {
 			}
 		}
 		// Text checks last, at 1440 and with every details block open: text hidden on phones or in closed details counts.
-		// content() leaves details and tab panels open, so screenshots must stay before this point.
+		// content() leaves details and tab panels open and code hidden, so screenshots must stay before this point.
 		await page.setViewportSize( { width: 1440, height: 900 } );
 		const mine = await allParts( context, page, 'main, body', textOnly );
 		add( 'parts', mine.failed );
@@ -314,7 +318,7 @@ async function check( { url, old } ) {
 		} ) );
 		add( 'h1', 1 === facts.h1 ? [] : [ `${ facts.h1 } h1` ] );
 		add( 'brokenImages', facts.broken );
-		add( 'shortcodes', [ ...new Set( mine.text.match( /\[\/?[a-z][a-z0-9_-]*(?:\s[^\]\n]*)?\]/g ) ?? [] ) ] );
+		add( 'shortcodes', [ ...new Set( mine.prose.match( /\[\/?[a-z][a-z0-9_-]*(?:\s[^\]\n]*)?\]/g ) ?? [] ) ] );
 		add( 'httpErrors', httpErrors );
 		add( 'foreignHosts', [ ...foreign ] );
 		if ( old ) {
