@@ -4,16 +4,33 @@ Details for `leitvia-page`. Read it when the briefing asks for entries of a post
 
 ## Values of fields on the front end
 
-Fields reach the page through block bindings of Leitvia Studio. A paragraph, heading or button whose `metadata.bindings` names a source shows the value instead of its own text:
+Fields reach the page through block bindings of Leitvia Studio. A block whose `metadata.bindings` names a source shows the value instead of its saved attribute:
 
 | Source | `args` | Shows |
 |---|---|---|
 | `leitvia/meta` | `{"key": "<field key>"}` | The field of the current entry: dates and times in the format of the site, the label of a `select` option, Yes or No for a boolean. |
 | `leitvia/relation` | `{"relation": "<relation key>", "field": "title"}` | The related entry: `title`, `url`, `excerpt` or a field key of the target type. `index` picks the second or later entry of a `multiple` relation. |
+| `leitvia/setting` | `{"key": "<setting key>"}` | A site setting with `bindable: true`, on any page. |
 
-Write the saved text of a bound block empty (`<p></p>`); a value that is missing then shows as an empty line, never as a sample text. Bindings only show values of published entries. `leitvia/meta` also takes `prefix` and `suffix`, text around a value that is not empty, such as `"suffix":" €"` for a price.
+Bind only the attributes WordPress binds; `leitvia/get-content-model` lists them under `bindings`, and the check `leitvia/bindings` refuses others:
+
+| Block | Attribute | Field |
+|---|---|---|
+| `core/paragraph`, `core/heading`, `core/list-item` | `content` | text, number, date, select, boolean |
+| `core/button` | `text`, `url` | text; a `url` field or `leitvia/relation` with `field` `url` |
+| `core/image` | `url` and `alt` (and `id`), `caption`, `title` | an `image` field, the same key on each; the caption and title come from the media library |
+| `core/post-date` | `datetime` | a `date` or `datetime` field; the `format` of the block sets the display |
+| `core/list` | `content` | a `textarea` field, one item per line (Leitvia only, see below) |
+
+Other blocks and attributes, such as a cover image or the link of a paragraph, keep their saved markup.
+
+Write the saved text of a bound block empty (`<p></p>`); a value that is missing then shows as an empty line, never as a sample text. Visitors see values of published entries only. `leitvia/meta` also takes `prefix` and `suffix`, text around a value that is not empty, such as `"suffix":" €"` for a price.
 
 A list of an entry, such as what a service includes, is a `textarea` field with one item per line (`"fields": {"service_scope": "Audit\nReport\nTraining"}`) and a `core/list` bound like a paragraph: `{"metadata":{"bindings":{"content":{"source":"leitvia/meta","args":{"key":"service_scope"}}}}}` on the list block, with one empty list item as saved markup. Each line becomes an item, an empty field shows no list. The editor shows the saved item, not the lines. Choose a repeater only when an item has fields of its own.
+
+`leitvia/meta` and `leitvia/relation` read the entry in context: on its own page, in its template, or in a post template of a query loop. On a page or a post they show nothing, since pages have no fields; use `leitvia/setting` there, or a query of the type.
+
+To change a bound value, send `fields` with `leitvia/update-content`, or `leitvia/update-site-values` for a setting. A text edit of the bound attribute is refused (`leitvia_invalid_input`, reason `bound`), since visitors would never see it.
 
 A bare value such as `12` needs a label. On an entry page use the pattern `leitvia-studio/content-entry-facts` (below). In a row of the overview, put label and value side by side:
 
@@ -61,3 +78,7 @@ The query of a page is live: it shows every published entry, newest first, so en
 ## Slugs
 
 A public type has entry URLs under its `slug` (`/course/<entry>/`) and, with `hasArchive`, an archive at that slug. A page with the same slug collides with the archive. Give the type a singular slug and the overview page the plural (`course` and `courses`), and leave `hasArchive` off when the overview page lists the entries; the archive of the theme shows only titles and excerpts.
+
+## Patterns and overrides
+
+Abilities copy a pattern into the page, a synced one too, so WordPress pattern overrides (`core/pattern-overrides`) never apply there. A value that repeats on several pages is a bindable setting; a value per entry is a field.

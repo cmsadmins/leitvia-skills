@@ -6,7 +6,7 @@
 	"mode": "package",
 	"unattended": true,
 	"budget": {
-		"tokens": 9750,
+		"tokens": 9800,
 		"files": [
 			"skills/leitvia-report/references/format.md",
 			"handbook/abilities/leitvia-audit-site.md",

@@ -1,6 +1,6 @@
 # Core REST without the leitvia MCP server
 
-Generated from Leitvia Studio 1.3.44. Do not edit. Hashes, autonomy and rejections: [agent handbook](README.md).
+Generated from Leitvia Studio 1.3.45. Do not edit. Hashes, autonomy and rejections: [agent handbook](README.md).
 
 Without the MCP server `leitvia`, for example when an agent works with the WordPress skills alone, every Leitvia ability runs over the REST API of the Abilities API in WordPress core. Sign in as the agent user with its application password (HTTP Basic auth). Checks, autonomy levels, change packages and the rate limit are the same as over MCP.
 

@@ -198,7 +198,7 @@ export function handbook( dump ) {
 		'- A new object (a new page, pattern, token set or image) has no hash: send an empty `base_hash`.',
 		'- A post, page, attachment, navigation menu or template part: `hash` of `leitvia/get-page-outline`, which is also `document_hash` of `leitvia/get-block`. Block hashes are for comparing blocks; `base_hash` is always the hash of the whole document.',
 		'- A product, product category or tag: its `hash` from `leitvia/get-product` or `leitvia/list-products`; an attribute: from `leitvia/list-product-attributes`.',
-		'- Targets no read ability returns a hash for (global styles, the content model, a menu, template part or template whose ID you do not know): send an empty `base_hash`, take `current_hash` from the rejection `leitvia_stale_hash` and repeat the call once with it.',
+		'- Targets no read ability returns a hash for (global styles, a menu, template part or template whose ID you do not know): send an empty `base_hash`, take `current_hash` from the rejection `leitvia_stale_hash` and repeat the call once with it.',
 		'',
 		'The result of a write carries the new `hash`; use it as `base_hash` of the next change of the same target.',
 		'',

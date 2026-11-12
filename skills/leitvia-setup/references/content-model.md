@@ -52,7 +52,9 @@ An entry of it with `leitvia/create-content`: `"post_type": "course"`, `"fields"
 
 ## Sections
 
-`version` is required and always `1`. The others are optional: `postTypes`, `taxonomies`, `relations`, `settings`. `leitvia/define-content-type` adds or replaces entries by their key and keeps the others; an entry you send replaces that entry whole, so send all its fields.
+`version` is required and always `1`. The others are optional: `postTypes`, `taxonomies`, `relations`, `settings`. `leitvia/define-content-type` adds entries by their key and keeps the others. A post type or taxonomy you send again is merged: the keys you send change, fields, repeaters and supports you leave out stay. A relation or setting you send replaces that one entry whole. Nothing is removed through the ability; a person removes fields on the Model screen.
+
+Fields belong to the post types of the model. `page` and `post` get no fields, and a relation starts at a type of the model (`to` may be `page`). A value that every page needs, such as opening hours or a phone number, is a setting with `bindable: true`.
 
 ### postTypes
 
@@ -71,7 +73,7 @@ Key: 2 to 20 characters, `a-z`, `0-9`, `_`, starting with a letter, not starting
 | `supports` | Any of `title`, `editor`, `author`, `thumbnail`, `excerpt`, `comments`, `revisions`, `page-attributes`. Default `title`, `editor`. A featured image needs `thumbnail`. |
 | `icon` | A Dashicon, `dashicons-<name>`. |
 | `fields` | Fields of the entries, see below. |
-| `repeaters` | Rows of a sub type per entry (an agenda of an event): key, `postType`, `label`, `singularLabel`, `fields`. |
+| `repeaters` | Rows of a sub type per entry (an agenda of an event): key, `postType`, `label`, `singularLabel`, `fields`. Write the rows with `rows` in `leitvia/create-content` or `leitvia/update-content`: a list of `title` and the fields of the repeater, which replaces the rows in its order. |
 | `showInAbilities` | Set only by a person, see below. |
 
 ### Fields
@@ -102,7 +104,7 @@ A link from entries of one type to entries of another, stored on the `from` type
 
 ### settings
 
-Values of the whole site, such as a phone number, by key with the field keys above. `bindable: true` lets blocks show the value to visitors.
+Values of the whole site, such as a phone number, by key with the field keys above. `bindable: true` lets blocks show the value to visitors through the source `leitvia/setting` ([bindings](../../leitvia-page/references/entries.md#values-of-fields-on-the-front-end)); a setting without it never reaches a page. Set the values with `leitvia/update-site-values`: `values` by key, `base_hash` the `settings_hash` of `leitvia/get-content-model`. It always waits in a change package for a person.
 
 ## showInAbilities
 
@@ -110,4 +112,21 @@ Agents may not set `showInAbilities`; a declaration that holds it is rejected wi
 
 ## Hash
 
-No ability returns the hash of the content model. Send `base_hash` empty, take `current_hash` from the rejection `leitvia_stale_hash` and send the call again with it. That round is the protocol, not a rejection; a rejection after it may still be corrected once.
+`leitvia/get-content-model` returns `hash`; send it as `base_hash`. A `leitvia_stale_hash` means a person changed the model since you read it: read it again and send the call once more.
+
+## Coming from the WordPress skills
+
+On a Leitvia site the content model replaces code: no `register_post_type()`, `register_post_meta()`, ACF or a plugin of your own for fields. Leitvia Studio registers every field with `show_in_rest`, a schema, a sanitize callback for its type and an auth callback; read and write values through the abilities, not through `/wp/v2`.
+
+| WordPress way | On a Leitvia site |
+|---|---|
+| `register_post_type()` | `postTypes` in `leitvia/define-content-type` |
+| `register_post_meta()` with `show_in_rest` | `fields` of the type |
+| `register_taxonomy()` | `taxonomies` |
+| meta with a list of post IDs | `relations` |
+| `register_setting()` | `settings` with `bindable`, values with `leitvia/update-site-values` |
+| `update_post_meta()`, `meta` over REST | `fields` (and `rows` for repeaters) in `leitvia/create-content` and `leitvia/update-content` |
+| binding `core/post-meta` | binding `leitvia/meta`; `core/post-meta` shows the same values, but not relations |
+| `core/pattern-overrides` | not used: abilities copy patterns into pages; values per entry are fields, values per site are settings |
+
+`leitvia/get-content-model` lists the binding sources and the attributes WordPress binds per block under `bindings`.

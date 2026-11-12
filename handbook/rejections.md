@@ -1,6 +1,6 @@
 # Rejections
 
-Generated from Leitvia Studio 1.3.44. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
+Generated from Leitvia Studio 1.3.45. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
 
 Every rejection of Leitvia Studio with its retry rule and next ability. Messages with `%s` or `%d` get a value at run time; codes with several rows come from several places.
 
@@ -76,6 +76,7 @@ Leitvia uses one code per kind of failure, not one per field as in the error voc
 | `leitvia_rate_limited` | 429 | `after:<seconds>` | none | Too many calls. Try again in %d seconds. |
 | `leitvia_recipe_unavailable` | 422 | `never` | `leitvia/list-recipes` | Built at run time; read the message. |
 | `leitvia_rollback_conflict` | 409 | `never` | `leitvia/get-package` | Someone changed the content after the package was applied. Nothing was rolled back; compare the changes and decide by hand. |
+| `leitvia_stale_hash` | 409 | `once` | `leitvia/get-content-model` | The site settings changed since they were read. Read them with leitvia/get-content-model and repeat the change on the current values with base_hash %s. |
 | `leitvia_stale_hash` | 409 | `once` | none or `leitvia/get-page-outline` | The target changed since it was read. Read it again and repeat the change on the current state. |
 | `leitvia_static_markup` | 422 | `once` | `leitvia/compose-page` | This change needs markup that cannot be rebuilt safely. Insert the pattern again with leitvia/compose-page, or change a block that supports it. |
 | `leitvia_too_large` | 413 | `once` | none | The change is too large to compare (more than %d KB). Split it into smaller changes. |

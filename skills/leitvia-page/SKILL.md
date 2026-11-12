@@ -92,6 +92,7 @@ Every code with its retry rule: [rejections](../../handbook/rejections.md).
 
 - `leitvia_pattern_not_approved`: a Lab pattern waits for review; take an approved pattern of the same role.
 - `leitvia_unknown_pattern` or `leitvia_not_found`: slug or path ID is wrong; read `leitvia/list-patterns` or the markup again.
+- `leitvia_check_failed` with `leitvia/bindings`, or a bound block shows its saved text: [bindings](references/entries.md#values-of-fields-on-the-front-end).
 - `leitvia_unsafe_content`: scripts, Custom HTML or Base64 in an edit; use registered blocks and media of the library.
 - Two `h1` or none on the page: the template prints the title or not ([templates and the h1](references/composition.md#templates-and-the-h1)).
 
