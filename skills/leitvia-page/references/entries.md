@@ -77,7 +77,7 @@ The query of a page is live: it shows every published entry, newest first, so en
 
 ## Slugs
 
-A public type has entry URLs under its `slug` (`/course/<entry>/`) and, with `hasArchive`, an archive at that slug. A page with the same slug collides with the archive. Give the type a singular slug and the overview page the plural (`course` and `courses`), and leave `hasArchive` off when the overview page lists the entries; the archive of the theme shows only titles and excerpts.
+A public type has entry URLs under its `slug` (`/course/<entry>/`) and, with `hasArchive`, an archive at that slug. A page with the same slug collides with the archive and its subpages: `leitvia/define-content-type` refuses a slug that a published page or another type has. Give the type a singular slug and the overview page the plural (`course` and `courses`), and leave `hasArchive` off when the overview page lists the entries; the archive of the theme shows only titles and excerpts.
 
 ## Patterns and overrides
 

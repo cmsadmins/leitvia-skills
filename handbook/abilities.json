@@ -1,5 +1,5 @@
 {
-	"studio": "1.3.46",
+	"studio": "1.3.47",
 	"abilities": [
 		{
 			"name": "leitvia/activate-token-set",
@@ -199,7 +199,7 @@
 		{
 			"name": "leitvia/add-media",
 			"label": "Add media",
-			"description": "Adds an image to the media library from a URL of this site or as Base64 data up to 5 MB, with alt text or marked as decorative. It also takes a WebVTT file with captions for a video (.vtt, UTF-8, starts with WEBVTT, no alt text). It needs the right to upload files. URLs of other hosts are rejected; nothing is fetched from them. base_hash is empty. Images already in the library are used by their ID in compose-page and update-block, a WebVTT file by its ID in tracks of update-block.",
+			"description": "Adds an image to the media library from a URL of this site or as Base64 data up to 5 MB, with alt text or marked as decorative. It also takes a WebVTT file with captions for a video (.vtt, UTF-8, starts with WEBVTT, no alt text) and a video hosted on this site, MP4 (H.264) or WebM up to 50 MB, with poster and caption instead of alt text. It needs the right to upload files. URLs of other hosts are rejected; nothing is fetched from them. base_hash is empty. Images already in the library are used by their ID in compose-page and update-block, a WebVTT file by its ID in tracks of update-block, a video by its ID and URL in a core/video.",
 			"category": "leitvia",
 			"group": "build",
 			"input_schema": {
@@ -210,7 +210,7 @@
 					},
 					"data": {
 						"type": "string",
-						"maxLength": 6990512
+						"maxLength": 69905072
 					},
 					"filename": {
 						"type": "string",
@@ -226,6 +226,16 @@
 					},
 					"decorative": {
 						"type": "boolean"
+					},
+					"poster": {
+						"type": "integer",
+						"minimum": 1,
+						"description": "Video only: attachment ID of an image of the media library that shows before the video plays, a still of it. Also set it as poster of the core/video."
+					},
+					"caption": {
+						"type": "string",
+						"maxLength": 2000,
+						"description": "Video only: what the video shows, in plain text, as caption of the file in the media library. A video without speech needs this text on the page as well."
 					},
 					"base_hash": {
 						"type": "string",
@@ -539,7 +549,7 @@
 		{
 			"name": "leitvia/audit-site",
 			"label": "Audit site",
-			"description": "Runs the content checks (headings, alt text, link text, #anchor links, block validity, unregistered blocks, tokens, contrast, one h1 and landmarks) over published content, at most 20 posts per call in ID order. Also reports classic content without blocks, deprecated patterns, preset slugs missing from the active tokens, internal links that lead to no page or to the old address of a renamed post, links that lead nowhere (empty href, # without target) on the rendered page outside content and template parts, with their class, pages that look like legal texts without a page kind, and placeholders left on legal pages: square brackets such as [Organization name] and sentences that say they are a placeholder. The first page (after 0) also returns site: an error when the site is closed to search engines outside a local or staging site, an error per header or footer part with such links, warnings for a missing imprint, contact or editorial page while there are posts, and for the latest 20 news posts without a featured image of at least 1200 px width or whose author has no biography. Pass next as after for the following page; next is null at the end.",
+			"description": "Runs the content checks (headings, alt text, link text, #anchor links, block validity, unregistered blocks, tokens, contrast, one h1 and landmarks) over published content, at most 20 posts per call in ID order. Also reports classic content without blocks, deprecated patterns, preset slugs missing from the active tokens, internal links that lead to no page or to the old address of a renamed post, links that lead nowhere (empty href, # without target) on the rendered page outside content and template parts, with their class, pages that look like legal texts without a page kind, placeholders left on legal pages (square brackets such as [Organization name] and sentences that say they are a placeholder), and uneven motion (leitvia/motion): leitviaMotion other than the site setting, fade and rise on one page, more than one kind of striking effect, more than 3 striking or 6 animated blocks. The first page (after 0) also returns site: an error when the site is closed to search engines outside a local or staging site, a warning when Gravity Forms loads a captcha from another host (a captcha add-on or a reCAPTCHA field), an error per header or footer part with such links, warnings for a missing imprint, contact or editorial page while there are posts, and for the latest 20 news posts without a featured image of at least 1200 px width or whose author has no biography. Pass next as after for the following page; next is null at the end.",
 			"category": "leitvia",
 			"group": "read",
 			"input_schema": {
@@ -675,7 +685,7 @@
 		{
 			"name": "leitvia/compose-page",
 			"label": "Compose page",
-			"description": "Creates a page from patterns in the order of a page frame of the contract. Plan it with leitvia/plan-page first; base_hash is empty for the new page. Per section texts (also quote citations and details summaries), links and images at block IDs of the pattern outline can change, and remove and repeat take blocks from a parent or add copies, for fewer or more entries than the pattern; a text that would drop a link is refused. Edits apply in order. Each section keeps metadata.patternName (core/block/<ID> for a Lab pattern). Unknown patterns are rejected with a pointer to leitvia/list-patterns, deprecated ones with their replacement, Lab patterns that are not approved (also through a part) with leitvia_pattern_not_approved. Later changes go through leitvia/update-content and leitvia/update-block.",
+			"description": "Creates a page from patterns in the order of a page frame of the contract. Plan it with leitvia/plan-page first; base_hash is empty for the new page. Per section texts (also quote citations and details summaries), links, images, captions, catalog attributes, an HTML anchor and the columns of a grid at block IDs of the pattern outline can change, remove and repeat take blocks from a parent or add copies, for fewer or more entries than the pattern, and insert adds a block of leitvia/list-blocks after a block, given as name with attributes, anchor and inner blocks, never as markup; a text that would drop a link is refused. Edits apply in order. Each section keeps metadata.patternName (core/block/<ID> for a Lab pattern). Unknown patterns are rejected with a pointer to leitvia/list-patterns, deprecated ones with their replacement, Lab patterns that are not approved (also through a part) with leitvia_pattern_not_approved. Later changes go through leitvia/update-content and leitvia/update-block.",
 			"category": "leitvia",
 			"group": "build",
 			"input_schema": {
@@ -728,7 +738,7 @@
 											"url": {
 												"type": "string",
 												"maxLength": 2000,
-												"description": "Link of a button, or of the one link in a paragraph, heading or list item (mailto: and tel: work too)."
+												"description": "Link of a button, or of the one link in a paragraph, heading or list item (mailto: and tel: work too). \"\" removes the saved link of a button whose link a binding fills; the binding stays."
 											},
 											"add_link": {
 												"type": "object",
@@ -757,6 +767,20 @@
 												"type": "string",
 												"maxLength": 1000,
 												"description": "Caption of an image, video, audio, gallery, table or embed as plain text; empty removes it."
+											},
+											"anchor": {
+												"type": [
+													"string",
+													"null"
+												],
+												"maxLength": 100,
+												"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+											},
+											"columns": {
+												"type": "integer",
+												"minimum": 1,
+												"maximum": 6,
+												"description": "Column count of a grid: a group or post template with the layout grid, such as the cards of a teaser pattern. Four cards take 2: with 4 a narrower window still wraps to 3 + 1."
 											},
 											"image": {
 												"type": "object",
@@ -788,6 +812,101 @@
 												"minimum": 1,
 												"maximum": 20,
 												"description": "Number of copies to add right after the block, for a section with more entries than the pattern. Later edits reach the copies by the IDs they get."
+											},
+											"insert": {
+												"description": "A new block right after the block, in the same parent, such as leitvia/form-errors with gravityforms/form inside or leitvia/consent-embed; a static block starts from the example of the catalog. Later edits reach it and its inner blocks by the IDs they get.",
+												"type": "object",
+												"properties": {
+													"block": {
+														"type": "string",
+														"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
+														"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+													},
+													"attributes": {
+														"type": "object",
+														"description": "Attributes from leitvia/list-blocks, checked as in leitvia/update-block."
+													},
+													"anchor": {
+														"type": [
+															"string",
+															"null"
+														],
+														"maxLength": 100,
+														"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+													},
+													"inner": {
+														"type": "array",
+														"minItems": 1,
+														"maxItems": 30,
+														"description": "Inner blocks in order, in place of those of the catalog example.",
+														"items": {
+															"type": "object",
+															"properties": {
+																"block": {
+																	"type": "string",
+																	"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
+																	"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+																},
+																"attributes": {
+																	"type": "object",
+																	"description": "Attributes from leitvia/list-blocks, checked as in leitvia/update-block."
+																},
+																"anchor": {
+																	"type": [
+																		"string",
+																		"null"
+																	],
+																	"maxLength": 100,
+																	"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+																},
+																"inner": {
+																	"type": "array",
+																	"minItems": 1,
+																	"maxItems": 30,
+																	"description": "Inner blocks in order, in place of those of the catalog example.",
+																	"items": {
+																		"type": "object",
+																		"properties": {
+																			"block": {
+																				"type": "string",
+																				"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
+																				"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+																			},
+																			"attributes": {
+																				"type": "object",
+																				"description": "Attributes from leitvia/list-blocks, checked as in leitvia/update-block."
+																			},
+																			"anchor": {
+																				"type": [
+																					"string",
+																					"null"
+																				],
+																				"maxLength": 100,
+																				"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+																			}
+																		},
+																		"required": [
+																			"block"
+																		],
+																		"additionalProperties": false
+																	}
+																}
+															},
+															"required": [
+																"block"
+															],
+															"additionalProperties": false
+														}
+													}
+												},
+												"required": [
+													"block"
+												],
+												"additionalProperties": false
+											},
+											"attributes": {
+												"type": "object",
+												"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label; for a leitvia/timeline-item date (YYYY, YYYY-MM or YYYY-MM-DD, empty for a free label), dateLabel and heading; leitviaAnimation and leitviaMotion on every block that lists them, also next to other attributes (null removes either); className (is-style-<name>, null removes the style and keeps other classes) on every core block with registered block styles; on core media blocks align, on core/image also width, height, aspectRatio, scale, sizeSlug, linkDestination, href, lightbox (null removes one). null for an attribute the block does not have changes nothing."
 											}
 										},
 										"required": [
@@ -992,7 +1111,7 @@
 											"url": {
 												"type": "string",
 												"maxLength": 2000,
-												"description": "Link of a button, or of the one link in a paragraph, heading or list item (mailto: and tel: work too)."
+												"description": "Link of a button, or of the one link in a paragraph, heading or list item (mailto: and tel: work too). \"\" removes the saved link of a button whose link a binding fills; the binding stays."
 											},
 											"add_link": {
 												"type": "object",
@@ -1021,6 +1140,20 @@
 												"type": "string",
 												"maxLength": 1000,
 												"description": "Caption of an image, video, audio, gallery, table or embed as plain text; empty removes it."
+											},
+											"anchor": {
+												"type": [
+													"string",
+													"null"
+												],
+												"maxLength": 100,
+												"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+											},
+											"columns": {
+												"type": "integer",
+												"minimum": 1,
+												"maximum": 6,
+												"description": "Column count of a grid: a group or post template with the layout grid, such as the cards of a teaser pattern. Four cards take 2: with 4 a narrower window still wraps to 3 + 1."
 											},
 											"image": {
 												"type": "object",
@@ -1052,6 +1185,101 @@
 												"minimum": 1,
 												"maximum": 20,
 												"description": "Number of copies to add right after the block, for a section with more entries than the pattern. Later edits reach the copies by the IDs they get."
+											},
+											"insert": {
+												"description": "A new block right after the block, in the same parent, such as leitvia/form-errors with gravityforms/form inside or leitvia/consent-embed; a static block starts from the example of the catalog. Later edits reach it and its inner blocks by the IDs they get.",
+												"type": "object",
+												"properties": {
+													"block": {
+														"type": "string",
+														"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
+														"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+													},
+													"attributes": {
+														"type": "object",
+														"description": "Attributes from leitvia/list-blocks, checked as in leitvia/update-block."
+													},
+													"anchor": {
+														"type": [
+															"string",
+															"null"
+														],
+														"maxLength": 100,
+														"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+													},
+													"inner": {
+														"type": "array",
+														"minItems": 1,
+														"maxItems": 30,
+														"description": "Inner blocks in order, in place of those of the catalog example.",
+														"items": {
+															"type": "object",
+															"properties": {
+																"block": {
+																	"type": "string",
+																	"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
+																	"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+																},
+																"attributes": {
+																	"type": "object",
+																	"description": "Attributes from leitvia/list-blocks, checked as in leitvia/update-block."
+																},
+																"anchor": {
+																	"type": [
+																		"string",
+																		"null"
+																	],
+																	"maxLength": 100,
+																	"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+																},
+																"inner": {
+																	"type": "array",
+																	"minItems": 1,
+																	"maxItems": 30,
+																	"description": "Inner blocks in order, in place of those of the catalog example.",
+																	"items": {
+																		"type": "object",
+																		"properties": {
+																			"block": {
+																				"type": "string",
+																				"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
+																				"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+																			},
+																			"attributes": {
+																				"type": "object",
+																				"description": "Attributes from leitvia/list-blocks, checked as in leitvia/update-block."
+																			},
+																			"anchor": {
+																				"type": [
+																					"string",
+																					"null"
+																				],
+																				"maxLength": 100,
+																				"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+																			}
+																		},
+																		"required": [
+																			"block"
+																		],
+																		"additionalProperties": false
+																	}
+																}
+															},
+															"required": [
+																"block"
+															],
+															"additionalProperties": false
+														}
+													}
+												},
+												"required": [
+													"block"
+												],
+												"additionalProperties": false
+											},
+											"attributes": {
+												"type": "object",
+												"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label; for a leitvia/timeline-item date (YYYY, YYYY-MM or YYYY-MM-DD, empty for a free label), dateLabel and heading; leitviaAnimation and leitviaMotion on every block that lists them, also next to other attributes (null removes either); className (is-style-<name>, null removes the style and keeps other classes) on every core block with registered block styles; on core media blocks align, on core/image also width, height, aspectRatio, scale, sizeSlug, linkDestination, href, lightbox (null removes one). null for an attribute the block does not have changes nothing."
 											}
 										},
 										"required": [
@@ -1729,7 +1957,7 @@
 		{
 			"name": "leitvia/crop-media",
 			"label": "Crop media",
-			"description": "Crops an image of the media library into a new image. The rectangle is in percent of the image size; the original stays. The new image takes the alt text of the original and its title with an addition. Use it for images with text burned in: keep the part without the text band. Only JPEG, PNG, GIF, WebP and AVIF, no SVG; it needs the right to upload files. base_hash is empty. A live crop gets a change package, so leitvia/rollback deletes the new image with its files.",
+			"description": "Crops an image of the media library into a new image. The rectangle is in percent of the image size; the original stays. The new image takes the alt text of the original and its title with an addition. Use it for images with text burned in: keep the part without the text band. Only JPEG, PNG, GIF, WebP and AVIF, no SVG; it needs the right to upload files. base_hash is empty. A live crop gets a change package, so leitvia/rollback deletes the new image with its files. In a package the new image has no ID before a person applies it (target.post 0); applied.post of leitvia/get-package gives it, so a further step on it goes into the next package.",
 			"category": "leitvia",
 			"group": "build",
 			"input_schema": {
@@ -1875,7 +2103,7 @@
 		{
 			"name": "leitvia/define-content-type",
 			"label": "Define content type",
-			"description": "Adds entries to the content model (postTypes, taxonomies, relations, settings) and keeps the others. An entry that exists is merged: the input sets its own keys and fields, fields, repeaters and supports it does not name stay, and the postTypes of a taxonomy are joined; relations and settings are replaced whole. Nothing is removed through this ability: an entry, field, repeater or supports value can only be removed by a person on the Model screen. Read the declaration with leitvia/get-content-model first. The base hash is the hash of the content model. leitvia/get-content-model returns it as hash. showInAbilities stays a decision of a person: agents may not set it.",
+			"description": "Adds entries to the content model (postTypes, taxonomies, relations, settings) and keeps the others. An entry that exists is merged: the input sets its own keys and fields, fields, repeaters and supports it does not name stay, and the postTypes of a taxonomy are joined; relations and settings are replaced whole. Nothing is removed through this ability: an entry, field, repeater or supports value can only be removed by a person on the Model screen. Read the declaration with leitvia/get-content-model first. The base hash is the hash of the content model. leitvia/get-content-model returns it as hash. showInAbilities stays a decision of a person: agents may not set it. A new address (slug, or the key) that a published page or another public type already has is refused: the subpages of such a page would lead to a 404.",
 			"category": "leitvia",
 			"group": "setup",
 			"input_schema": {
@@ -1900,6 +2128,123 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"required": [
+					"mode"
+				],
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						],
+						"description": "Autonomy level of the area that decided the mode."
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
+					},
+					"package": {
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
+					},
+					"snapshot": {
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					},
+					"notice": {
+						"type": "string"
+					},
+					"slug_changed": {
+						"type": "object",
+						"description": "The slug asked for (requested) is taken or reserved, so the address uses slug instead, on publishing at the latest."
+					},
+					"applied": {
+						"type": "integer",
+						"description": "For a list of items: the package that holds what went live, for leitvia/rollback; 0 for none."
+					},
+					"items": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						},
+						"description": "For a list of items: the result per item in their order, or code, message, reason and target of its rejection."
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": false,
+				"openWorldHint": false
+			}
+		},
+		{
+			"name": "leitvia/delete-media",
+			"label": "Delete media",
+			"description": "Deletes a file of the media library for good, with all its sizes; there is no way back. First it looks where the file is used: in blocks and links of content, templates, patterns and navigation, as featured image, as site logo or site icon. While published content or the site uses it, the call is refused with leitvia_media_in_use and the places in data.usage: replace the image there with leitvia/update-block, or send force to delete it anyway, and those places show no image. Places in drafts come as notice and report.usage. Removing content is the decision of a person: the change always waits in a change package, and applying it needs the right to delete the file. base_hash is the hash of the attachment from leitvia/get-page-outline with its ID as post.",
+			"category": "leitvia",
+			"group": "maintain",
+			"input_schema": {
+				"properties": {
+					"id": {
+						"type": "integer",
+						"minimum": 1,
+						"description": "ID of the file in the media library, from leitvia/list-media."
+					},
+					"force": {
+						"type": "boolean",
+						"description": "Delete the file although published content or the site still uses it."
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"id",
+					"base_hash"
+				],
+				"additionalProperties": false,
+				"type": "object"
 			},
 			"output_schema": {
 				"type": "object",
@@ -2146,6 +2491,97 @@
 					},
 					"document_hash": {
 						"type": "string"
+					}
+				}
+			},
+			"annotations": {
+				"readonly": true,
+				"destructive": false,
+				"idempotent": true,
+				"openWorldHint": false
+			}
+		},
+		{
+			"name": "leitvia/get-consent-providers",
+			"label": "Get consent providers",
+			"description": "Returns the providers of embedded content from the privacy settings. providers holds key, label, hosts, purpose and privacy of each, services the services the consent placeholder knows without an entry (key and label, such as YouTube), hash the base_hash of leitvia/set-consent-providers. Content from a host of a provider or service waits behind a consent placeholder named after it.",
+			"category": "leitvia",
+			"group": "read",
+			"input_schema": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": [],
+				"default": {}
+			},
+			"output_schema": {
+				"type": "object",
+				"required": [
+					"providers",
+					"services",
+					"hash"
+				],
+				"properties": {
+					"providers": {
+						"type": "array",
+						"description": "Providers saved under Settings, Privacy.",
+						"items": {
+							"type": "object",
+							"properties": {
+								"key": {
+									"type": "string",
+									"description": "Key from leitvia/get-consent-providers; send it to keep a provider, so \"Always allow\" of visitors stays with it. A new provider gets one from its label."
+								},
+								"label": {
+									"type": "string",
+									"minLength": 1,
+									"description": "Name of the provider, as the consent placeholder shows it."
+								},
+								"hosts": {
+									"type": "array",
+									"minItems": 1,
+									"maxItems": 10,
+									"description": "Host names of the embedded content, such as maps.example.com; subdomains count as well, the own site never.",
+									"items": {
+										"type": "string",
+										"minLength": 1,
+										"maxLength": 253
+									}
+								},
+								"purpose": {
+									"type": "string",
+									"description": "One sentence on what the content does, shown in the placeholder."
+								},
+								"privacy": {
+									"type": "string",
+									"pattern": "^(https://.*)?$",
+									"description": "https address of the privacy policy of the provider."
+								}
+							},
+							"required": [
+								"label",
+								"hosts"
+							],
+							"additionalProperties": false
+						}
+					},
+					"services": {
+						"type": "array",
+						"description": "Services the consent placeholder knows without an entry.",
+						"items": {
+							"type": "object",
+							"properties": {
+								"key": {
+									"type": "string"
+								},
+								"label": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"hash": {
+						"type": "string",
+						"description": "Hash of the providers, the base_hash of leitvia/set-consent-providers."
 					}
 				}
 			},
@@ -2691,7 +3127,7 @@
 		{
 			"name": "leitvia/get-seo",
 			"label": "Get SEO data",
-			"description": "Returns the SEO data of posts, pages and entries from the active SEO plugin. Supported are Yoast SEO, Rank Math, SEOPress and The SEO Framework. Per item: title, meta description, canonical, noindex, nofollow, Open Graph title, description and image, focus keyword and schema type. schema_type is the article type Leitvia Studio prints for a post (NewsArticle or BlogPosting), null where it prints none. indexable says whether the site is open to search engines, news_sitemap is the address of the news sitemap of Leitvia Studio or null, organization holds the address, phone and email of leitvia/set-organization. An empty value means the plugin falls back to its template. defaults holds what WordPress itself would print and a description suggested from the excerpt; without an SEO plugin plugin names Leitvia Studio, with an unsupported one seo is null, and notice says why. hash is the base_hash of leitvia/update-seo. IDs that are no readable content come back under skipped.",
+			"description": "Returns the SEO data of posts, pages and entries from the active SEO plugin. Supported are Yoast SEO, Rank Math, SEOPress and The SEO Framework. Per item: title, meta description, canonical, noindex, nofollow, Open Graph title, description and image, focus keyword and schema type. schema_type is the article type Leitvia Studio prints for a post (NewsArticle or BlogPosting), null where it prints none. indexable says whether the site is open to search engines, news_sitemap is the address of the news sitemap of Leitvia Studio or null, organization holds the details of leitvia/set-organization: type, name, url, address, phone, email, founding date, area served, opening hours and profiles. An empty value means the plugin falls back to its template. defaults holds what WordPress itself would print and a description suggested from the excerpt; without an SEO plugin plugin names Leitvia Studio, with an unsupported one seo is null, and notice says why. hash is the base_hash of leitvia/update-seo. IDs that are no readable content come back under skipped.",
 			"category": "leitvia",
 			"group": "read",
 			"input_schema": {
@@ -2796,6 +3232,98 @@
 							"string",
 							"null"
 						]
+					},
+					"organization": {
+						"type": "object",
+						"properties": {
+							"type": {
+								"type": "string",
+								"enum": [
+									"Organization",
+									"LocalBusiness",
+									"HomeAndConstructionBusiness",
+									"GeneralContractor",
+									"Electrician",
+									"Plumber",
+									"HVACBusiness",
+									"RoofingContractor",
+									"HousePainter",
+									"AutoRepair",
+									"Restaurant",
+									"Store",
+									"HealthAndBeautyBusiness",
+									"LodgingBusiness"
+								]
+							},
+							"name": {
+								"type": "string"
+							},
+							"url": {
+								"type": "string"
+							},
+							"street": {
+								"type": "string"
+							},
+							"postal_code": {
+								"type": "string"
+							},
+							"city": {
+								"type": "string"
+							},
+							"country": {
+								"type": "string"
+							},
+							"phone": {
+								"type": "string"
+							},
+							"email": {
+								"type": "string"
+							},
+							"founding_date": {
+								"type": "string"
+							},
+							"area_served": {
+								"type": "array",
+								"items": {
+									"type": "string"
+								}
+							},
+							"opening_hours": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"days": {
+											"type": "array",
+											"items": {
+												"type": "string",
+												"enum": [
+													"Monday",
+													"Tuesday",
+													"Wednesday",
+													"Thursday",
+													"Friday",
+													"Saturday",
+													"Sunday"
+												]
+											}
+										},
+										"opens": {
+											"type": "string"
+										},
+										"closes": {
+											"type": "string"
+										}
+									}
+								}
+							},
+							"same_as": {
+								"type": "array",
+								"items": {
+									"type": "string"
+								}
+							}
+						}
 					}
 				}
 			},
@@ -2916,7 +3444,7 @@
 		{
 			"name": "leitvia/list-blocks",
 			"label": "List blocks",
-			"description": "Returns the block catalog of Leitvia Studio and its add-ons with attribute schema and usage rules. With post_type only the blocks the editor allows for that post type.",
+			"description": "Returns the block catalog of Leitvia Studio and its add-ons with attribute schema and usage rules, and the registered block styles of every block, core blocks included, by block name; a style is set as the class is-style-<name>. With post_type only the blocks the editor allows for that post type.",
 			"category": "leitvia",
 			"group": "read",
 			"input_schema": {
@@ -3071,6 +3599,24 @@
 									"description": "Core blocks only: what Studio changes about the block.",
 									"type": "string",
 									"minLength": 1
+								}
+							}
+						}
+					},
+					"styles": {
+						"type": "object",
+						"description": "Block styles by block name, from block.json and register_block_style(), each with name and label.",
+						"additionalProperties": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string"
+									},
+									"label": {
+										"type": "string"
+									}
 								}
 							}
 						}
@@ -3992,8 +4538,8 @@
 		},
 		{
 			"name": "leitvia/replace-pattern",
-			"label": "Replace deprecated pattern",
-			"description": "Replaces the sections of one post that use a deprecated pattern (metadata.patternName) with the replacement the contract names, all of them or the one section given by block. leitvia/audit-site reports the posts that use deprecated patterns; the base hash is the hash of the post from leitvia/get-page-outline. Texts and button links move over in order per block type. A section without replacement is rejected with leitvia_no_replacement.",
+			"label": "Replace pattern",
+			"description": "Replaces top-level sections of one post with another pattern. Without pattern the sections that use a deprecated pattern (metadata.patternName) get the replacement the contract names, all of them or the one given by block; leitvia/audit-site reports such posts, and a section without replacement is rejected with leitvia_no_replacement. With pattern the one section given by block gets that pattern, any approved one of leitvia/list-patterns, with edits at block IDs of its outline as in leitvia/compose-page (text, link, image, caption, catalog attributes such as the level of a heading, anchor, columns of a grid, remove, repeat and insert): so a section of an existing page changes its pattern. Texts and button links of the old section move over in order per block type (carry false keeps the texts of the pattern), then the edits apply and win; the HTML anchor of the old section does not move over, set it again with an anchor edit. The base hash is the hash of the post from leitvia/get-page-outline.",
 			"category": "leitvia",
 			"group": "maintain",
 			"input_schema": {
@@ -4008,6 +4554,218 @@
 						"minLength": 1,
 						"maxLength": 200,
 						"description": "Block ID or path ID of a top-level section from the outline."
+					},
+					"pattern": {
+						"type": "string",
+						"minLength": 1,
+						"description": "Pattern slug such as leitvia/cta-split, or block:<ID> for a Lab pattern, that replaces the section given by block."
+					},
+					"edits": {
+						"type": "array",
+						"maxItems": 50,
+						"items": {
+							"type": "object",
+							"properties": {
+								"block": {
+									"type": "string",
+									"minLength": 1,
+									"maxLength": 200,
+									"description": "Block ID or path ID from the outline."
+								},
+								"text": {
+									"type": "string",
+									"maxLength": 5000,
+									"description": "Plain text of a paragraph, heading, list item or button, the citation of a quote or the summary of a details block."
+								},
+								"link_text": {
+									"type": "string",
+									"minLength": 1,
+									"maxLength": 500,
+									"description": "Part of text that stays linked when the text holds a link, such as the mail address in a contact line. Without it the link stays around its old text, and a text without that is refused unless the link only points to #."
+								},
+								"url": {
+									"type": "string",
+									"maxLength": 2000,
+									"description": "Link of a button, or of the one link in a paragraph, heading or list item (mailto: and tel: work too). \"\" removes the saved link of a button whose link a binding fills; the binding stays."
+								},
+								"add_link": {
+									"type": "object",
+									"description": "New link around a passage of a paragraph, heading, list item, citation or summary, as text with the exact words and url. Other links and inline formatting stay; the first place outside a link counts.",
+									"properties": {
+										"text": {
+											"type": "string",
+											"minLength": 1,
+											"maxLength": 500,
+											"description": "The exact words of the passage to link, without markup."
+										},
+										"url": {
+											"type": "string",
+											"minLength": 1,
+											"maxLength": 2000,
+											"description": "Target of the link (mailto: and tel: work too)."
+										}
+									},
+									"required": [
+										"text",
+										"url"
+									],
+									"additionalProperties": false
+								},
+								"caption": {
+									"type": "string",
+									"maxLength": 1000,
+									"description": "Caption of an image, video, audio, gallery, table or embed as plain text; empty removes it."
+								},
+								"anchor": {
+									"type": [
+										"string",
+										"null"
+									],
+									"maxLength": 100,
+									"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+								},
+								"columns": {
+									"type": "integer",
+									"minimum": 1,
+									"maximum": 6,
+									"description": "Column count of a grid: a group or post template with the layout grid, such as the cards of a teaser pattern. Four cards take 2: with 4 a narrower window still wraps to 3 + 1."
+								},
+								"image": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "integer",
+											"minimum": 1,
+											"description": "Attachment ID of the image, from leitvia/list-media or leitvia/add-media."
+										},
+										"alt": {
+											"type": "string",
+											"maxLength": 500
+										},
+										"decorative": {
+											"type": "boolean"
+										}
+									},
+									"required": [
+										"id"
+									],
+									"additionalProperties": false
+								},
+								"remove": {
+									"type": "boolean",
+									"description": "Removes the block from its parent, for a section with fewer entries than the pattern. Later edits of the list count from the result, so work from the last block to the first."
+								},
+								"repeat": {
+									"type": "integer",
+									"minimum": 1,
+									"maximum": 20,
+									"description": "Number of copies to add right after the block, for a section with more entries than the pattern. Later edits reach the copies by the IDs they get."
+								},
+								"insert": {
+									"description": "A new block right after the block, in the same parent, such as leitvia/form-errors with gravityforms/form inside or leitvia/consent-embed; a static block starts from the example of the catalog. Later edits reach it and its inner blocks by the IDs they get.",
+									"type": "object",
+									"properties": {
+										"block": {
+											"type": "string",
+											"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
+											"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+										},
+										"attributes": {
+											"type": "object",
+											"description": "Attributes from leitvia/list-blocks, checked as in leitvia/update-block."
+										},
+										"anchor": {
+											"type": [
+												"string",
+												"null"
+											],
+											"maxLength": 100,
+											"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+										},
+										"inner": {
+											"type": "array",
+											"minItems": 1,
+											"maxItems": 30,
+											"description": "Inner blocks in order, in place of those of the catalog example.",
+											"items": {
+												"type": "object",
+												"properties": {
+													"block": {
+														"type": "string",
+														"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
+														"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+													},
+													"attributes": {
+														"type": "object",
+														"description": "Attributes from leitvia/list-blocks, checked as in leitvia/update-block."
+													},
+													"anchor": {
+														"type": [
+															"string",
+															"null"
+														],
+														"maxLength": 100,
+														"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+													},
+													"inner": {
+														"type": "array",
+														"minItems": 1,
+														"maxItems": 30,
+														"description": "Inner blocks in order, in place of those of the catalog example.",
+														"items": {
+															"type": "object",
+															"properties": {
+																"block": {
+																	"type": "string",
+																	"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
+																	"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+																},
+																"attributes": {
+																	"type": "object",
+																	"description": "Attributes from leitvia/list-blocks, checked as in leitvia/update-block."
+																},
+																"anchor": {
+																	"type": [
+																		"string",
+																		"null"
+																	],
+																	"maxLength": 100,
+																	"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+																}
+															},
+															"required": [
+																"block"
+															],
+															"additionalProperties": false
+														}
+													}
+												},
+												"required": [
+													"block"
+												],
+												"additionalProperties": false
+											}
+										}
+									},
+									"required": [
+										"block"
+									],
+									"additionalProperties": false
+								},
+								"attributes": {
+									"type": "object",
+									"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label; for a leitvia/timeline-item date (YYYY, YYYY-MM or YYYY-MM-DD, empty for a free label), dateLabel and heading; leitviaAnimation and leitviaMotion on every block that lists them, also next to other attributes (null removes either); className (is-style-<name>, null removes the style and keeps other classes) on every core block with registered block styles; on core media blocks align, on core/image also width, height, aspectRatio, scale, sizeSlug, linkDestination, href, lightbox (null removes one). null for an attribute the block does not have changes nothing."
+								}
+							},
+							"required": [
+								"block"
+							],
+							"additionalProperties": false
+						}
+					},
+					"carry": {
+						"type": "boolean",
+						"description": "With pattern: whether texts and button links of the old section move over before the edits; true by default."
 					},
 					"base_hash": {
 						"type": "string",
@@ -4364,6 +5122,271 @@
 			}
 		},
 		{
+			"name": "leitvia/set-consent-providers",
+			"label": "Set consent providers",
+			"description": "Replaces the providers of embedded content in the privacy settings. Send the whole list, at most 20; a provider you leave out is removed. Read them with leitvia/get-consent-providers first, send its hash as base_hash and the key of every provider that stays. A built-in service such as YouTube needs no entry. Hosts lose scheme, port and path; a provider without a valid host of another site is rejected. Use only providers the site embeds and privacy policies the provider publishes. Like every setting it waits in a change package for a person.",
+			"category": "leitvia",
+			"group": "setup",
+			"input_schema": {
+				"properties": {
+					"providers": {
+						"type": "array",
+						"maxItems": 20,
+						"description": "The whole new list of providers; an empty list removes all.",
+						"items": {
+							"type": "object",
+							"properties": {
+								"key": {
+									"type": "string",
+									"description": "Key from leitvia/get-consent-providers; send it to keep a provider, so \"Always allow\" of visitors stays with it. A new provider gets one from its label."
+								},
+								"label": {
+									"type": "string",
+									"minLength": 1,
+									"description": "Name of the provider, as the consent placeholder shows it."
+								},
+								"hosts": {
+									"type": "array",
+									"minItems": 1,
+									"maxItems": 10,
+									"description": "Host names of the embedded content, such as maps.example.com; subdomains count as well, the own site never.",
+									"items": {
+										"type": "string",
+										"minLength": 1,
+										"maxLength": 253
+									}
+								},
+								"purpose": {
+									"type": "string",
+									"description": "One sentence on what the content does, shown in the placeholder."
+								},
+								"privacy": {
+									"type": "string",
+									"pattern": "^(https://.*)?$",
+									"description": "https address of the privacy policy of the provider."
+								}
+							},
+							"required": [
+								"label",
+								"hosts"
+							],
+							"additionalProperties": false
+						}
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"providers",
+					"base_hash"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"required": [
+					"mode"
+				],
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						],
+						"description": "Autonomy level of the area that decided the mode."
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
+					},
+					"package": {
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
+					},
+					"snapshot": {
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					},
+					"notice": {
+						"type": "string"
+					},
+					"slug_changed": {
+						"type": "object",
+						"description": "The slug asked for (requested) is taken or reserved, so the address uses slug instead, on publishing at the latest."
+					},
+					"applied": {
+						"type": "integer",
+						"description": "For a list of items: the package that holds what went live, for leitvia/rollback; 0 for none."
+					},
+					"items": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						},
+						"description": "For a list of items: the result per item in their order, or code, message, reason and target of its rejection."
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": false,
+				"openWorldHint": false
+			}
+		},
+		{
+			"name": "leitvia/set-front-page",
+			"label": "Set front page",
+			"description": "Makes an existing page the static front page; 0 shows the latest posts there again. The front page is the page the address of the site shows. base_hash is empty. The page must exist, so create it first and wait until a package with it is applied; the posts page cannot be the front page as well. Like every setting it waits in a change package for a person. notice says so while the page is not published. Set the posts page with leitvia/set-posts-page.",
+			"category": "leitvia",
+			"group": "setup",
+			"input_schema": {
+				"properties": {
+					"page": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "ID of a page from leitvia/list-content, 0 for the latest posts."
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"page",
+					"base_hash"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"required": [
+					"mode"
+				],
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						],
+						"description": "Autonomy level of the area that decided the mode."
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
+					},
+					"package": {
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
+					},
+					"snapshot": {
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					},
+					"notice": {
+						"type": "string"
+					},
+					"slug_changed": {
+						"type": "object",
+						"description": "The slug asked for (requested) is taken or reserved, so the address uses slug instead, on publishing at the latest."
+					},
+					"applied": {
+						"type": "integer",
+						"description": "For a list of items: the package that holds what went live, for leitvia/rollback; 0 for none."
+					},
+					"items": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						},
+						"description": "For a list of items: the result per item in their order, or code, message, reason and target of its rejection."
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": false,
+				"openWorldHint": false
+			}
+		},
+		{
 			"name": "leitvia/set-merchandising",
 			"label": "Set merchandising",
 			"description": "Sets the featured flag, the upsells, the cross-sells and the sort order of one product. The lists replace the current ones. Read the product with leitvia/get-product first and send its hash as base_hash; product IDs come from leitvia/list-products.",
@@ -4502,13 +5525,149 @@
 			]
 		},
 		{
-			"name": "leitvia/set-organization",
-			"label": "Set organization details",
-			"description": "Sets address, phone and email of the organization. Leitvia Studio adds them to its structured data while no SEO plugin is active; the name and the logo stay those of the site. Only the fields you send change, an empty string clears one. leitvia/get-seo returns the current values. base_hash is empty. Use only facts the person gave or the site shows. Like every setting it waits in a change package for a person.",
+			"name": "leitvia/set-motion",
+			"label": "Set motion",
+			"description": "Sets the motion of the whole site: off (no effect on scroll and no hover motion of the theme), subtle (800 ms, the default) or bold (twice the way, 1200 ms). It is the strength and duration of every effect of leitviaAnimation without leitviaMotion, so one setting keeps the motion of all pages the same. When a person wants more or less motion, change this setting instead of giving single blocks effects or leitviaMotion. base_hash is empty. Like every setting it waits in a change package for a person.",
 			"category": "leitvia",
 			"group": "setup",
 			"input_schema": {
 				"properties": {
+					"motion": {
+						"type": "string",
+						"enum": [
+							"off",
+							"subtle",
+							"bold"
+						],
+						"description": "off, subtle or bold."
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"motion",
+					"base_hash"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"required": [
+					"mode"
+				],
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						],
+						"description": "Autonomy level of the area that decided the mode."
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
+					},
+					"package": {
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
+					},
+					"snapshot": {
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					},
+					"notice": {
+						"type": "string"
+					},
+					"slug_changed": {
+						"type": "object",
+						"description": "The slug asked for (requested) is taken or reserved, so the address uses slug instead, on publishing at the latest."
+					},
+					"applied": {
+						"type": "integer",
+						"description": "For a list of items: the package that holds what went live, for leitvia/rollback; 0 for none."
+					},
+					"items": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						},
+						"description": "For a list of items: the result per item in their order, or code, message, reason and target of its rejection."
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": false,
+				"openWorldHint": false
+			}
+		},
+		{
+			"name": "leitvia/set-organization",
+			"label": "Set organization details",
+			"description": "Sets the details of the organization behind the site: kind of business (type, Organization or a type of LocalBusiness; type falls back to Organization), address, phone, email, founding date (founding_date, YYYY, YYYY-MM or YYYY-MM-DD), area served (area_served, places), opening hours (opening_hours, rows of days with opens and closes as HH:MM, only printed for a local business) and profiles on other sites (same_as, https addresses). Leitvia Studio prints them as structured data on the front page and as publisher of posts while no SEO plugin is active; the name and the logo stay those of the site. Only the fields you send change, an empty string or an empty list clears one. leitvia/get-seo returns the current values. base_hash is empty. Use only facts the person gave or the site shows; never guess opening hours. Like every setting it waits in a change package for a person.",
+			"category": "leitvia",
+			"group": "setup",
+			"input_schema": {
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [
+							"Organization",
+							"LocalBusiness",
+							"HomeAndConstructionBusiness",
+							"GeneralContractor",
+							"Electrician",
+							"Plumber",
+							"HVACBusiness",
+							"RoofingContractor",
+							"HousePainter",
+							"AutoRepair",
+							"Restaurant",
+							"Store",
+							"HealthAndBeautyBusiness",
+							"LodgingBusiness"
+						]
+					},
 					"street": {
 						"type": "string"
 					},
@@ -4527,6 +5686,67 @@
 					},
 					"email": {
 						"type": "string"
+					},
+					"founding_date": {
+						"type": "string",
+						"pattern": "^(\\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[12]\\d|3[01]))?)?)?$"
+					},
+					"area_served": {
+						"type": "array",
+						"maxItems": 50,
+						"items": {
+							"type": "string"
+						}
+					},
+					"opening_hours": {
+						"type": "array",
+						"maxItems": 14,
+						"items": {
+							"type": "object",
+							"properties": {
+								"days": {
+									"type": "array",
+									"description": "Days of the week the times apply to, in English: Monday to Sunday.",
+									"minItems": 1,
+									"items": {
+										"type": "string",
+										"enum": [
+											"Monday",
+											"Tuesday",
+											"Wednesday",
+											"Thursday",
+											"Friday",
+											"Saturday",
+											"Sunday"
+										]
+									}
+								},
+								"opens": {
+									"type": "string",
+									"description": "Opening time as HH:MM, 24-hour clock.",
+									"pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+								},
+								"closes": {
+									"type": "string",
+									"description": "Closing time as HH:MM, 24-hour clock.",
+									"pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+								}
+							},
+							"required": [
+								"days",
+								"opens",
+								"closes"
+							],
+							"additionalProperties": false
+						}
+					},
+					"same_as": {
+						"type": "array",
+						"maxItems": 50,
+						"items": {
+							"type": "string",
+							"pattern": "^https://"
+						}
 					},
 					"base_hash": {
 						"type": "string",
@@ -4854,6 +6074,130 @@
 			}
 		},
 		{
+			"name": "leitvia/set-site-identity",
+			"label": "Set site identity",
+			"description": "Sets the site title, the tagline, the logo and the site icon. logo and icon are image IDs from leitvia/list-media or leitvia/add-media, 0 removes them. The logo is the one core/site-logo shows in the header and WordPress hands out as custom logo, the title is the text of core/site-title and the start of every page title in the browser, the tagline that of core/site-tagline; so the header needs no image block for the logo. The icon is the small image of browser tabs and bookmarks, square and at least 512 pixels wide; notice says so otherwise. Only the fields you send change, an empty string clears the tagline. base_hash is empty. Like every setting it waits in a change package for a person.",
+			"category": "leitvia",
+			"group": "setup",
+			"input_schema": {
+				"properties": {
+					"title": {
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 200
+					},
+					"tagline": {
+						"type": "string",
+						"maxLength": 300
+					},
+					"logo": {
+						"type": "integer",
+						"minimum": 0
+					},
+					"icon": {
+						"type": "integer",
+						"minimum": 0
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"type": "object",
+				"additionalProperties": false,
+				"required": [
+					"base_hash"
+				]
+			},
+			"output_schema": {
+				"type": "object",
+				"required": [
+					"mode"
+				],
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						],
+						"description": "Autonomy level of the area that decided the mode."
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
+					},
+					"package": {
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
+					},
+					"snapshot": {
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					},
+					"notice": {
+						"type": "string"
+					},
+					"slug_changed": {
+						"type": "object",
+						"description": "The slug asked for (requested) is taken or reserved, so the address uses slug instead, on publishing at the latest."
+					},
+					"applied": {
+						"type": "integer",
+						"description": "For a list of items: the package that holds what went live, for leitvia/rollback; 0 for none."
+					},
+					"items": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						},
+						"description": "For a list of items: the result per item in their order, or code, message, reason and target of its rejection."
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": false,
+				"openWorldHint": false
+			}
+		},
+		{
 			"name": "leitvia/set-variation",
 			"label": "Set style variation",
 			"description": "Applies a style variation of the contract to the global styles of the active theme: a full variation replaces them, a colors or typography variation replaces only its part. Names come from the style variations of leitvia/get-contract. The base hash is the hash of the global styles. leitvia/get-tokens returns it as hash.",
@@ -4967,9 +6311,122 @@
 			}
 		},
 		{
+			"name": "leitvia/trash-content",
+			"label": "Trash content",
+			"description": "Moves a post, page or entry to the trash. It stays restorable with its address: leitvia/rollback of the applied package or Restore in the trash of the admin bring it back, until WordPress empties the trash (after 30 days unless the site changed that). Removing content is the decision of a person: the change always waits in a change package, and applying it needs the right to delete the post. Read the post with leitvia/get-page-outline first and send its hash as base_hash. Refused for the front page, the posts page and the privacy policy page (point the setting to another page first) and for a page with subpages (move them with parent of leitvia/update-content, or trash them first). notice and report.links name the posts whose links lead nowhere afterwards. Files go with leitvia/delete-media.",
+			"category": "leitvia",
+			"group": "maintain",
+			"input_schema": {
+				"properties": {
+					"post": {
+						"type": "integer",
+						"minimum": 1,
+						"description": "Post ID from leitvia/list-content."
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"post",
+					"base_hash"
+				],
+				"additionalProperties": false,
+				"type": "object"
+			},
+			"output_schema": {
+				"type": "object",
+				"required": [
+					"mode"
+				],
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						],
+						"description": "Autonomy level of the area that decided the mode."
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string",
+						"description": "Hash of the target after the write, the base_hash of the next change; empty when the change waits in a package."
+					},
+					"package": {
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
+					},
+					"snapshot": {
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					},
+					"notice": {
+						"type": "string"
+					},
+					"slug_changed": {
+						"type": "object",
+						"description": "The slug asked for (requested) is taken or reserved, so the address uses slug instead, on publishing at the latest."
+					},
+					"applied": {
+						"type": "integer",
+						"description": "For a list of items: the package that holds what went live, for leitvia/rollback; 0 for none."
+					},
+					"items": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						},
+						"description": "For a list of items: the result per item in their order, or code, message, reason and target of its rejection."
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": false,
+				"openWorldHint": false
+			}
+		},
+		{
 			"name": "leitvia/update-block",
 			"label": "Update block",
-			"description": "Changes one block found by its ID or path ID: attributes from the block catalog and the level of a heading, the text of a paragraph, heading, list item or button, the citation of a quote, the summary of a details block, the link of a button or of the one link in a text (link_text names the linked part), or the image of an image or cover block with alt text. add_link sets a new link on a passage of a text, caption the caption of an image, video, audio, gallery, table or embed. Attributes that a static block keeps in its markup, such as prefix, value, suffix and label of a counter, change like any other. query of a core/query merges into its settings. tracks of a core/video replaces its text tracks: each names a WebVTT file from leitvia/add-media by id, with kind, srclang and label. A spotlight point moves with attributes x and y in percent. The effect on scroll (leitviaAnimation, leitviaMotion) changes on every block that has it, core blocks and saved markup included, since only the block comment changes. Static markup is rebuilt with the HTML API; changes it cannot rebuild safely are rejected with leitvia_static_markup. Read the post with leitvia/get-page-outline first and send its hash as base_hash; get-block shows the current attributes. For several text changes in one post use leitvia/update-content.",
+			"description": "Changes one block found by its ID or path ID: attributes from the block catalog and the level of a heading, the text of a paragraph, heading, list item or button, the citation of a quote, the summary of a details block, the link of a button or of the one link in a text (link_text names the linked part), or the image of an image or cover block with alt text. add_link sets a new link on a passage of a text, caption the caption of an image, video, audio, gallery, table or embed, anchor the HTML anchor of a block with the support anchor (unique on the page), columns the column count of a grid (group or post template with the layout grid). A timeline entry takes date, dateLabel and heading as attributes. Attributes that a static block keeps in its markup, such as prefix, value, suffix and label of a counter, change like any other. query of a core/query merges into its settings. tracks of a core/video replaces its text tracks: each names a WebVTT file from leitvia/add-media by id, with kind, srclang and label. A spotlight point moves with attributes x and y in percent. The effect on scroll (leitviaAnimation, leitviaMotion) changes on every block that has it, core blocks and saved markup included, since only the block comment changes. Static markup is rebuilt with the HTML API; changes it cannot rebuild safely are rejected with leitvia_static_markup. Read the post with leitvia/get-page-outline first and send its hash as base_hash; get-block shows the current attributes. For several text changes in one post use leitvia/update-content.",
 			"category": "leitvia",
 			"group": "build",
 			"input_schema": {
@@ -4995,7 +6452,7 @@
 					"url": {
 						"type": "string",
 						"maxLength": 2000,
-						"description": "Link of a button, or of the one link in a paragraph, heading or list item (mailto: and tel: work too)."
+						"description": "Link of a button, or of the one link in a paragraph, heading or list item (mailto: and tel: work too). \"\" removes the saved link of a button whose link a binding fills; the binding stays."
 					},
 					"add_link": {
 						"type": "object",
@@ -5025,6 +6482,20 @@
 						"maxLength": 1000,
 						"description": "Caption of an image, video, audio, gallery, table or embed as plain text; empty removes it."
 					},
+					"anchor": {
+						"type": [
+							"string",
+							"null"
+						],
+						"maxLength": 100,
+						"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+					},
+					"columns": {
+						"type": "integer",
+						"minimum": 1,
+						"maximum": 6,
+						"description": "Column count of a grid: a group or post template with the layout grid, such as the cards of a teaser pattern. Four cards take 2: with 4 a narrower window still wraps to 3 + 1."
+					},
 					"image": {
 						"type": "object",
 						"properties": {
@@ -5048,7 +6519,7 @@
 					},
 					"attributes": {
 						"type": "object",
-						"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label; leitviaAnimation and leitviaMotion on every block that lists them (null removes leitviaMotion); on core media blocks align and className (is-style-<name>), on core/image also width, height, aspectRatio, scale, sizeSlug, linkDestination, href, lightbox (null removes one)."
+						"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label; for a leitvia/timeline-item date (YYYY, YYYY-MM or YYYY-MM-DD, empty for a free label), dateLabel and heading; leitviaAnimation and leitviaMotion on every block that lists them, also next to other attributes (null removes either); className (is-style-<name>, null removes the style and keeps other classes) on every core block with registered block styles; on core media blocks align, on core/image also width, height, aspectRatio, scale, sizeSlug, linkDestination, href, lightbox (null removes one). null for an attribute the block does not have changes nothing."
 					},
 					"post": {
 						"type": "integer",
@@ -5158,7 +6629,7 @@
 		{
 			"name": "leitvia/update-content",
 			"label": "Update content",
-			"description": "Updates title, excerpt, slug, date, status, author, terms, fields, rows of repeaters, featured image, comment status and the texts and button links of several blocks of one post in one operation, blocks found by their ID from the outline. Per block, url changes the one link of a text too, link_text names the part that stays linked, add_link sets a new link on a passage and caption the caption of a figure, as in leitvia/update-block. status publishes a draft, schedules it (future, with a date) or takes a post back to draft or pending; like every change it follows the autonomy level, so at a lower level it waits in a change package, and publishing needs the right to publish when it is applied. Terms, fields, rows, featured image and template follow the rules of leitvia/create-content; terms replace those of their taxonomy, and template switches the post to another template of the contract (page-landing for a page). Instead of blocks, content replaces the whole content with block markup, for example to turn classic content into blocks; the new content may hold no classic block. Read the post with leitvia/get-page-outline first and send its hash as base_hash. A slug change is a URL change and lands at most as a suggestion; after one, leitvia/repair-links with auto points the links of other posts to the new address. For attributes or images of a block use leitvia/update-block.",
+			"description": "Updates title, excerpt, slug, date, status, author, terms, fields, rows of repeaters, featured image, comment status and the texts and button links of several blocks of one post in one operation, blocks found by their ID from the outline. Per block, url changes the one link of a text too, link_text names the part that stays linked, add_link sets a new link on a passage and caption the caption of a figure, as in leitvia/update-block. status publishes a draft, schedules it (future, with a date) or takes a post back to draft or pending; like every change it follows the autonomy level, so at a lower level it waits in a change package, and publishing needs the right to publish when it is applied. Terms, fields, rows, featured image and template follow the rules of leitvia/create-content; terms replace those of their taxonomy, and template switches the post to another template of the contract (page-landing for a page). Instead of blocks, content replaces the whole content with block markup, for example to turn classic content into blocks; the new content may hold no classic block. parent moves a page below another page of the same type, 0 to the top level; a page cannot go below itself or one of its subpages. Read the post with leitvia/get-page-outline first and send its hash as base_hash. A slug or parent change is a URL change and lands at most as a suggestion; after a slug change leitvia/repair-links with auto points the links of other posts to the new address, after a parent change leitvia/repair-links with from and to. For attributes or images of a block use leitvia/update-block.",
 			"category": "leitvia",
 			"group": "maintain",
 			"input_schema": {
@@ -5327,6 +6798,11 @@
 						"type": "string",
 						"pattern": "^[a-z0-9-]*$",
 						"description": "Template of the contract: a page template for pages, a single template for the other types. Empty or default: the standard template."
+					},
+					"parent": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "ID of the new parent page from leitvia/list-content, 0 for the top level; only for pages and other hierarchical types."
 					},
 					"base_hash": {
 						"type": "string",
@@ -6760,7 +8236,7 @@
 								"url": {
 									"type": "string",
 									"maxLength": 2000,
-									"description": "Link of a button, or of the one link in a paragraph, heading or list item (mailto: and tel: work too)."
+									"description": "Link of a button, or of the one link in a paragraph, heading or list item (mailto: and tel: work too). \"\" removes the saved link of a button whose link a binding fills; the binding stays."
 								},
 								"add_link": {
 									"type": "object",
@@ -6789,6 +8265,20 @@
 									"type": "string",
 									"maxLength": 1000,
 									"description": "Caption of an image, video, audio, gallery, table or embed as plain text; empty removes it."
+								},
+								"anchor": {
+									"type": [
+										"string",
+										"null"
+									],
+									"maxLength": 100,
+									"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+								},
+								"columns": {
+									"type": "integer",
+									"minimum": 1,
+									"maximum": 6,
+									"description": "Column count of a grid: a group or post template with the layout grid, such as the cards of a teaser pattern. Four cards take 2: with 4 a narrower window still wraps to 3 + 1."
 								},
 								"image": {
 									"type": "object",
@@ -6820,6 +8310,101 @@
 									"minimum": 1,
 									"maximum": 20,
 									"description": "Number of copies to add right after the block, for a section with more entries than the pattern. Later edits reach the copies by the IDs they get."
+								},
+								"insert": {
+									"description": "A new block right after the block, in the same parent, such as leitvia/form-errors with gravityforms/form inside or leitvia/consent-embed; a static block starts from the example of the catalog. Later edits reach it and its inner blocks by the IDs they get.",
+									"type": "object",
+									"properties": {
+										"block": {
+											"type": "string",
+											"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
+											"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+										},
+										"attributes": {
+											"type": "object",
+											"description": "Attributes from leitvia/list-blocks, checked as in leitvia/update-block."
+										},
+										"anchor": {
+											"type": [
+												"string",
+												"null"
+											],
+											"maxLength": 100,
+											"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+										},
+										"inner": {
+											"type": "array",
+											"minItems": 1,
+											"maxItems": 30,
+											"description": "Inner blocks in order, in place of those of the catalog example.",
+											"items": {
+												"type": "object",
+												"properties": {
+													"block": {
+														"type": "string",
+														"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
+														"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+													},
+													"attributes": {
+														"type": "object",
+														"description": "Attributes from leitvia/list-blocks, checked as in leitvia/update-block."
+													},
+													"anchor": {
+														"type": [
+															"string",
+															"null"
+														],
+														"maxLength": 100,
+														"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+													},
+													"inner": {
+														"type": "array",
+														"minItems": 1,
+														"maxItems": 30,
+														"description": "Inner blocks in order, in place of those of the catalog example.",
+														"items": {
+															"type": "object",
+															"properties": {
+																"block": {
+																	"type": "string",
+																	"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
+																	"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+																},
+																"attributes": {
+																	"type": "object",
+																	"description": "Attributes from leitvia/list-blocks, checked as in leitvia/update-block."
+																},
+																"anchor": {
+																	"type": [
+																		"string",
+																		"null"
+																	],
+																	"maxLength": 100,
+																	"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+																}
+															},
+															"required": [
+																"block"
+															],
+															"additionalProperties": false
+														}
+													}
+												},
+												"required": [
+													"block"
+												],
+												"additionalProperties": false
+											}
+										}
+									},
+									"required": [
+										"block"
+									],
+									"additionalProperties": false
+								},
+								"attributes": {
+									"type": "object",
+									"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label; for a leitvia/timeline-item date (YYYY, YYYY-MM or YYYY-MM-DD, empty for a free label), dateLabel and heading; leitviaAnimation and leitviaMotion on every block that lists them, also next to other attributes (null removes either); className (is-style-<name>, null removes the style and keeps other classes) on every core block with registered block styles; on core media blocks align, on core/image also width, height, aspectRatio, scale, sizeSlug, linkDestination, href, lightbox (null removes one). null for an attribute the block does not have changes nothing."
 								}
 							},
 							"required": [
@@ -6949,6 +8534,7 @@
 			"leitvia_invalid_input",
 			"leitvia_invalid_package",
 			"leitvia_locked",
+			"leitvia_media_in_use",
 			"leitvia_media_missing",
 			"leitvia_needs_human",
 			"leitvia_no_contract",
@@ -7424,6 +9010,16 @@
 				"retry": "never"
 			},
 			{
+				"code": "leitvia_media_in_use",
+				"status": 409,
+				"reason": "in_use",
+				"message": "Published content or the site still uses this file: %s. Replace it there with leitvia/update-block first, or send force to delete it anyway; those places then show no image.",
+				"next_ability": [
+					"leitvia/update-block"
+				],
+				"retry": "never"
+			},
+			{
 				"code": "leitvia_media_missing",
 				"status": 422,
 				"reason": "media",
@@ -7520,6 +9116,16 @@
 				"message": "There is no pattern with this slug. List the patterns for the current slugs.",
 				"next_ability": [
 					"leitvia/list-patterns"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_not_found",
+				"status": 404,
+				"reason": "post",
+				"message": "There is no post, page or entry with this ID that agents can read. Take the ID from leitvia/list-content; files go with leitvia/delete-media.",
+				"next_ability": [
+					"leitvia/list-content"
 				],
 				"retry": "once"
 			},
@@ -7645,9 +9251,30 @@
 				"code": "leitvia_stale_hash",
 				"status": 409,
 				"reason": "stale_hash",
+				"message": "The providers changed since they were read. Read them with leitvia/get-consent-providers and repeat the change on the current list with base_hash %s.",
+				"next_ability": [
+					"leitvia/get-consent-providers"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_stale_hash",
+				"status": 409,
+				"reason": "stale_hash",
 				"message": "The site settings changed since they were read. Read them with leitvia/get-content-model and repeat the change on the current values with base_hash %s.",
 				"next_ability": [
 					"leitvia/get-content-model"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_stale_hash",
+				"status": 409,
+				"reason": "stale_hash",
+				"message": "The target changed since it was read. Read it again and repeat the change on the current state with base_hash %s.",
+				"next_ability": [
+					"",
+					"leitvia/get-page-outline"
 				],
 				"retry": "once"
 			},
@@ -7739,6 +9366,16 @@
 				"message": "There is no recipe with this name. List the recipes and use one of them.",
 				"next_ability": [
 					"leitvia/list-recipes"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_unsafe_content",
+				"status": 422,
+				"reason": null,
+				"message": "A block comment is broken: its attributes are no valid JSON, or the comment does not close. Send each block comment as serialize_block() writes it.",
+				"next_ability": [
+					"leitvia/list-blocks"
 				],
 				"retry": "once"
 			},

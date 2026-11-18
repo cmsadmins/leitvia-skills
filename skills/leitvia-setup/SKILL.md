@@ -98,7 +98,7 @@ Checkpoint "Legal texts supplied by the human".
 - Fetch the public URL of every page the recipe created and the front page: status 200 and exactly one `h1`. A 404 often means the page waits in a package or stayed a draft.
 - `leitvia/list-packages` with `state` `open`: empty when the person applied everything.
 - **Search visibility on** before the site counts as finished: `indexable` of `leitvia/get-seo` is true and the front page has no `noindex`. Only the person changes it (Settings, Reading, "Discourage search engines"); while it is off, it is an open point of the report, high.
-- For a shop, the WooCommerce pages and the privacy options: [recipe details](references/recipe.md#shop-sites). Tell the person what a recipe does not cover (avatars, page language, admin settings): [recipe details](references/recipe.md#what-a-recipe-does-not-cover). No ability sets the site title and tagline; propose both from the briefing in your report.
+- For a shop, the WooCommerce pages and the privacy options: [recipe details](references/recipe.md#shop-sites). Tell the person what a recipe does not cover (avatars, page language, admin settings): [recipe details](references/recipe.md#what-a-recipe-does-not-cover). Site title, tagline, logo and icon: `leitvia/set-site-identity` in the same package, values from the briefing.
 
 ## Failure modes / debugging
 

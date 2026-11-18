@@ -52,7 +52,7 @@ Ask which pages to check when the person did not say it; default is every publis
 | `page-structure` | 1.3.1 | not exactly one h1 per page, missing header, main or footer |
 | `alt-text` | 1.1.1 | images without alt, alt that is a file name, empty alt without the decorative mark |
 | `link-text` | 2.4.4 | empty links, links to `#`, link texts such as "click here", "read more", "hier" |
-| `content-contrast` | 1.4.3 | text and background roles of a block that are no pair of the contract and miss 4.5:1 |
+| `content-contrast` | 1.4.3 | text role of a block on its ground (own, nearest around it, inverse for `is-style-inverse`) that is no pair of the contract and misses 4.5:1 |
 
 - `leitvia/get-tokens`: `contrast` lists the pairs of the active palette that miss their minimum. Fixing the palette is a design change: hand it to the skill `leitvia-design`, do not change colors in content.
 - Public pages: run the [page check](references/page-check.md) over the scope, then check what the audit does not see, because it comes from the template or a plugin: `<html lang>` matches the language of the page, `<title>` names the page, exactly one `h1`, every `img` has `alt`, every link and button has a name, the skip link is the first focusable element. Findings in header, footer or navigation belong to the template parts; a person decides on them.

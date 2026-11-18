@@ -11,6 +11,9 @@ Details for `leitvia-page`. Read it before you write the edits of step 4.
 - Write in the language of the page. German headings are not hyphenated: long compound words in headings need soft hyphens (`&shy;`). Paragraphs and lists hyphenate words of ten letters or more, table cells every word, wherever the language has a dictionary; pages in easy language keep words whole.
 - A page in another language than the site needs its own document language. Core has no setting per page; tell the person, who decides on a language plugin.
 - Never put review notes or HTML comments into block markup. Open questions go into your report.
+- A motto below the h1 of the stage takes the paragraph style Claim (`is-style-claim`), never a heading or a font set by hand; one per page at most.
+- A long quote takes the style Compact (`is-style-compact`). A dark stage: `is-style-inverse` on its outer group.
+- Forms, embeds and job postings go in with `insert` ([edits](composition.md#edits)), never as new whole content.
 
 ## Links
 
@@ -29,17 +32,21 @@ Details for `leitvia-page`. Read it before you write the edits of step 4.
 - Use the attachment ID in the `image` edit with the same alt text or `decorative: true` (stored as `metadata.leitviaDecorative`). An image without alt and without that flag is rejected.
 - Sample images of a pattern come with a sample alt text that describes the sample picture. Replace the image, or choose a pattern without an image slot.
 - `images` in `leitvia/list-patterns` gives aspect ratio and recommended size per slot.
+- A file no page needs any more goes with `leitvia/delete-media`: refused with `leitvia_media_in_use` while published content or the site uses it, the places in `data.usage`. Replace the image there first; `force` only on the word of the person.
 - Illustrations and diagrams show their whole motif: no overlap pattern, where a card covers them, and no slot with another aspect ratio, which crops them (`scale: contain`, or a pattern whose slot matches). On a dark band use only an image made for dark ground, never a recolored or inverted copy. No mask or wipe animation on fine line art.
+- A cut-out drawing beside a text takes the image style Illustration (no radius, no shadow, at most 20 rem): `leitvia/update-block` with `className` `is-style-illustration` and `scale` `contain`. Add `leitviaAnimation` `none` only when the image carries an effect and `leitvia/list-blocks` lists the attribute for the block.
 
 ## Files to download
 
-- Files are not uploaded by an ability: `leitvia/add-media` takes images only. Use files the person put into the media library and find them with `leitvia/list-media` (`mime` `application/pdf`, or `application` for every document); each item has `url`, `filename`, `mime` and `filesize` in bytes. A file that is missing is an open question, never a link to `#`.
+- Files are not uploaded by an ability: `leitvia/add-media` takes images, videos and captions only. Use files the person put into the media library and find them with `leitvia/list-media` (`mime` `application/pdf`, or `application` for every document); each item has `url`, `filename`, `mime` and `filesize` in bytes. A file that is missing is an open question, never a link to `#`.
 - Use `leitvia/content-downloads`: one list item per file. Its `text` edit holds the link text and one sentence about the file, with `link_text` the part that stays linked and `url` the file URL: `{"block": "p:0.2.0", "text": "Price list 2026 (PDF, 180 KB) All plans and services with prices excluding VAT.", "link_text": "Price list 2026 (PDF, 180 KB)", "url": "<url>"}`. The list style puts the link on its own line.
 - The link text names the file, its format in capitals and its size, rounded: KB below 1 MB, MB with one decimal above. Keep each link text unique on the page. Remove list items you have no file for, or choose another pattern; never keep a sample item.
 - One file inside running text needs no pattern: link it in the sentence with the same text, "the price list (PDF, 180 KB)".
 
 ## Videos
 
-- `leitvia/add-media` takes images only: use a video the person put into the media library (`leitvia/list-media`, `mime` `video`); a missing one is an open question.
-- Use `leitvia/content-video`. Its transcript holds one list item per scene in the words on screen; without the script of the video, ask. Spoken words also need captions in a text track, a task for the person.
-- Its video block is empty and its caption takes no edit: after composing, send the whole content with `leitvia/update-content`, the video with attachment `id`, `src`, `controls` and a caption. Never `autoplay`.
+- Videos stay on the site: upload MP4 (H.264) or WebM with `leitvia/add-media`, `poster` (image ID, a still) and `caption`, or take one from `leitvia/list-media` (`mime` `video`). Videos of other hosts only in `leitvia/consent-embed`.
+- Use `leitvia/content-video`. Its transcript holds one list item per scene in the words on screen; without the script of the video, ask. Spoken words need captions: a WebVTT file as `tracks`.
+- Its video block is empty and its caption takes no edit: after composing, send the whole content with `leitvia/update-content`, the video with attachment `id`, `src`, `poster` (URL of the poster image), `controls` and `preload` `none`, and a caption. Never `autoplay` or `loop`.
+- A video without speech still needs its content as text (WCAG 1.2.1) in caption and transcript.
+- Wider than the text: `align` `wide` or `full` on the `core/video` with `leitvia/update-block`, `null` back to the text width.

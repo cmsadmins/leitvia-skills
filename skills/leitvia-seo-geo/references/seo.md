@@ -29,6 +29,8 @@ Search engines may still show another text when theirs fits a search better; a g
 
 Fields `leitvia/get-seo` reads but `leitvia/update-seo` does not write: canonical, Open Graph title, description and image, focus keyword and schema type. Report problems with them for the person to fix in the SEO plugin. Without an SEO plugin Leitvia Studio prints the canonical of archives; Open Graph needs a plugin. A canonical that points to another page is often deliberate (a copy of a page); ask before you call it a mistake.
 
+The 404 page and archives (categories, tags, authors) have no post for `leitvia/update-seo`. WordPress builds their titles from the name of the archive or "Page not found" and the site name; the 404 page is never indexed. Report a wish for other titles there as a setting of the SEO plugin for the person. The visible heading of the 404 page comes from the template `404` (`leitvia/update-template`).
+
 Common findings and what to do:
 
 | Finding | Do |
@@ -50,7 +52,7 @@ AI search (Google AI Overviews, ChatGPT search, Perplexity, Copilot) quotes shor
 - Names stay the same everywhere: the organization, products and places as on the imprint.
 - Questions people ask may become headings, answered right below, when the page really answers them. No invented FAQ.
 
-Structured data: with an SEO plugin, the plugin prints it (its settings decide the types). Without one, Leitvia Studio prints, when its setting for structured data is on: `WebSite` with the organization on the front page, `BlogPosting` or `NewsArticle` with the organization as publisher and `BreadcrumbList` on posts, `CollectionPage` on the posts page and on archives, `ProfilePage` on author pages, and `FAQPage` from the FAQ block; `defaults.schema` of `leitvia/get-seo` names what a post gets. No `LocalBusiness`, no opening hours. Address, phone and email of the organization come from the Studio settings or `leitvia/set-organization` (only facts from the person or the imprint), `organization` of `leitvia/get-seo` shows them. With an SEO plugin Studio prints none of this. Never add JSON-LD in content blocks.
+Structured data: with an SEO plugin, the plugin prints it (its settings decide the types). Without one, Leitvia Studio prints, when its setting for structured data is on: `WebSite` with the organization on the front page, `BlogPosting` or `NewsArticle` with the organization as publisher and `BreadcrumbList` on posts, `CollectionPage` on the posts page and on archives, `ProfilePage` on author pages, and `FAQPage` from the FAQ block; `defaults.schema` of `leitvia/get-seo` names what a post gets. On the front page the organization is `Organization` or a subtype of `LocalBusiness` with its details, which `organization` of `leitvia/get-seo` shows: [local business and jobs](local-business.md). With an SEO plugin Studio prints none of this. Never add JSON-LD in content blocks.
 
 ## Google News
 

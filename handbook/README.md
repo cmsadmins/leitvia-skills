@@ -1,8 +1,8 @@
 # Leitvia agent handbook
 
-Generated from Leitvia Studio 1.3.46. Do not edit.
+Generated from Leitvia Studio 1.3.47. Do not edit.
 
-Everything an agent needs to work on a WordPress site with Leitvia Studio through its 59 abilities. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call.
+Everything an agent needs to work on a WordPress site with Leitvia Studio through its 66 abilities. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call.
 
 ## Access over MCP and REST
 
@@ -76,7 +76,7 @@ Some content kinds lower the level to at most `suggest`, whatever the area allow
 |---|---|
 | `prices` | Pricing blocks, price columns of comparison tables and product prices. Prices in plain text are not detected. |
 | `legal` | Pages with a legal page kind (imprint, privacy, terms, withdrawal, accessibility) and the privacy policy page. |
-| `slugs` | A changed slug, which changes a URL. |
+| `slugs` | A changed slug or parent page, which changes a URL. |
 | `organization` | Site options such as the site title, the logo and the reading settings. |
 | `tax` | Tax status and tax class of products. |
 | `shipping` | Shipping class of products. |
@@ -115,6 +115,7 @@ Read abilities change nothing. Call them first: they return the IDs, block IDs a
 | [`leitvia/check-composition`](abilities/leitvia-check-composition.md) | GET | Scores a page against the composition rules of the contract: pass pattern slugs in page order, or a post ID to read the sections of a saved page from metadata.patternName. |
 | [`leitvia/export`](abilities/leitvia-export.md) | GET | Exports the site as a portable JSON package, page by page. |
 | [`leitvia/get-block`](abilities/leitvia-get-block.md) | GET | Returns one block of a post by its ID or path ID with all attributes, its markup alone and with children, the image attachments, its hash, the IDs of its children and the document hash. |
+| [`leitvia/get-consent-providers`](abilities/leitvia-get-consent-providers.md) | GET | Returns the providers of embedded content from the privacy settings. |
 | [`leitvia/get-content-model`](abilities/leitvia-get-content-model.md) | GET | Returns the content model declaration: post types, taxonomies, fields, relations and site settings with their definitions, never content. |
 | [`leitvia/get-contract`](abilities/leitvia-get-contract.md) | GET | Returns the site this connection works on and the design contract of the active theme: version, rules, color roles, contrast pairs, composition rules, page frames, template parts, templates, block styles and style variations, plus the base hashes of template parts, templates and navigation menus. |
 | [`leitvia/get-package`](abilities/leitvia-get-package.md) | GET | Returns a change package with its operations: status, the post each applied operation wrote, conflicts and, for open operations, a block diff against the current state. |
@@ -124,7 +125,7 @@ Read abilities change nothing. Call them first: they return the IDs, block IDs a
 | [`leitvia/get-seo`](abilities/leitvia-get-seo.md) | GET | Returns the SEO data of posts, pages and entries from the active SEO plugin. |
 | [`leitvia/get-site-health`](abilities/leitvia-get-site-health.md) | GET | Returns the versions of WordPress, PHP, the theme and the plugins and the updates WordPress knows of, read from its last update check; nothing is requested. |
 | [`leitvia/get-tokens`](abilities/leitvia-get-tokens.md) | GET | Returns the active design tokens as a DTCG document, the token sets with their status, the active style variations, whether the global styles drifted from the active set, the contrast findings of the current palette and the hash of the global styles, the base_hash of leitvia/activate-token-set and leitvia/set-variation. |
-| [`leitvia/list-blocks`](abilities/leitvia-list-blocks.md) | GET | Returns the block catalog of Leitvia Studio and its add-ons with attribute schema and usage rules. |
+| [`leitvia/list-blocks`](abilities/leitvia-list-blocks.md) | GET | Returns the block catalog of Leitvia Studio and its add-ons with attribute schema and usage rules, and the registered block styles of every block, core blocks included, by block name; a style is set as the class is-style-\<name>. |
 | [`leitvia/list-building-blocks`](abilities/leitvia-list-building-blocks.md) | GET | Lists the building blocks of add-ons: name, title, description, whether the site has them, their post types and taxonomies, the patterns that show them and the number of sample entries. |
 | [`leitvia/list-content`](abilities/leitvia-list-content.md) | GET | Lists posts, pages and entries of the content model, newest first, with hash, terms and the open package that waits for each. |
 | [`leitvia/list-media`](abilities/leitvia-list-media.md) | GET | Lists the media library, newest first: ID, URL, file name, MIME type, file size in bytes, alt text, width, height and hash. |
@@ -148,9 +149,13 @@ Content model, design tokens, style variation, template parts, navigation and re
 | [`leitvia/apply-recipe`](abilities/leitvia-apply-recipe.md) | POST | Sets up the site from a recipe of leitvia/list-recipes: content model and building blocks, token set, style variation, header and footer, pages from patterns, navigation, reading settings and options that save data. |
 | [`leitvia/create-token-set`](abilities/leitvia-create-token-set.md) | POST | Creates a token set from a DTCG document. |
 | [`leitvia/define-content-type`](abilities/leitvia-define-content-type.md) | POST | Adds entries to the content model and keeps the others. |
-| [`leitvia/set-organization`](abilities/leitvia-set-organization.md) | POST | Sets address, phone and email of the organization. |
+| [`leitvia/set-consent-providers`](abilities/leitvia-set-consent-providers.md) | POST | Replaces the providers of embedded content in the privacy settings. |
+| [`leitvia/set-front-page`](abilities/leitvia-set-front-page.md) | POST | Makes an existing page the static front page; 0 shows the latest posts there again. |
+| [`leitvia/set-motion`](abilities/leitvia-set-motion.md) | POST | Sets the motion of the whole site: off, subtle or bold. |
+| [`leitvia/set-organization`](abilities/leitvia-set-organization.md) | POST | Sets the details of the organization behind the site: kind of business, address, phone, email, founding date, area served, opening hours and profiles on other sites. |
 | [`leitvia/set-posts-page`](abilities/leitvia-set-posts-page.md) | POST | Makes an existing page the posts page of the reading settings, the address that lists all posts; 0 clears it. |
 | [`leitvia/set-privacy-page`](abilities/leitvia-set-privacy-page.md) | POST | Makes an existing page the privacy policy page of the site; 0 clears it. |
+| [`leitvia/set-site-identity`](abilities/leitvia-set-site-identity.md) | POST | Sets the site title, the tagline, the logo and the site icon. |
 | [`leitvia/set-variation`](abilities/leitvia-set-variation.md) | POST | Applies a style variation of the contract to the global styles of the active theme: a full variation replaces them, a colors or typography variation replaces only its part. |
 | [`leitvia/update-navigation`](abilities/leitvia-update-navigation.md) | POST | Replaces the links of a navigation menu, by default the one published last, which headers without a chosen menu show. |
 | [`leitvia/update-site-values`](abilities/leitvia-update-site-values.md) | POST | Sets values of site settings of the content model declared with bindable true, the values blocks show on every page through the binding source leitvia/setting, such as opening hours or a phone number. |
@@ -174,17 +179,19 @@ Pages from patterns, single blocks, Lab patterns and media.
 
 ### Maintain
 
-Texts, links, alt text, deprecated patterns, products and change packages of existing content.
+Texts, links, alt text, patterns of sections, trash, media deletion, products and change packages of existing content.
 
 | Ability | REST | What it does |
 |---|---|---|
 | [`leitvia/apply-package`](abilities/leitvia-apply-package.md) | POST | Applies the open operations of a change package, all or the listed ones. |
+| [`leitvia/delete-media`](abilities/leitvia-delete-media.md) | POST | Deletes a file of the media library for good, with all its sizes; there is no way back. |
 | [`leitvia/reject-package`](abilities/leitvia-reject-package.md) | POST | Discards an open or partly applied change package. |
 | [`leitvia/repair-links`](abilities/leitvia-repair-links.md) | POST | Repairs internal links of one post: from pairs of old and new link, or with auto through the old slugs WordPress keeps for redirects. |
-| [`leitvia/replace-pattern`](abilities/leitvia-replace-pattern.md) | POST | Replaces the sections of one post that use a deprecated pattern with the replacement the contract names, all of them or the one section given by block. |
+| [`leitvia/replace-pattern`](abilities/leitvia-replace-pattern.md) | POST | Replaces top-level sections of one post with another pattern. |
 | [`leitvia/rollback`](abilities/leitvia-rollback.md) | POST | Rolls back the applied operations of a change package from their snapshots. |
 | [`leitvia/set-alt-text`](abilities/leitvia-set-alt-text.md) | POST | Sets the alt text of an image: without post and block on the attachment in the media library, with post and block on one image or cover block that shows it. |
 | [`leitvia/set-merchandising`](abilities/leitvia-set-merchandising.md) | POST | Sets the featured flag, the upsells, the cross-sells and the sort order of one product. |
+| [`leitvia/trash-content`](abilities/leitvia-trash-content.md) | POST | Moves a post, page or entry to the trash. |
 | [`leitvia/update-content`](abilities/leitvia-update-content.md) | POST | Updates title, excerpt, slug, date, status, author, terms, fields, rows of repeaters, featured image, comment status and the texts and button links of several blocks of one post in one operation, blocks found by their ID from the outline. |
 | [`leitvia/update-product`](abilities/leitvia-update-product.md) | POST | Updates texts, status, images, categories and tags of one product or variation, and its prices, tax and shipping class. |
 | [`leitvia/update-product-attribute`](abilities/leitvia-update-product-attribute.md) | POST | Renames a global product attribute and its values and sorts the values, in one operation. |

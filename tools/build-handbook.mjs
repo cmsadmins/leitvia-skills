@@ -30,7 +30,7 @@ const GROUPS = {
 	read: [ 'Read', 'Read abilities change nothing. Call them first: they return the IDs, block IDs and hashes the write abilities need.' ],
 	setup: [ 'Set up', 'Content model, design tokens, style variation, template parts, navigation and recipes.' ],
 	build: [ 'Build', 'Pages from patterns, single blocks, Lab patterns and media.' ],
-	maintain: [ 'Maintain', 'Texts, links, alt text, deprecated patterns, products and change packages of existing content.' ],
+	maintain: [ 'Maintain', 'Texts, links, alt text, patterns of sections, trash, media deletion, products and change packages of existing content.' ],
 };
 
 const LEVELS = {
@@ -52,7 +52,7 @@ const AREAS = {
 const KINDS = {
 	prices: 'Pricing blocks, price columns of comparison tables and product prices. Prices in plain text are not detected.',
 	legal: 'Pages with a legal page kind (imprint, privacy, terms, withdrawal, accessibility) and the privacy policy page.',
-	slugs: 'A changed slug, which changes a URL.',
+	slugs: 'A changed slug or parent page, which changes a URL.',
 	organization: 'Site options such as the site title, the logo and the reading settings.',
 	tax: 'Tax status and tax class of products.',
 	shipping: 'Shipping class of products.',

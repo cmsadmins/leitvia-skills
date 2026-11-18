@@ -59,7 +59,7 @@ For each page that needs it, write a title (at most 60 characters) and a descrip
 
 ### 5. Structure for search and AI answers
 
-AI answers quote passages that stand on their own. Suggest, per page, what would make it clearer: a first paragraph that answers the main question, headings that name their section, lists for steps, the date and author on articles: [structure](references/seo.md#structure-for-ai-answers). Text changes go through `leitvia/update-content` in the same package, only with facts from the page or the person (checkpoint **New text**). Structured data comes from the SEO plugin or Leitvia Studio; you do not write JSON-LD.
+AI answers quote passages that stand on their own. Suggest, per page, what would make it clearer: a first paragraph that answers the main question, headings that name their section, lists for steps, the date and author on articles: [structure](references/seo.md#structure-for-ai-answers). Text changes go through `leitvia/update-content` in the same package, only with facts from the page or the person (checkpoint **New text**). Structured data comes from the SEO plugin or Leitvia Studio; you do not write JSON-LD. Organization data, job postings and the anchors of a one-pager: [local business and jobs](references/local-business.md).
 
 ### 6. llms.txt and AI crawlers
 

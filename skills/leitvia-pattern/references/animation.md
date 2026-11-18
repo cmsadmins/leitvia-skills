@@ -27,7 +27,7 @@ What a visitor sees: the script hides only blocks that start below the visible a
 The values go into the block comment, nothing else changes:
 
 ```html
-<!-- wp:group {"metadata":{"name":"Services"},"leitviaAnimation":"rise","align":"full","style":{"spacing":{"padding":{"top":"var:preset|spacing|xl","bottom":"var:preset|spacing|xl"}}},"layout":{"type":"constrained"}} -->
+<!-- wp:group {"metadata":{"name":"Services"},"leitviaAnimation":"fade","align":"full","style":{"spacing":{"padding":{"top":"var:preset|spacing|xl","bottom":"var:preset|spacing|xl"}}},"layout":{"type":"constrained"}} -->
 <div class="wp-block-group alignfull" style="padding-top:var(--wp--preset--spacing--xl);padding-bottom:var(--wp--preset--spacing--xl)">...</div>
 <!-- /wp:group -->
 
@@ -35,22 +35,34 @@ The values go into the block comment, nothing else changes:
 <div class="wp-block-columns alignwide">...</div>
 <!-- /wp:columns -->
 
-<!-- wp:image {"id":12,"sizeSlug":"large","leitviaAnimation":"mask","leitviaMotion":"bold"} -->
+<!-- wp:image {"id":12,"sizeSlug":"large","leitviaAnimation":"mask"} -->
 
 <!-- wp:leitvia/icon-list {"icon":"circle-check","leitviaAnimation":"stagger","fontSize":"lead"} -->
 ```
 
-Key order as the editor saves it: `leitviaAnimation`, then `leitviaMotion`, come after the attributes of the block itself (`icon`, `id`, `sizeSlug`, `verticalAlignment`, `postType`), after `lock` and `metadata`, and before every attribute of the block supports: `align`, `className`, `style`, the colors, `fontSize`, `fontFamily`, `layout` and `anchor`. Leave out `"leitviaAnimation":"none"`, it is the default and the editor does not save it; leave out `leitviaMotion` for the site default. A value outside the lists is ignored on the front end. As everywhere, copy the order from markup the editor saved and never sort keys.
+Key order as the editor saves it: `leitviaAnimation`, then `leitviaMotion`, come after the attributes of the block itself (`icon`, `id`, `sizeSlug`, `verticalAlignment`, `postType`), after `lock` and `metadata`, and before every attribute of the block supports: `align`, `className`, `style`, the colors, `fontSize`, `fontFamily`, `layout` and `anchor`. Leave out `"leitviaAnimation":"none"`, it is the default and the editor does not save it; leave out `leitviaMotion` (see below). A value outside the lists is ignored on the front end. As everywhere, copy the order from markup the editor saved and never sort keys.
+
+## One motion per site
+
+Every page of a site moves alike; strength and duration come from the site setting `motion` (`off`, `subtle`, `bold`).
+
+- **Never `leitviaMotion`:** a block with a strength of its own runs longer or shorter than its neighbours.
+- **Sections** get one entry effect for the whole site, `fade` as in every shipped pattern, never `rise` beside it; **cards and grids** `stagger`; **covers and timelines** `parallax`.
+- **Striking effects** (zoom, slide, wipe, blur, mask): one kind per page, at most three blocks; shipped patterns use `mask` only, so add no other kind.
+- **Nothing else moves** but counter, scroll story, slider and marquee. No custom animations, delays or durations.
+- **More or less motion:** `leitvia/set-motion` (`bold`, `subtle`, `off`), never effects on more blocks.
+
+`leitvia/audit-site` reports a page that breaks this as `leitvia/motion`.
 
 ## When to use it
 
 - **Sparingly.** On a home page three to six sections at most, on other pages one or two, many pages none. Never every section: motion on every block distracts and slows reading. At most one striking effect (zoom, slide, wipe, blur, mask, parallax or anything bold) per screen height.
-- **Never in the first screen.** No effect on the hero, the first section after it or the block that holds the largest image or heading of the first view (LCP), parallax included. On a short screen the second section is already in the first view.
+- **Never in the first screen.** No effect on the hero, the first section after it or the block that holds the largest image or heading of the first view (LCP), parallax included. On a short screen the second section is already in the first view. Nothing fades in on load either, text included: the hero heading is often the LCP element, and a start from opacity 0 delays it.
 - **Never** on the header, the navigation, forms, notices and messages (form errors, announcement bar, consent, alerts), legal texts or content a visitor needs right away (opening hours of today, prices next to a checkout, a warning).
 - **Calls to action never wait.** No effect on a buttons block or a band whose purpose is the button; in a `stagger` the main button is never one of the later children. A closing band with a call to action stays still.
-- **One effect per section,** on its root block or on its grid, not on both and not nested. Text sections: `rise` or `fade`. Cards, icon lists, columns, feature groups, bento and pricing grids: `stagger` on the block whose direct children are the cards or items (`core/columns`, `leitvia/icon-list`, the grid group), not on the outer band. Images and covers: `zoom`, `wipe-up`, `wipe-start`, `mask` or `blur`. Media and text side by side: `slide-start` on one half. Headings: `wipe-up` or `wipe-start` on the heading block, never split into words.
-- **Calm sectors** such as a law firm, a medical practice, a public authority, an association, an insurer or a funeral home: `fade` or `rise`, `subtle` only, or no animation at all. When in doubt, none.
-- **Tone of the brand:** lively brands (a restaurant, an agency, a shop for young buyers, software) may use `bold` for images and galleries; a site that reads quiet stays quiet and subtle.
+- **One effect per section,** on its root block or on its grid, not on both and not nested. Text sections: the one entry effect of the site, `fade`, as in every shipped pattern. Cards, icon lists, columns, feature groups, bento and pricing grids: `stagger` on the block whose direct children are the cards or items (`core/columns`, `leitvia/icon-list`, the grid group), not on the outer band. Images and covers: `mask`, the one striking effect of the shipped patterns, at most three per page. Never split a heading into words.
+- **Calm sectors** such as a law firm, a medical practice, a public authority, an association, an insurer or a funeral home: `fade` only, `subtle`, or no animation at all. When in doubt, none.
+- **Tone of the brand:** lively brands (a restaurant, an agency, a shop for young buyers, software) get the site setting `bold`; a site that reads quiet stays `subtle`.
 
 ## Accessibility
 
@@ -64,4 +76,5 @@ Key order as the editor saves it: `leitviaAnimation`, then `leitviaMotion`, come
 
 - **New pattern or variant:** set `leitviaAnimation` and `leitviaMotion` in the markup of `leitvia/create-pattern`, or of `leitvia/vary-pattern` with a full `content`. `edits` of a variant cannot set them.
 - **New page:** `leitvia/compose-page` keeps the attributes the patterns carry; its edits (text, link, image) cannot add or remove them. Pick a pattern that already has the effect, or a variant with it.
-- **Existing page:** `leitvia/update-block` with `attributes: { "leitviaAnimation": "rise", "leitviaMotion": "bold" }` works on every block that lists the attributes, core blocks and blocks with saved markup included, since only the block comment changes. `"leitviaAnimation": "none"` removes the effect, `"leitviaMotion": null` returns to the site default. Send only these two keys in that call; other attributes of a core block still go through their own rules. A block without the attributes (the excluded ones above) is refused with `leitvia_invalid_input`.
+- **Existing page:** `leitvia/update-block` with `attributes: { "leitviaAnimation": "fade" }` works on every block that lists the attributes, core blocks and blocks with saved markup included, since only the block comment changes. `"leitviaAnimation": "none"` removes the effect, `"leitviaMotion": null` returns to the site setting.
+- **Whole site:** `leitvia/set-motion`. Send only these two keys in that call; other attributes of a core block still go through their own rules. A block without the attributes (the excluded ones above) is refused with `leitvia_invalid_input`.

@@ -12,7 +12,8 @@ Read the post with `leitvia/get-page-outline` (`hash`, block IDs) and the block 
 - **Link texts:** the link text names the target. For a text with one link use `leitvia/update-block` with `text` (the whole new text), `link_text` (the part that stays linked) and `url` when the target changes. A link to `#` needs the real target; when you cannot find it on the site, ask (checkpoint **Link targets**).
 - **Empty headings:** give them text with `leitvia/update-content` (`blocks` with `block` and `text`), or ask the person what the section is about.
 - **Heading levels:** a skipped level or a second h1 gets the level that fits the outline: `leitvia/update-block` with `attributes: { "level": <n> }` (1 to 6), for example h3 after h1 becomes h2. Work from the top down, so each fix sees the level before it. A heading that is missing altogether needs its text from the person.
-- **Animation:** `leitviaAnimation` (in the `attributes` of `leitvia/get-block`) on the header, a form, a notice, a call to action or the first view, or on most sections of a page, goes: remove it with `leitvia/update-block` and `attributes: { "leitviaAnimation": "none" }` on that block (works on every block, only the block comment changes); a `bold` strength on a calm site goes the same way with `"leitviaMotion": null`. A text that refers to the motion gets a new wording. Rules: [animation](../../leitvia-pattern/references/animation.md).
+- **Animation:** `leitviaAnimation` (in the `attributes` of `leitvia/get-block`) on the header, a form, a notice, a call to action or the first view, or on most sections of a page, goes: remove it with `leitvia/update-block` and `attributes: { "leitviaAnimation": "none" }` on that block (works on every block, only the block comment changes); every `leitviaMotion` goes with `"leitviaMotion": null` (strength comes from `leitvia/set-motion`); the same fixes `leitvia/motion` of `leitvia/audit-site`. A text that refers to the motion gets a new wording. Rules: [animation](../../leitvia-pattern/references/animation.md).
+- **Embeds behind consent:** each `leitvia/consent-embed` needs a `title` that names the content; it titles the frame for screen readers (`leitvia/update-block`). By keyboard, after loading the focus lands on the frame, not at the top of the page; report what you saw.
 
 ## What the abilities cannot fix
 
@@ -30,7 +31,7 @@ No ability or automated check decides these. List each one that applies to the c
 - **Plain language and easy-to-read language** (Leichte Sprache): whether the texts are understandable for the audience, and whether the site needs an easy-to-read version (BITV 2.0 asks public bodies for one).
 - **Language changes** inside a text: passages in another language need `lang` on their element, which no ability sets.
 - **Videos and audio:** captions, audio description, transcripts; media embedded from other hosts also need a consent placeholder.
-- **Forms of other plugins** (contact forms, newsletter, shop checkout): labels, error messages, keyboard use; the checks of Studio do not see them.
+- **Forms of other plugins** (contact forms, newsletter, shop checkout): labels, error messages, keyboard use; the checks of Studio do not see them. Gravity Forms: [rules](../../leitvia-page/references/gravity-forms.md#accessibility). Content inside an embedded frame belongs to its provider: list it.
 - **Documents:** PDF and office files linked from the pages.
 - **Motion:** with reduced motion turned on in the system every animated block is there at once; with it off, a block reached by keyboard shows itself when it gets focus, and no content depends on the effect.
 - **Zoom and reflow:** 200 % text zoom and 400 % zoom at 320 px width on the real content.

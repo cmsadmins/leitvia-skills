@@ -13,7 +13,8 @@
  *   12 characters per line (1920, 1440); form fields (a p or li holding an input, select or textarea) do not count
  * - axe: WCAG 2.2 A and AA rules of axe-core with reduced motion (1440 and 390)
  * - foreignHosts: requests to other hosts before any consent, after scrolling the page once (lazy images, embeds)
- * - httpErrors, brokenImages, h1 (not exactly one), shortcodes (text such as [vc_row] in the content), redirect, parts
+ * - httpErrors, brokenImages, h1 (not exactly one), shortcodes (text such as [vc_row] in the content; a bare
+ *   word such as [date] is a placeholder, no shortcode), redirect, parts
  *   (a further part of a post split into parts that did not load)
  * - words, links: with --old <address> (same paths) or an old URL per line, the words and links of the old page that
  *   the new one lacks; text in closed details, hidden tab panels (product tabs), all parts of a post split into parts
@@ -318,7 +319,11 @@ async function check( { url, old } ) {
 		} ) );
 		add( 'h1', 1 === facts.h1 ? [] : [ `${ facts.h1 } h1` ] );
 		add( 'brokenImages', facts.broken );
-		add( 'shortcodes', [ ...new Set( mine.prose.match( /\[\/?[a-z][a-z0-9_-]*(?:\s[^\]\n]*)?\]/g ) ?? [] ) ] );
+		// As leitvia_unknown_shortcode of Studio: a closing tag, an attribute or an underscore in the name. A bare word in
+		// brackets, such as [date] in the accessibility statement, is a placeholder of a pattern, no shortcode.
+		const shortcodes = [ ...mine.prose.matchAll( /\[(\/?)([a-z][a-z0-9_-]*)((?:\s[^\]\n]*)?)\]/g ) ]
+			.filter( ( [ , closing, name, rest ] ) => closing || name.includes( '_' ) || /^\s+[a-z_-]+\s*=|\/\s*$/.test( rest ) );
+		add( 'shortcodes', [ ...new Set( shortcodes.map( ( [ code ] ) => code ) ) ] );
 		add( 'httpErrors', httpErrors );
 		add( 'foreignHosts', [ ...foreign ] );
 		if ( old ) {

@@ -1,8 +1,8 @@
 # leitvia/replace-pattern
 
-Generated from Leitvia Studio 1.3.46. Do not edit. Group: Maintain. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.47. Do not edit. Group: Maintain. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
-**Replace deprecated pattern.** Replaces the sections of one post that use a deprecated pattern (metadata.patternName) with the replacement the contract names, all of them or the one section given by block. leitvia/audit-site reports the posts that use deprecated patterns; the base hash is the hash of the post from leitvia/get-page-outline. Texts and button links move over in order per block type. A section without replacement is rejected with leitvia_no_replacement.
+**Replace pattern.** Replaces top-level sections of one post with another pattern. Without pattern the sections that use a deprecated pattern (metadata.patternName) get the replacement the contract names, all of them or the one given by block; leitvia/audit-site reports such posts, and a section without replacement is rejected with leitvia_no_replacement. With pattern the one section given by block gets that pattern, any approved one of leitvia/list-patterns, with edits at block IDs of its outline as in leitvia/compose-page (text, link, image, caption, catalog attributes such as the level of a heading, anchor, columns of a grid, remove, repeat and insert): so a section of an existing page changes its pattern. Texts and button links of the old section move over in order per block type (carry false keeps the texts of the pattern), then the edits apply and win; the HTML anchor of the old section does not move over, set it again with an anchor edit. The base hash is the hash of the post from leitvia/get-page-outline.
 
 MCP tool `leitvia-replace-pattern`, REST POST. Annotations: readonly false, destructive true, idempotent false.
 
@@ -10,6 +10,9 @@ MCP tool `leitvia-replace-pattern`, REST POST. Annotations: readonly false, dest
 |---|---|---|---|
 | `post` | integer, min `1` | yes | Post ID from leitvia/list-content. |
 | `block` | string, min length `1`, max length `200` |  | Block ID or path ID of a top-level section from the outline. |
+| `pattern` | string, min length `1` |  | Pattern slug such as leitvia/cta-split, or block:\<ID> for a Lab pattern, that replaces the section given by block. |
+| `edits` | array of object { block\*, text, link_text, url, add_link, caption, anchor, columns, image, remove, repeat, insert, attributes }, max items `50` |  |  |
+| `carry` | boolean |  | With pattern: whether texts and button links of the old section move over before the edits; true by default. |
 | `base_hash` | string | yes | Hash of the target as last read; empty for a new object. |
 | `package` | string, max length `64` |  | Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package. |
 

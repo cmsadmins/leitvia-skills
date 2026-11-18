@@ -40,7 +40,7 @@ Each page loads once with reduced motion, scrolls through once (lazy images, emb
 | `httpErrors`, `brokenImages` | | Answers 400 and above, images that did not load. |
 | `h1` | | Not exactly one h1. |
 | `redirect` | | The page ended at another address (a login, another host). |
-| `shortcodes` | | Text such as `[vc_row]` in the content: a shortcode no plugin renders. |
+| `shortcodes` | | Text such as `[vc_row]` or `[/x]` in the content: a shortcode no plugin renders. A bare word such as `[date]` is a placeholder of a pattern and no finding; replace it before going live. |
 | `words`, `links` | | With an old page: words (with how many are missing) and link destinations of the old page that the new one lacks. Text of closed details blocks and hidden tab panels (product tabs) counts on both pages, and so do all parts of a post split into parts (the links of its page numbers). A link of the old page to an address of the old site that redirects counts by its destination. `old` when the old page or one of its parts did not answer 200 or not at all; the new page is still checked. |
 | `parts` | | A part of the new page (post split into parts) that did not load; its text is not in the comparison. |
 

@@ -41,7 +41,7 @@ A topic or a source outside the brief is not used. A brief without topics or sou
 - Sources: a heading "Sources" and a list with one link per source item (title of the item, publisher, date).
 - AI notice: `ai_generated` true on `leitvia/create-content`. Studio then shows a note before the text that AI wrote it, in the language of the site; a person removes it after their own review by deleting the custom field `leitvia_ai_generated`. Do not add a notice of your own to the content.
 - Excerpt: one or two sentences, 120 to 160 characters. It is the meta description of the post.
-- Images only from the brief: images the operator may use; an image from a news source is never copied. Featured image: `featured_image`, with alt text. Screenshots: one or two real screens, no mockups, with alt text and caption. Video: only with its script; `core/video` with `controls` and caption, then `core/details` "Transcript of the video", one list item per scene, as in `leitvia/content-video`.
+- Images only from the brief: images the operator may use; an image from a news source is never copied. Featured image: `featured_image`, with alt text. Screenshots: one or two real screens, no mockups, with alt text and caption. Video: only with its script, uploaded with `leitvia/add-media`; `core/video` with `poster`, `controls`, `preload` `none` and caption, never `autoplay`, then `core/details` "Transcript of the video", one list item per scene, as in `leitvia/content-video`.
 
 Rules of Google News that the post and the site have to meet:
 

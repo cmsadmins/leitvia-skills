@@ -53,7 +53,9 @@ Tell the person about these points; there is no ability for them:
 - Avatars come from Gravatar, a third party; recommend switching them off in Settings, Discussion.
 - Plugin scripts from other hosts need consent: the operator [lists them](../../../workflows/new-site-operator.md#scripts-of-plugins-from-other-providers).
 - A page in another language than the site needs its own document language; core has no per-page setting. With Polylang the operator sets languages and links translations ([second language](../../../workflows/new-site-operator.md#a-second-language-polylang)); header and footer of a language are the parts `header-<language>` and `footer-<language>`, which `leitvia/update-template-part` writes like `header`.
-- Plugins, users, the site title and tagline, the logo and the permalink structure are admin settings for the person. Propose site title and tagline from the briefing.
+- Plugins, users and the permalink structure are admin settings for the person.
+- Site title, tagline, logo and site icon: `leitvia/set-site-identity`, logo and icon as image IDs (upload with `leitvia/add-media`). The header shows them through `core/site-title` and `core/site-logo`; never put the logo there as an image block. The front page of a site without a recipe: `leitvia/set-front-page`.
+- Embedded content from a provider Studio does not know (a map, a booking tool) shows a placeholder named after its host: add the provider with `leitvia/get-consent-providers` and `leitvia/set-consent-providers`, with name, hosts, purpose and the privacy policy the provider publishes.
 - A sticky header is off; on request see [sticky header](sticky-header.md).
 - A header written as `content` keeps the navigation block of the theme with its attributes, only its items change: [navigation in the header](sticky-header.md#navigation-in-the-header).
 - The sample post "Hello world!" and the "Sample Page" of a new WordPress stay; no ability deletes content. Ask the person to delete them.

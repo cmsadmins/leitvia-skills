@@ -4,11 +4,11 @@ No recipe makes the header sticky; it scrolls with the page by default. When the
 
 - `is-style-sticky-header`: on every screen.
 - `is-style-sticky-header-desktop`: from 600 px wide only. For headers with several rows or a large logo.
-- `is-style-sticky-header-mobile`: below 600 px wide only.
+- `is-style-sticky-header-mobile`: below 600 px wide only. The usual choice for trades and local services with a long one-page site: on a phone the row with logo and menu button stays in reach, the menu holds the main button and the phone number.
 
 Read the part with `leitvia/get-block` on its root block, add the class to `className` of that group and to the class list of its `div`, change nothing else, and send the markup as `content` with the `package` key. Header parts live in the area `design`, so a person decides.
 
-The theme keeps it accessible by itself: in windows lower than 500 px or not wider than 320 px, at 200 % zoom, with enlarged text and in print the header scrolls away, and focused elements and jump targets stop below it (WCAG 2.4.11). With Leitvia Studio a header taller than a quarter of the window scrolls away as well. A calm site (a practice, a law firm) keeps the default.
+The theme keeps it accessible by itself: in windows lower than 500 px or not wider than 320 px, at 200 % zoom, with enlarged text and in print the header scrolls away, and focused elements and jump targets stop below it (WCAG 2.4.11). With Leitvia Studio a header taller than a quarter of the window scrolls away as well. On phones a service bar on top (`header-utility`) scrolls away and only the row below it sticks; keep the bar the first block of the group named Header, or the whole header sticks. The row needs no compact variant: nothing shrinks or hides on scroll, so do not add a script or classes for that. A calm site (a practice, a law firm) keeps the default.
 
 ## Navigation in the header
 

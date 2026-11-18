@@ -1,6 +1,6 @@
 # Rejections
 
-Generated from Leitvia Studio 1.3.46. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
+Generated from Leitvia Studio 1.3.47. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
 
 Every rejection of Leitvia Studio with its retry rule and next ability. Messages with `%s` or `%d` get a value at run time; codes with several rows come from several places.
 
@@ -54,6 +54,7 @@ Leitvia uses one code per kind of failure, not one per field as in the error voc
 | `leitvia_invalid_input` | 422 | `never` | none | The value is not valid for this option. |
 | `leitvia_invalid_package` | 400 | `never` | none | Built at run time; read the message. |
 | `leitvia_locked` | 403 | `never` | none | Agents may not change this area. A person can change the autonomy settings. |
+| `leitvia_media_in_use` | 409 | `never` | `leitvia/update-block` | Published content or the site still uses this file: %s. Replace it there with leitvia/update-block first, or send force to delete it anyway; those places then show no image. |
 | `leitvia_media_missing` | 422 | `never` | `leitvia/add-media` | The file of a new image is not on this site any more. Add the image again with leitvia/add-media, then export. |
 | `leitvia_media_missing` | 409 | `never` | none | The image this content uses is not applied yet. Apply the image first. |
 | `leitvia_needs_human` | 403 | `never` | none | A person has to decide on these operations in the inbox. Apply only operations whose area is autonomous for you. |
@@ -64,6 +65,7 @@ Leitvia uses one code per kind of failure, not one per field as in the error voc
 | `leitvia_not_found` | 404 | `once` | `leitvia/get-page-outline` | There is no block with this ID. Read the outline for the current IDs. |
 | `leitvia_not_found` | 404 | `once` | `leitvia/list-media` | There is no file with this ID in the media library. List the media for the current IDs. |
 | `leitvia_not_found` | 404 | `once` | `leitvia/list-patterns` | There is no pattern with this slug. List the patterns for the current slugs. |
+| `leitvia_not_found` | 404 | `once` | `leitvia/list-content` | There is no post, page or entry with this ID that agents can read. Take the ID from leitvia/list-content; files go with leitvia/delete-media. |
 | `leitvia_not_found` | 404 | `once` | `leitvia/get-page-outline` | There is no top-level section with this ID. Read the outline for the current IDs. |
 | `leitvia_out_of_scope` | 403 | `never` | none | Agents may not change this object. Only published or draft content of the allowed post types is open to them. |
 | `leitvia_out_of_scope` | 403 | `never` | none | Agents may not read this object. Only published or draft content of the allowed post types is open to them. |
@@ -76,7 +78,9 @@ Leitvia uses one code per kind of failure, not one per field as in the error voc
 | `leitvia_rate_limited` | 429 | `after:<seconds>` | none | Too many calls. Try again in %d seconds. |
 | `leitvia_recipe_unavailable` | 422 | `never` | `leitvia/list-recipes` | Built at run time; read the message. |
 | `leitvia_rollback_conflict` | 409 | `never` | `leitvia/get-package` | Someone changed the content after the package was applied. Nothing was rolled back; compare the changes and decide by hand. |
+| `leitvia_stale_hash` | 409 | `once` | `leitvia/get-consent-providers` | The providers changed since they were read. Read them with leitvia/get-consent-providers and repeat the change on the current list with base_hash %s. |
 | `leitvia_stale_hash` | 409 | `once` | `leitvia/get-content-model` | The site settings changed since they were read. Read them with leitvia/get-content-model and repeat the change on the current values with base_hash %s. |
+| `leitvia_stale_hash` | 409 | `once` | none or `leitvia/get-page-outline` | The target changed since it was read. Read it again and repeat the change on the current state with base_hash %s. |
 | `leitvia_stale_hash` | 409 | `once` | none or `leitvia/get-page-outline` | The target changed since it was read. Read it again and repeat the change on the current state. |
 | `leitvia_static_markup` | 422 | `once` | `leitvia/compose-page` | This change needs markup that cannot be rebuilt safely. Insert the pattern again with leitvia/compose-page, or change a block that supports it. |
 | `leitvia_too_large` | 413 | `once` | none | The change is too large to compare (more than %d KB). Split it into smaller changes. |
@@ -86,6 +90,7 @@ Leitvia uses one code per kind of failure, not one per field as in the error voc
 | `leitvia_unknown_pattern` | 404 | `once` | none | There is no pattern with this name for this template. Use one of the patterns the rejection lists in patterns. |
 | `leitvia_unknown_pattern` | 404 | `once` | `leitvia/list-patterns` | There is no pattern with this name. List the patterns and use one of them. |
 | `leitvia_unknown_recipe` | 404 | `once` | `leitvia/list-recipes` | There is no recipe with this name. List the recipes and use one of them. |
+| `leitvia_unsafe_content` | 422 | `once` | `leitvia/list-blocks` | A block comment is broken: its attributes are no valid JSON, or the comment does not close. Send each block comment as serialize_block() writes it. |
 | `leitvia_unsafe_content` | 422 | `once` | `leitvia/list-blocks` | The content holds markup agents may not write: scripts, event attributes, Custom HTML blocks, classic blocks or Base64 data. Use registered blocks and media from the library. |
 
 ## Codes of other plugins

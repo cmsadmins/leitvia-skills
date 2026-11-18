@@ -27,7 +27,7 @@ Everything else (`<script>`, `<style>`, `<form>`, shortcodes, page builders) has
 
 - An image without alt text gets one: one short sentence from what the image shows and why it is on the page, using caption and text around it. An image that only decorates gets an empty alt and `"metadata":{"leitviaDecorative":true}` on the block. List every alt text you wrote.
 - An image from another host is not fetched and must not load from there. Ask the person for the file and add it with `leitvia/add-media` as Base64 data, or leave it out with their consent (checkpoint **Open items**).
-- Text burned into an image goes into the content as text; cut the image to the part without it with `leitvia/crop-media`, never outside the abilities.
+- Text burned into an image goes into the content as text; cut the image to the part without it with `leitvia/crop-media`, never outside the abilities. In a package a crop has no ID until applied.
 
 ## Compare before you write
 
