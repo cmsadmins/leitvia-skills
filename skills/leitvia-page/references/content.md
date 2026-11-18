@@ -49,4 +49,4 @@ Details for `leitvia-page`. Read it before you write the edits of step 4.
 - Use `leitvia/content-video`. Its transcript holds one list item per scene in the words on screen; without the script of the video, ask. Spoken words need captions: a WebVTT file as `tracks`.
 - Its video block is empty and its caption takes no edit: after composing, send the whole content with `leitvia/update-content`, the video with attachment `id`, `src`, `poster` (URL of the poster image), `controls` and `preload` `none`, and a caption. Never `autoplay` or `loop`.
 - A video without speech still needs its content as text (WCAG 1.2.1) in caption and transcript.
-- Wider than the text: `align` `wide` or `full` on the `core/video` with `leitvia/update-block`, `null` back to the text width.
+- Wider than the text: `align` `wide` or `full` on the `core/video` with `leitvia/update-block`, `null` back to the text width. Also on any block whose `supports.align` has it.

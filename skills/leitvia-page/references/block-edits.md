@@ -11,6 +11,7 @@ Details for `leitvia-page`, `leitvia-maintain` and `leitvia-a11y`. Read this whe
 - **Remove a page or post:** `leitvia/trash-content`. It always waits for a person and stays restorable. Refused for the front page, the posts page, the privacy page and a page with subpages; `notice` names the pages that link to it.
 - **Map (`leitvia/map`):** set `lat`, `lng`, `zoom` (1 to 19), `height`, `heading`, `linkText` and `markers` (each `title`, `address`, `lat`, `lng`) as `attributes` of `insert` or of `leitvia/update-block`; the list of places is built again. `markers` replaces the list, so send it on every insert, or the sample place stays. `text` is the heading.
 - **Bound button:** a button whose `url` a binding fills (`metadata.bindings.url`, for example the button of a job posting) takes no new link. `url: ""` removes only its saved link, the binding stays; change the value at its source.
+- **Library image:** `image` `{ id }` without `alt` keeps the alt text of the library; `decorative: true` for decoration.
 - **Caption:** `caption` on `leitvia/update-block` or per block in `leitvia/update-content`, plain text, on images, videos, audio, galleries, tables and embeds. An empty string removes it.
 
 ## Captions of a video
