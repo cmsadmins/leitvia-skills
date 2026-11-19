@@ -21,7 +21,7 @@ Each `SKILL.md` is built like the skills of [WordPress/agent-skills](https://git
 ## 1. Prepare the site
 
 - WordPress 7.1 or later and PHP 8.2 or later, with HTTPS. Application passwords of WordPress work only over HTTPS (or on a local development site).
-- The theme **Leitvia** and the plugin **Leitvia Studio**. Both are submitted to WordPress.org and not listed there yet. Until they are, install the zips from the releases of [cmsadmins/leitvia](https://github.com/cmsadmins/leitvia/releases) and [cmsadmins/leitvia-studio](https://github.com/cmsadmins/leitvia-studio/releases) under **Appearance, Themes, Add New, Upload Theme** and **Plugins, Add New, Upload Plugin**. Once listed, search for them on the same screens.
+- The theme **Leitvia** and the plugin **Leitvia Studio**. The theme passed the WordPress.org theme review on 18.11.2026 and appears in the directory once the themes team publishes it; Leitvia Studio is submitted. Until they are listed, install the zips from the releases of [cmsadmins/leitvia](https://github.com/cmsadmins/leitvia/releases) and [cmsadmins/leitvia-studio](https://github.com/cmsadmins/leitvia-studio/releases) under **Appearance, Themes, Add New, Upload Theme** and **Plugins, Add New, Upload Plugin**. Once listed, search for them on the same screens.
 - For MCP: the plugin **MCP Adapter** 0.7 from WordPress.org. Without it the agent uses the REST API, see step 2.
 
 With WP-CLI on the server, the bootstrap in [workflows/new-site.md](workflows/new-site.md#bootstrap-the-operator-or-the-runner-before-the-agent) does this step and creates the agent user of step 2. For a test site on your own machine the same section starts WordPress Playground from a blueprint, without a server.
@@ -37,7 +37,7 @@ For a test or demo run on your own machine, without a server, the Playground CLI
 	"constants": { "WP_ENVIRONMENT_TYPE": "local" },
 	"siteOptions": { "permalink_structure": "/%postname%/" },
 	"steps": [
-		{ "step": "installTheme", "themeData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia/releases/download/1.2.51/leitvia-1.2.51.zip" }, "options": { "activate": true } },
+		{ "step": "installTheme", "themeData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia/releases/download/1.2.54/leitvia-1.2.54.zip" }, "options": { "activate": true } },
 		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.48/leitvia-studio-1.3.48.zip" }, "options": { "activate": true } },
 		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://downloads.wordpress.org/plugin/mcp-adapter.0.7.1.zip" }, "options": { "activate": true } },
 		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://downloads.wordpress.org/plugin/woocommerce.11.2.1.zip" }, "options": { "activate": true } },
