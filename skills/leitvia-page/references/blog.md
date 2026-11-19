@@ -6,7 +6,7 @@ Details for `leitvia-page`. Read it when the briefing asks for a blog, a journal
 
 The blog needs no pattern of yours. The theme templates show:
 
-- **Overview** (`home`): the h1 and lead of the blog, the sticky post as a wide band, then ten posts per page with date, linked title, excerpt and a "Continue reading" link, and numbered pages with previous and next links. With a posts page set, the h1 is the title of that page, the lead its excerpt, and its featured image and content follow above the posts.
+- **Overview** (`home`): the h1 and lead of the blog, the sticky post as a wide band marked "Featured" on the first page, then ten posts per page with date, linked title, excerpt and a "Continue reading" link, and numbered pages with previous and next links. With a posts page set, the h1 is the title of that page, the lead its excerpt, and its featured image and content follow above the posts.
 - **Category, tag and date archives** (`archive`): title, the description of the term, a grid of posts with images. **Author pages** (`author`): name, the biographical info of the profile, the posts.
 - **Post page** (`single`): category, title, excerpt, byline with author, dates and reading time, featured image, content, tags, an author box, previous and next post, up to three related posts from the same categories, and comments only while they are open or exist.
 
@@ -24,7 +24,7 @@ The blog needs no pattern of yours. The theme templates show:
 A blog with news for Google News and AI answers needs a few things more; `leitvia-news` and `leitvia-seo-geo` check them.
 
 1. **Editorial page:** a page with `leitvia/create-content`, `kind` `editorial`: who writes, how sources are checked, how corrections and AI texts are handled, all from the person. The person picks it in Leitvia Studio as the editorial page (`editorial_page`); Studio then links it in the author box and names it as `publishingPrinciples` in the structured data.
-2. **Categories:** two to six, each with a description. The overview shows them as chips; more than six make the row hard to scan, one makes it useless.
+2. **Categories:** two to six, each with a description. The overview shows them as chips; more than six make the row hard to scan, one makes it useless. From thirteen categories on, the theme keeps the twelve with the most posts and the current one in the row; the rest stay reachable on the posts.
 3. **Featured images:** every post has one, at least 1200 px wide, fit for a 16:9 crop, with alt text. The newest post leads the card grid with it.
 4. **Authors:** real names with a biographical info in the profile, set by the person. The author box and the author page show it.
 5. **Imprint and contact** pages exist and are linked in the footer.
