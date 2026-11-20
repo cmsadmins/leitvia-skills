@@ -49,7 +49,7 @@ Every page of a site moves alike; strength and duration come from the site setti
 - **Never `leitviaMotion`:** a block with a strength of its own runs longer or shorter than its neighbours.
 - **Sections** get one entry effect for the whole site, `fade` as in every shipped pattern, never `rise` beside it; **cards and grids** `stagger`; **covers and timelines** `parallax`.
 - **Striking effects** (zoom, slide, wipe, blur, mask): one kind per page, at most three blocks; shipped patterns use `mask` only, so add no other kind.
-- **Nothing else moves** but counter, scroll story, slider and marquee. No custom animations, delays or durations.
+- **Nothing else moves** but counter, scroll story, slider, marquee and the effects and styles of add-ons (below). No custom animations, delays or durations.
 - **More or less motion:** `leitvia/set-motion` (`bold`, `subtle`, `off`), never effects on more blocks.
 
 `leitvia/audit-site` reports a page that breaks this as `leitvia/motion`.
@@ -70,7 +70,7 @@ Every page of a site moves alike; strength and duration come from the site setti
 - Reduced motion, Motion off, no JavaScript and print show everything at once; that is the state to judge contrast, reading order and focus in, and the state an accessibility check sees.
 - A reveal runs once and lasts at most 1.2 s, parallax follows the scroll and stops with it (WCAG 2.2.2 needs no pause button for either); nothing flashes (2.3.1). The accessibility bar has the switch "Motion off" (2.3.3), stored in the browser of the visitor.
 - A hidden block shows itself when it gets focus, so keyboard users never land in invisible content (2.4.7, 2.4.11).
-- The theme adds a mild hover of its own: a card with a link lifts 2px with the `raised` shadow, linked images scale to 1.03 inside their frame, in 200 ms, the same for keyboard focus, never with reduced motion or Motion off. It needs no attribute; never build hover effects into a pattern.
+- The theme adds a mild hover of its own: a card with a link lifts 2px with the `raised` shadow, linked images scale to 1.03 inside their frame, in 200 ms, the same for keyboard focus, never with reduced motion or Motion off. It needs no attribute; never build hover effects into a pattern. A block style of an add-on that brings its own hover is a style, not markup, and may be used.
 
 ## Through the abilities
 
@@ -78,3 +78,13 @@ Every page of a site moves alike; strength and duration come from the site setti
 - **New page:** `leitvia/compose-page` keeps the attributes the patterns carry; its edits (text, link, image) cannot add or remove them. Pick a pattern that already has the effect, or a variant with it.
 - **Existing page:** `leitvia/update-block` with `attributes: { "leitviaAnimation": "fade" }` works on every block that lists the attributes, core blocks and blocks with saved markup included, since only the block comment changes. `"leitviaAnimation": "none"` removes the effect, `"leitviaMotion": null` returns to the site setting.
 - **Whole site:** `leitvia/set-motion`. Send only these two keys in that call; other attributes of a core block still go through their own rules. A block without the attributes (the excluded ones above) is refused with `leitvia_invalid_input`.
+
+## Effects of add-ons
+
+An add-on can add effects of its own to `leitviaAnimation`. Each is an entry effect (plays once like those above) or a scroll effect (follows the scroll position like `parallax`; Studio sets `has-lv-scroll is-lv-scroll-<effect>`). `leitvia/list-blocks` names them, with the blocks they fit and when to use them, in the description of the attribute; on any other block they are ignored. Block styles of an add-on show in the same list with the block.
+
+- **At most two kinds of scroll effect per page** besides `parallax`; `leitvia/audit-site` reports more as `leitvia/motion`.
+- **Never in the last screen of a page:** a scroll effect reaches its end state before the block gets to the middle of the window, and at the end of a page it may never get there.
+- **The first screen stays still,** as above. A style an add-on describes as the opening stage of a page is the one exception.
+- Everything else above holds for them too: one effect per section, none in calm sectors, never `leitviaMotion`.
+
