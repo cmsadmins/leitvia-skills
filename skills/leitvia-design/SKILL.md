@@ -39,18 +39,18 @@ Checkpoint "Brand confirmed".
 
 ### 2. Read the site
 
-- `leitvia/get-contract`: `roles` (every color, font size, font family, spacing, radius and shadow slug), `pairs` (foreground, background, minimum ratio, optional `ring`).
+- `leitvia/get-contract`: `roles` (every color, font size, font family, spacing, radius and shadow slug), `pairs` (foreground, background, minimum ratio, optional `ring`), `optionalRoles` and `optionalPairs` (button and band colors a set may add).
 - `leitvia/get-tokens`: the current `document` (start from it), `sets` (existing token sets) and `contrast` (findings of the current palette).
 - The front page: its `--wp--preset--color--*` and `--wp--preset--font-family--*` values are what visitors see. When they differ from the `document`, tell the person which values differ and ask which ones to keep before you write; never build a set on values the site does not show.
 - A style variation of a recipe (such as `corporate-light`, in the same package as the recipe) and a token set do not add up: once the set is active, its colors and fonts replace those of the variation. Build the set on the `document` of `leitvia/get-tokens`; a variation that still waits in an open package is no reason to ask.
 
 ### 3. Map brand values to roles
 
-Copy the `document` of `leitvia/get-tokens` and change only `$value` entries, keeping every slug. Roles and the value format: [token details](references/tokens.md#roles). A brand color that fits no role (for example a second orange for print) stays out of the set; mention it in the `$description` of the set.
+Copy the `document` of `leitvia/get-tokens` and change only `$value` entries, keeping every slug. Roles and the value format: [token details](references/tokens.md#roles). A brand whose buttons or dark bands have another color than its text adds the optional roles `button`, `on-button`, `band`, `band-button` and `on-band-button`: [button and band colors](references/tokens.md#button-and-band-colors). A brand color that fits no role (for example a second orange for print) stays out of the set; mention it in the `$description` of the set.
 
 ### 4. Compute every contrast pair before writing
 
-For every entry of `pairs`, compute the WCAG 2.2 ratio of `fg` on `bg`, rings included, with the formula in [token details](references/tokens.md#contrast). Check all pairs, not only the ones the brand guide mentions.
+For every entry of `pairs`, and of `optionalPairs` when the set carries an optional role, compute the WCAG 2.2 ratio of `fg` on `bg`, rings included, with the formula in [token details](references/tokens.md#contrast). Check all pairs, not only the ones the brand guide mentions.
 
 ### 5. Create the token set
 

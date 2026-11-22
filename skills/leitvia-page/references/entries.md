@@ -54,7 +54,7 @@ Leitvia Studio gives every public type a template `single-<type>`: breadcrumbs (
 
 Compose the `content` of an entry page in this order:
 
-1. Introduction: one or two paragraphs on what the entry offers and for whom (the excerpt above it is the summary, do not repeat it).
+1. Introduction: one or two paragraphs on what the entry offers and for whom (the excerpt above it is the summary, do not repeat it, and do not start the content with the featured image: the template shows both).
 2. Facts: the markup of `leitvia/get-pattern` `leitvia-studio/content-entry-facts`, one row per field that matters (date, time, duration, price, free places, level). Keep two paragraphs per row, the label first and the value bound to the field: set `key` to your field keys, add or remove rows, keep `"suffix":" €"` on a price in euros. A relation such as the instructor is a row with `leitvia/relation`. The rows render as a description list.
 3. Call to action: how to book or ask, for example `leitvia/cta-banner` with its button to the contact page. It spans the width of the entry like the image; keep the button text short ("Book this course"), the heading names the entry. Only link to pages that exist.
 4. Nothing more: the template adds "More <type>".

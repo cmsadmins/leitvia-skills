@@ -1,8 +1,8 @@
 # Leitvia agent handbook
 
-Generated from Leitvia Studio 1.3.50. Do not edit.
+Generated from Leitvia Studio 1.3.51. Do not edit.
 
-Everything an agent needs to work on a WordPress site with Leitvia Studio through its 66 abilities. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call.
+Everything an agent needs to work on a WordPress site with Leitvia Studio through its 68 abilities. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call.
 
 ## Access over MCP and REST
 
@@ -13,6 +13,8 @@ Sign in as a WordPress user that may edit posts, with an application password (H
 **MCP.** The server `leitvia` answers at `POST /wp-json/leitvia-studio/v1/mcp` when the plugin MCP Adapter 0.7 is active. Send `initialize` first; its response carries the header `Mcp-Session-Id`. Every further request sends that header and `MCP-Protocol-Version` (for example `2025-06-18`), otherwise the server answers with 400. `tools/list` lists the abilities, named with a hyphen for the slash (`leitvia-get-contract`). `tools/call` takes the input of the ability as `arguments`. A rejection comes back as a tool result with `isError` true whose text is JSON with `code`, `message` and `data`.
 
 **REST.** Every ability runs at `/wp-json/wp-abilities/v1/abilities/<name>/run`. The HTTP method follows the annotations: read only abilities take GET, abilities that are destructive and idempotent take DELETE, all others POST. GET and DELETE send the input as query arguments (`?input[post]=12`, lists as `input[upsells][]=4&input[upsells][]=7`), POST sends it as JSON body `{"input": {…}}`. A rejection is an error response with `code`, `message` and `data`; the HTTP status is `data.status`. Without the MCP server `leitvia`: [core REST](core-rest.md).
+
+**Check the MCP connection.** The MCP server is the whole route `<address of the site>/wp-json/leitvia-studio/v1/mcp`, never the address of the site alone. Its tools must hold `leitvia-get-contract`; call it first. When the client finds no endpoint or gets 404, the URL lacks that path or MCP Adapter is not active: do not retry at the host and do not guess paths. Call `GET <address of the site>/wp-json/wp-abilities/v1/abilities/leitvia/get-contract/run` with the same credentials. When it answers, work over REST and report the broken MCP connection; on 401 or 404 stop and ask.
 
 ## Read before write
 
@@ -185,7 +187,9 @@ Texts, links, alt text, patterns of sections, trash, media deletion, products an
 |---|---|---|
 | [`leitvia/apply-package`](abilities/leitvia-apply-package.md) | POST | Applies the open operations of a change package, all or the listed ones. |
 | [`leitvia/delete-media`](abilities/leitvia-delete-media.md) | POST | Deletes a file of the media library for good, with all its sizes; there is no way back. |
+| [`leitvia/insert-section`](abilities/leitvia-insert-section.md) | POST | Inserts sections into the content of an existing post, page or entry, or moves one of its top-level sections; the rest of the content stays as it is. |
 | [`leitvia/reject-package`](abilities/leitvia-reject-package.md) | POST | Discards an open or partly applied change package. |
+| [`leitvia/remove-section`](abilities/leitvia-remove-section.md) | POST | Takes one top-level section out of the content of a post, page or entry; the rest of the content stays as it is. |
 | [`leitvia/repair-links`](abilities/leitvia-repair-links.md) | POST | Repairs internal links of one post: from pairs of old and new link, or with auto through the old slugs WordPress keeps for redirects. |
 | [`leitvia/replace-pattern`](abilities/leitvia-replace-pattern.md) | POST | Replaces top-level sections of one post with another pattern. |
 | [`leitvia/rollback`](abilities/leitvia-rollback.md) | POST | Rolls back the applied operations of a change package from their snapshots. |

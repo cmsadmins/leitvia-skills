@@ -15,9 +15,34 @@ Details for `leitvia-design`. Read "Format" before you change a `$value`, "Contr
 
 A dark set (`surface` darker than `ink`) keeps inverse bands dark, also on a light variation.
 
+## Button and band colors
+
+By default the primary button and the dark bands (Inverse block style) take `ink`, and a button on a dark band takes `accent`. A token set separates them with the optional roles of `optionalRoles` in `leitvia/get-contract`. Add only the ones the brand needs; a role you leave out keeps its fallback, and a set without any of them looks as before.
+
+| Optional role | Falls back to | Sets |
+|---|---|---|
+| `button` | `ink` | Fill and border of the primary button on light surfaces |
+| `on-button` | `surface` | Label on `button` |
+| `band` | `ink` | Background of dark bands in a light set; `ink` stays the text color |
+| `band-button` | `accent` | Fill and border of the primary button on dark bands |
+| `on-band-button` | `on-accent` | Label on `band-button` |
+
+Add each one as a color token next to `ink`, in the same value format:
+
+```json
+"button": { "$type": "color", "$value": { "colorSpace": "srgb", "components": [0.122, 0.373, 0.749], "hex": "#1f5fbf" } }
+```
+
+Example: a brand with mid blue buttons and white labels, near black blue text, deep blue bands and white buttons on them sets `ink` `#0b1b33`, `button` `#1f5fbf`, `on-button` `#ffffff`, `band` `#0b2a5b`, `band-button` `#ffffff` and `on-band-button` `#0b2a5b`.
+
+- The set is then also checked against `optionalPairs`: the label on its button (4.5:1, here 6.1:1 and 14.0:1), and `surface`, `stroke` and the focus ring on `band`. A role you left out counts with its fallback, so `button` alone still needs `surface` to read on it.
+- Hover stays `accent` with `on-accent` for every button; a `button` equal to `accent` has no visible hover change, so keep them apart.
+- `band` applies to the Inverse block style in a light set. A dark set keeps `surface-alt`, and a plain `ink` background stays `ink`.
+- Outline buttons, form buttons of Gravity Forms and the token editor of Leitvia Studio do not know these roles yet: outline and form buttons keep `ink`, the editor keeps the roles when it saves but has no fields for them. Change them through `leitvia/create-token-set`.
+
 ## Format
 
-Copy the `document` of `leitvia/get-tokens` and change only `$value` entries. Keep every slug, add none; see [`radius.media`](media-radius.md).
+Copy the `document` of `leitvia/get-tokens` and change only `$value` entries. Keep every slug and add none, except the optional [button and band colors](#button-and-band-colors); see [`radius.media`](media-radius.md).
 
 Colors as `{"colorSpace": "srgb", "components": [r, g, b], "hex": "#rrggbb"}` with components from 0 to 1; dimensions as `{"value": 1.5, "unit": "rem"}`; `clamp()` values through `$extensions` `com.leitvia` `css`, fluid font sizes through `com.leitvia` `fluid`, as in the document you started from.
 
@@ -27,7 +52,7 @@ Extra surfaces go in `color.surface-extra`: at most eight color tokens, names of
 
 ## Contrast
 
-For every entry of `pairs`, compute the WCAG 2.2 ratio of `fg` on `bg`: relative luminance L of each color (sRGB channel c from 0 to 1, linear `c / 12.92` when c is at most 0.04045, else `((c + 0.055) / 1.055) ^ 2.4`; L = 0.2126 R + 0.7152 G + 0.0722 B), ratio = (L1 + 0.05) / (L2 + 0.05) with L1 the lighter one. A pair with `ring` passes when the better of `fg` on `bg` and `ring` on `bg` reaches `min`, and `fg` on `ring` reaches 3:1 (the double focus ring).
+For every entry of `pairs`, and of `optionalPairs` when the set carries one of its optional roles, compute the WCAG 2.2 ratio of `fg` on `bg`: relative luminance L of each color (sRGB channel c from 0 to 1, linear `c / 12.92` when c is at most 0.04045, else `((c + 0.055) / 1.055) ^ 2.4`; L = 0.2126 R + 0.7152 G + 0.0722 B), ratio = (L1 + 0.05) / (L2 + 0.05) with L1 the lighter one. A pair with `ring` passes when the better of `fg` on `bg` and `ring` on `bg` reaches `min`, and `fg` on `ring` reaches 3:1 (the double focus ring).
 
 Check all pairs, not only the ones the brand guide mentions. Brand guides often list a muted text or border color that fails on the brand's own background.
 

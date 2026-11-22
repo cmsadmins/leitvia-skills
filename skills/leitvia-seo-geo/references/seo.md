@@ -11,8 +11,10 @@ Check this before any page. A site that tells search engines to stay away gains 
 | Indexing | `indexable` of `leitvia/get-seo` (false when "Discourage search engines" is ticked in Settings, Reading) | false on a live site: high |
 | Robots of the home page | `<meta name="robots">` of the public home page | `noindex`: high |
 | robots.txt | `/robots.txt` | `Disallow: /` for all crawlers: high; no `Sitemap:` line: low |
-| Sitemap | `/wp-sitemap.xml` or the sitemap of the SEO plugin | missing or empty: medium |
+| Sitemap | `/wp-sitemap.xml` or the sitemap of the SEO plugin | missing or empty: medium. With `indexable` false WordPress serves no sitemap and no `Sitemap:` line: no finding of its own, it comes back with indexing |
 | News sitemap | `news_sitemap` of `leitvia/get-seo`, `/news.xml` | missing on a site with news: medium |
+
+`leitvia/update-seo` refuses a title over 60 and a description over 160 characters. Shorten a text from the source to fit before the call and say so in the report; never leave a page without its lines because the source was too long. After `leitvia/create-content` with `seo`, read `leitvia/get-seo` to see what was stored.
 
 Only the person changes indexing, in Settings, Reading. Propose it plainly: "The site is live but asks search engines not to index it. Untick 'Discourage search engines' in Settings, Reading." A site that is not live yet may stay hidden; say so and move on.
 
@@ -52,7 +54,7 @@ AI search (Google AI Overviews, ChatGPT search, Perplexity, Copilot) quotes shor
 - Names stay the same everywhere: the organization, products and places as on the imprint.
 - Questions people ask may become headings, answered right below, when the page really answers them. No invented FAQ.
 
-Structured data: with an SEO plugin, the plugin prints it (its settings decide the types). Without one, Leitvia Studio prints, when its setting for structured data is on: `WebSite` with the organization on the front page, `BlogPosting` or `NewsArticle` with the organization as publisher and `BreadcrumbList` on posts, `CollectionPage` on the posts page and on archives, `ProfilePage` on author pages, and `FAQPage` from the FAQ block; `defaults.schema` of `leitvia/get-seo` names what a post gets. On the front page the organization is `Organization` or a subtype of `LocalBusiness` with its details, which `organization` of `leitvia/get-seo` shows: [local business and jobs](local-business.md). With an SEO plugin Studio prints none of this. Never add JSON-LD in content blocks.
+Structured data: with an SEO plugin, the plugin prints it (its settings decide the types). Without one, Leitvia Studio prints, when its setting for structured data is on: `WebSite` with the organization on the front page, `BlogPosting` or `NewsArticle` with the organization as publisher and `BreadcrumbList` on posts (the author is the organization when the account of the author carries its name, else a `Person`), `BreadcrumbList` on every page that shows breadcrumbs, with the same items as on screen, `CollectionPage` on the posts page and on archives, `ProfilePage` on author pages, and `FAQPage` from the FAQ block; `defaults.schema` of `leitvia/get-seo` names what a post gets. On the front page the organization is `Organization` or a subtype of `LocalBusiness` with its details, which `organization` of `leitvia/get-seo` shows: [local business and jobs](local-business.md). With an SEO plugin Studio prints none of this. Never add JSON-LD in content blocks; a type of its own for entries (a `Service`) is code of a plugin on the filter `leitvia_studio_schema_nodes`.
 
 ## Google News
 

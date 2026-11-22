@@ -1,6 +1,6 @@
 # leitvia/set-organization
 
-Generated from Leitvia Studio 1.3.50. Do not edit. Group: Set up. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.51. Do not edit. Group: Set up. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **Set organization details.** Sets the details of the organization behind the site: kind of business (type, Organization or a type of LocalBusiness; type falls back to Organization), address, phone, email, founding date (founding_date, YYYY, YYYY-MM or YYYY-MM-DD), area served (area_served, places), opening hours (opening_hours, rows of days with opens and closes as HH:MM, only printed for a local business) and profiles on other sites (same_as, https addresses). Leitvia Studio prints them as structured data on the front page and as publisher of posts while no SEO plugin is active; the name and the logo stay those of the site. Only the fields you send change, an empty string or an empty list clears one. leitvia/get-seo returns the current values. base_hash is empty. Use only facts the person gave or the site shows; never guess opening hours. Like every setting it waits in a change package for a person.
 

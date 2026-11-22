@@ -6,16 +6,22 @@ Details for `leitvia-page`. Read "Rules" when you score an outline, "Templates a
 
 `leitvia/check-composition` scores an outline with the rules of the contract (`compositionRules`):
 
-- no two neighbors with the same layout and tone (`noAdjacentRepeat`);
-- a break at least every three sections: an image, accent or ink tone, a full bleed layout or `leitvia/content-quote` (`breakWithin`, `breakWhen`);
+- no two neighbors with the same layout and tone (`noAdjacentRepeat`); the same pattern twice in a row passes on another ground or with its media on the other side;
+- a break at least every three sections: an image, accent or ink tone, a full bleed layout, `leitvia/content-quote` or a media section (`breakWithin`, `breakWhen`);
 - accent sections at least two sections apart (`accentMinGap`), and in practice one accent band per page;
-- at most two sections of the same density in a row (`maxDensityRun`);
+- at most two sections of the same density in a row (`maxDensityRun`); a media section stands outside the run and starts it anew;
 - a hero only as the first section and only on a template without a printed title (`heroFirstOnly`, `heroTemplate`);
 - at most `maxSections` sections; frames (header, footer) do not count.
 
-For a saved page (`post`) a section made dark on its outer group, `is-style-inverse` or an ink or accent ground, counts with that tone.
+A saved page (`post`) counts as built. The tone of a section is the ground on its outer block: `ink` for `is-style-inverse` or an ink ground, otherwise the slug of its `backgroundColor`. A section with the block style Media right (`is-style-media-right`) counts as the mirrored layout. An outline (`slugs`) scores the tone and layout of the patterns: name every section whose ground your edits will change in `tones`, by its place in `slugs` from 0, such as `{ "2": "ink" }` for `is-style-inverse` on the third section or `{ "2": "surface-alt" }` for a `backgroundColor`, and every section that gets Media right in `mirrored`, such as `[ 3 ]`. Then the score of the outline matches the page. With `post`, both lie over what the page sets and answer what an edit would change.
 
-The page starts at 100 and loses the points in `compositionRules.scoring` per finding. On a template that shows the title (frames `contact` and `article`, not `page-landing`) paragraphs, headings, lists and a table of contents before the first pattern are the intro and count as no section; the same blocks after a pattern count as `unknownPattern`. `min_score` (80 by default) is the score below which a write is held for a person.
+A media section is a pattern with a video, an embed, a gallery or a wide image. It is a break, stands outside the density run and repeats only another media section of the same layout and tone.
+
+Text between the sections is running text and no section: paragraphs, headings, lists, images, galleries, accordions and other single blocks, also in a plain group. It needs no pattern, costs no points and separates its neighbors, and an image, a gallery or a video in it relieves the run of plain sections. A layout built by hand (columns, cover, media and text) and an unknown slug stay `unknownPattern`; replace them with a pattern.
+
+Each finding names the section by its number, for a saved page also by its block ID in `block` (use it for `leitvia/update-block` or `leitvia/replace-pattern`), and says what to change.
+
+The page starts at 100 and loses the points in `compositionRules.scoring` per finding. On a template that starts with a hero (`page-landing`) running text above the first section is `unknownPattern`: move it below the hero. `min_score` (80 by default) is the score below which a write is held for a person.
 
 The narrative order of the roles is `hook`, `context`, `proof`, `detail`, `offer`, `close` (`compositionRules.narrative`): open with the promise, explain, prove, go into detail, make the offer, close with the next step. Section padding already follows the density of each pattern; do not change spacing.
 
@@ -41,8 +47,8 @@ Edits address blocks by path ID: `p:0` is the root block of the pattern, `p:0.1`
 - `caption`: text under an image, video, audio, gallery, table or embed; empty removes it.
 - `attributes`: as in `leitvia/update-block`, such as `date`, `dateLabel` and `heading` of a timeline entry.
 - `anchor`: HTML id for links to `#contact`, unique on the page.
-- `columns`: column count of a grid ([page rules](page-rules.md)).
-- `insert`: a block of `leitvia/list-blocks` after the block, never markup: `{ "block": "leitvia/form-errors", "inner": [ { "block": "gravityforms/form", "attributes": { "formId": "1" } } ] }`, also with `attributes` and `anchor`. A static block starts from its `example`.
+- `columns`: column count of a grid or a gallery ([page rules](page-rules.md)).
+- `insert`: a block of `leitvia/list-blocks` after the block, never markup: `{ "block": "leitvia/form-errors", "inner": [ { "block": "gravityforms/form", "attributes": { "formId": "1" } } ] }`, also with `attributes` and `anchor`. A static block starts from its `example`. Only blocks of `leitvia/list-blocks` go in: a paragraph, list or button of core does not. Take a pattern that has the block, or `repeat` one that is there and write its text.
 - `remove: true`: takes the block out of its parent, for three tiles of a six-tile pattern. The outer block of a pattern and the last child of a parent stay.
 - `repeat: <n>`: adds n copies right after the block, for more people or entries than the pattern has. Blocks with an HTML anchor cannot be copied.
 
@@ -50,6 +56,6 @@ Edits address blocks by path ID: `p:0` is the root block of the pattern, `p:0.1`
 
 ## After the page exists
 
-Later changes go through `leitvia/update-content` (texts, title and links of several blocks; per block `text`, `url` and `link_text` as in compose-page, `add_link` and `caption`; `status` publishes a draft), `leitvia/update-block` (attributes, one image) and `leitvia/set-alt-text`, each with the `hash` of `leitvia/get-page-outline` as `base_hash`. To add a section, send as `content` of `leitvia/update-content` the `markup` of `leitvia/get-block` for each top-level block in order, with the new section (`leitvia/get-pattern`, root block with `"metadata":{"patternName":"<slug>"}`) where it belongs. For a new order of most sections, compose a new page and let the person swap them. Another page template for a page that exists, for example `page-landing` once a hero carries the h1: `template` of `leitvia/update-content`, a page template of the contract; the page needs exactly one h1 with the new template ([templates and the h1](#templates-and-the-h1)). New section designs belong to the skill `leitvia-pattern`.
+Later changes go through `leitvia/update-content` (texts, title and links of several blocks; per block `text`, `url` and `link_text` as in compose-page, `add_link` and `caption`; `status` publishes a draft), `leitvia/update-block` (attributes, one image) and `leitvia/set-alt-text`, each with the `hash` of `leitvia/get-page-outline` as `base_hash`. A new section on a page that exists: `leitvia/insert-section` with `sections` (patterns and edits as in compose-page) and its place, `after` or `before` a top-level ID of the outline or `position` `start` or `end`. The same ability moves a section (`move` with its ID and the place), `leitvia/remove-section` takes one out. Never send the whole content again to add, move or drop a section. After it, run `leitvia/check-composition` on the new order of patterns. Another page template for a page that exists, for example `page-landing` once a hero carries the h1: `template` of `leitvia/update-content`, a page template of the contract; the page needs exactly one h1 with the new template ([templates and the h1](#templates-and-the-h1)). New section designs belong to the skill `leitvia-pattern`.
 
 New links on words of a text, captions, status, text attributes of static blocks, posts per page of a list, captions of a video, another pattern for a section, the parent page and removing a page: [block edits](block-edits.md).

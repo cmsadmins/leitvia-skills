@@ -1,6 +1,6 @@
 # leitvia/create-content
 
-Generated from Leitvia Studio 1.3.50. Do not edit. Group: Build. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
+Generated from Leitvia Studio 1.3.51. Do not edit. Group: Build. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).
 
 **Create content.** Creates a post, a page or an entry of the content model from block markup or patterns; base_hash is empty. Post types come from leitvia/get-content-model, sections work as in leitvia/compose-page. The content runs through the same checks as leitvia/update-content. Terms take IDs, names or slugs; a name no term has yet creates the term with the content, in categories at the top level and only for a user who may manage them, and in a change package it stays a name until the package is applied. Fields follow the content model; required fields must be set before publishing. rows fill the repeaters of an entry. The featured image needs alt text (leitvia/set-alt-text) or the decorative mark, or names the file of an image that waits in the same package from leitvia/add-media. The status is capped by the autonomy level. ai_generated adds a visible note to the text.
 
@@ -24,7 +24,7 @@ MCP tool `leitvia-create-content`, REST POST. Annotations: readonly false, destr
 | `rows` | object |  | Rows of the repeaters of an entry by repeater key, such as {"event_agenda": [{"title": "Welcome", "session_time": "09:00"}]}: title and the field keys of the repeater from leitvia/get-content-model. A list replaces the rows of its repeater in this order, an empty list removes them; repeaters you leave out stay. |
 | `featured_image` | object { id, decorative, file } |  |  |
 | `status` | one of `draft`, `publish`, `future` |  |  |
-| `comment_status` | one of `open`, `closed` |  | Whether visitors may comment; without it a new post takes the default of the site. |
+| `comment_status` | one of `open`, `closed` |  | Whether visitors may comment; without it a new post is closed for comments, whatever the default of the site. Pingbacks and trackbacks are closed on every new post. |
 | `ai_generated` | boolean |  | Whether AI wrote the text; it then shows a note that says so. |
 | `sources` | array of string, max length `2000`, format `uri`, max items `20` |  | URLs of the sources of the text, stored with it. |
 | `seo` | object { title, description } |  | SEO title and meta description, checked and written as by leitvia/update-seo. With an unsupported SEO plugin they are left out and notice says so. |
