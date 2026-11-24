@@ -17,7 +17,7 @@ Details for `leitvia-page`. Read it before you write the edits of step 4.
 
 ## Links
 
-- Every link and button needs a real target: a page of the site, an `https` URL, `mailto:` or `tel:`. A link to `#` is rejected by the link text check; so is link text that does not name its target.
+- Every link and button needs a real target: a page of the site, an `https` URL, `mailto:` or `tel:`. A link to `#` and a sample link of a pattern without an address are rejected by the link text check; so is link text that does not name its target.
 - Button texts name the action and the target ("Book a repair by e-mail", not "Click here").
 - A text with one link, such as a contact line "Write to hello@example.com", keeps its link: send `text`, `link_text` (the part that stays linked) and `url` in one edit. The same in compose-page, update-block and `blocks` of update-content. A text that would drop a link with a real target is rejected with `leitvia_invalid_input`; a sample link to `#` may be replaced by plain text.
 - A text without a link gets one with `add_link` (`text`, the exact words, and `url`) on `leitvia/update-block` or per block in `leitvia/update-content`, for example an e-mail address in a contact paragraph with `url` `mailto:hello@example.org`: [block edits](block-edits.md).

@@ -1,6 +1,6 @@
 # Leitvia agent handbook
 
-Generated from Leitvia Studio 1.3.53. Do not edit.
+Generated from Leitvia Studio 1.3.54. Do not edit.
 
 What an agent needs on a WordPress site with Leitvia Studio through its 74 abilities. Agents change the site only through them: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages is allowed. Read this file before the first call, with Leitvia Pro also [pro.md](pro.md).
 
@@ -155,7 +155,7 @@ Content model, design tokens, style variation, template parts, navigation and re
 | [`leitvia/set-front-page`](abilities/leitvia-set-front-page.md) | POST | Makes an existing page the static front page; 0 shows the latest posts there again. |
 | [`leitvia/set-llms`](abilities/leitvia-set-llms.md) | POST | Sets llms.txt, the file at the root of the site that tells AI assistants what the site is about, and whether robots.txt lets AI crawlers in. |
 | [`leitvia/set-motion`](abilities/leitvia-set-motion.md) | POST | Sets the motion of the whole site: off, subtle or bold. |
-| [`leitvia/set-organization`](abilities/leitvia-set-organization.md) | POST | Sets the details of the organization behind the site: kind of business, address, phone, email, founding date, founder or owner, the copyright line of the footer, area served, opening hours, profiles on other sites and the rating on a review site. |
+| [`leitvia/set-organization`](abilities/leitvia-set-organization.md) | POST | Sets the details of the organization behind the site: kind of business, address, phone, email, founding date, founder or owner, the copyright line of the footer, area served, opening hours, profiles on other sites, the rating on a review site and how the default texts visitors read address them. |
 | [`leitvia/set-permalinks`](abilities/leitvia-set-permalinks.md) | POST | Sets the permalink structure of posts and the bases of category and tag addresses, as in Settings, Permalinks, for a migration that keeps the addresses of the old site: structure such as /news/%postname%/ or /%postname%/, category_base and tag_base such as topic. |
 | [`leitvia/set-posts-page`](abilities/leitvia-set-posts-page.md) | POST | Makes an existing page the posts page of the reading settings, the address that lists all posts; 0 clears it. |
 | [`leitvia/set-privacy-page`](abilities/leitvia-set-privacy-page.md) | POST | Makes an existing page the privacy policy page of the site; 0 clears it. |

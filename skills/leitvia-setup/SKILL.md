@@ -40,6 +40,7 @@ Before any call that writes, collect the answers to these questions. Ask only wh
 3. Which URLs must stay fixed because other sites already link to them (for example `/legal-notice/` or `/privacy-policy/`)? Slugs of a recipe are not sacred; fixed links are.
 4. Is the site live (mode `package`) or a fresh install nobody visits yet (mode `direct`)?
 5. Which kind of site: company, shop, blog, publication or documentation? A shop needs WooCommerce active before you start.
+6. Du or Sie? Sie: `leitvia/set-organization` with `address` `formal`.
 
 When the operator has legal pages elsewhere, fetch them, copy the facts verbatim and compare the facts of the pages with each other (name, address, contact on imprint versus privacy policy). Report every contradiction to the person; never decide which one is right.
 
