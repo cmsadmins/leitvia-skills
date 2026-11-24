@@ -8,7 +8,7 @@ The blog needs no pattern of yours. The theme templates show:
 
 - **Overview** (`home`): the h1 and lead of the blog, the sticky post as a wide band marked "Featured" on the first page, then ten posts per page with date, linked title, excerpt and a "Continue reading" link, and numbered pages with previous and next links. With a posts page set, the h1 is the title of that page, the lead its excerpt, and its featured image and content follow above the posts.
 - **Category, tag and date archives** (`archive`): title, the description of the term, a grid of posts with images. **Author pages** (`author`): name, the biographical info of the profile, the posts.
-- **Post page** (`single`): category, title, excerpt, byline with author, dates and reading time, featured image, content, tags, an author box, previous and next post, up to three related posts from the same categories, and comments only while they are open or exist.
+- **Post page** (`single`): category, title, excerpt as lead (only one or two sentences that the text does not repeat), byline with author, dates and reading time, featured image, then the text in reading width with a sidebar beside it from 64rem (sticky): "On this page" from the h2 and h3 of the post, author, published and updated date, category and, when the post has a hub, a card for that service. Below 64rem the sidebar stands above the text and the card moves to the end. Tables and images with `align` `wide` take the width of the text column. Then tags, an author box, previous and next post, up to three related posts from the same categories, and comments only while they are open or exist.
 
 ## Set up a journal
 
@@ -26,8 +26,10 @@ A blog with news for Google News and AI answers needs a few things more; `leitvi
 1. **Editorial page:** a page with `leitvia/create-content`, `kind` `editorial`: who writes, how sources are checked, how corrections and AI texts are handled, all from the person. The person picks it in Leitvia Studio as the editorial page (`editorial_page`); Studio then links it in the author box and names it as `publishingPrinciples` in the structured data.
 2. **Categories:** two to six, each with a description. The overview shows them as chips; more than six make the row hard to scan, one makes it useless. From thirteen categories on, the theme keeps the twelve with the most posts and the current one in the row; the rest stay reachable on the posts.
 3. **Featured images:** every post has one, at least 1200 px wide, fit for a 16:9 crop, with alt text. The newest post leads the card grid with it.
-4. **Authors:** real names with a biographical info in the profile, set by the person. The author box and the author page show it.
-5. **Imprint and contact** pages exist and are linked in the footer.
-6. **Visible to search engines:** in Settings, Reading, "Discourage search engines" is unticked once the site is live, a step of the person.
+4. **Authors:** real names with a biographical info in the profile, set by the person. The author box and the author page show it; the website of the profile becomes `sameAs` of the Person. A post by someone without an account takes `author_name` and `author_page` (ID of a published page about that person, such as the team page) in `leitvia/create-content`, `update-content` or `import-post`: the name links there and the NewsArticle names it as `url`, which Google News asks for.
+5. **Service of a post:** `leitvia/set-page-structure` with `post` (a post) and `hub` (the page of the service the post is about) shows a card "Related service" with a button beside the post.
+6. **News of a page:** A service or topic page points to its news with the pattern `leitvia/teaser-related-news` (`provides` `related`): three cards of the latest posts with one of the categories or tags the page names in `news` of `leitvia/set-page-structure` (`{"categories":["hosting"],"tags":["backup"]}`, IDs or slugs), the latest posts when none matches, never the page itself.
+7. **Imprint and contact** pages exist and are linked in the footer.
+8. **Visible to search engines:** in Settings, Reading, "Discourage search engines" is unticked once the site is live, a step of the person.
 
 Check the result on the public URLs: the overview, one category archive, one author page and one post, each with one h1.

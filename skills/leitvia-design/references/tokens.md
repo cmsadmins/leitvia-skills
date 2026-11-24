@@ -50,9 +50,17 @@ Optional group `fontWeight`, numbers from 100 to 900: `heading` sets h1, h2, h4,
 "fontWeight": { "heading": { "$type": "fontWeight", "$value": 300 }, "heading-s": { "$type": "fontWeight", "$value": 600 }, "eyebrow": { "$type": "fontWeight", "$value": 700 } }
 ```
 
+## Icon line width
+
+Optional top-level token `iconStroke`, a number from 1 to 3: the line width of the Lucide icons of Leitvia Studio (icon and icon list) on their 24 grid, such as 1.5 for a lighter line that fits a light typeface. Without it the width is 2. The lead symbol of the Pro pattern `hero-symbol` draws 0.25 thinner.
+
+```json
+"iconStroke": { "$type": "number", "$value": 1.5 }
+```
+
 ## Format
 
-Copy the `document` of `leitvia/get-tokens` and change only `$value` entries. Keep every slug and add none, except the optional [button and band colors](#button-and-band-colors) and [font weights](#font-weights); see [`radius.media`](media-radius.md).
+Copy the `document` of `leitvia/get-tokens` and change only `$value` entries. Keep every slug and add none, except the optional [button and band colors](#button-and-band-colors), [font weights](#font-weights) and [icon line width](#icon-line-width); see [`radius.media`](media-radius.md).
 
 Colors as `{"colorSpace": "srgb", "components": [r, g, b], "hex": "#rrggbb"}` with components from 0 to 1; dimensions as `{"value": 1.5, "unit": "rem"}`; `clamp()` values through `$extensions` `com.leitvia` `css`, fluid font sizes through `com.leitvia` `fluid`, as in the document you started from.
 

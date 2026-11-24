@@ -37,7 +37,7 @@ A frame may name `requires` and `recommends`: kinds of `sectionKinds` in the con
 
 - **Answer and facts:** `leitvia/content-answer-facts` right after the hero: the main question as h2, the answer in one or two sentences, three to five facts (label and value) and the date line. Only facts of the person or the page; `remove` a fact you lack, never invent a price or a duration.
 - **Tiles and related:** `teaser-icon-tiles`, `teaser-services`, `teaser-cards-3` or `teaser-pictogram-list`, one tile per page of the topic (hub) or per fitting service (audience), each linked.
-- **After the build:** give every page of the topic its hub with `leitvia/set-page-structure` (`hub`, the ID of the hub page): the breadcrumbs then show Home, hub and page while the addresses stay flat. A service page with a price gets `service` with `name`, `price`, `unit` and `vat_included` there, only as the page states them.
+- **After the build:** give every page of the topic its hub with `leitvia/set-page-structure` (`hub`, the ID of the hub page): the breadcrumbs then show Home, hub and page while the addresses stay flat. A service page with a price gets `service` with `name`, `price`, `unit` and `vat_included` there, only as the page states them. When an add-on of the site keeps the packages with their prices (`leitvia/get-content-model` lists its content type), link the page to them with `offerings` (`line`, the slug of their line, or `skus`) instead of typing the prices into `service`: the add-on then shows them and gives the page its service.
 - **One section of two patterns:** a pattern that names its neighbor in `continues` (Pro: price cards after the row of their parts) counts with it as one section, so the pair is no `noAdjacentRepeat`.
 
 ## Patterns that need facts

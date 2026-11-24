@@ -53,7 +53,7 @@ Tell the person about these points; there is no ability for them:
 - Avatars come from Gravatar, a third party; recommend switching them off in Settings, Discussion.
 - Plugin scripts from other hosts need consent: the operator [lists them](../../../workflows/new-site-operator.md#scripts-of-plugins-from-other-providers).
 - A page in another language than the site needs its own document language; core has no per-page setting. With Polylang the operator sets languages and links translations ([second language](../../../workflows/new-site-operator.md#a-second-language-polylang)); header and footer of a language are the parts `header-<language>` and `footer-<language>`, which `leitvia/update-template-part` writes like `header`.
-- Plugins, users and the permalink structure are admin settings for the person.
+- Plugins, users and the permalink structure are admin settings for the person. Date and time format follow the site language by themselves.
 - Site title, tagline, logo and site icon: `leitvia/set-site-identity`, logo and icon as image IDs (upload with `leitvia/add-media`). An SVG logo is refused (it can carry scripts): add it as PNG or WebP at twice its shown width.
 - Copyright line of the footer: `copyright_since` (YYYY) and `copyright_holder` of `leitvia/set-organization`; the owner goes in `founder`.
 - Header or footer with other texts: `leitvia/update-template-part` with `pattern` and `edits`, as a section of `leitvia/compose-page`.

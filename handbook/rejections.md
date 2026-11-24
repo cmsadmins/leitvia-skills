@@ -1,6 +1,6 @@
 # Rejections
 
-Generated from Leitvia Studio 1.3.52. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
+Generated from Leitvia Studio 1.3.53. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
 
 Every rejection of Leitvia Studio with its retry rule and next ability. Messages with `%s` or `%d` get a value at run time; codes with several rows come from several places.
 
@@ -45,18 +45,26 @@ Leitvia uses one code per kind of failure, not one per field as in the error voc
 | `leitvia_import_conflict` | 409 | `never` | none | Targets changed on this site since the package was made. Nothing was imported; compare and export again. |
 | `leitvia_invalid_input` | 422 | `once` | set at run time | Built at run time; read the message. |
 | `leitvia_invalid_input` | 422 | `never` | none | Built at run time; read the message. |
+| `leitvia_invalid_input` | 422 | `never` | `leitvia/list-content` | Built at run time; read the message. |
 | `leitvia_invalid_input` | 422 | `never` | none | Coordinates are off on this site. Ask a person to choose a service under Sync, Coordinates; until then leave latitude and longitude empty. |
+| `leitvia_invalid_input` | 422 | `never` | none | Every form key needs lower case letters, digits or hyphens and a group name of 1 to 160 characters. |
+| `leitvia_invalid_input` | 422 | `never` | none | Every kind needs a key of lower case letters, digits or hyphens, a name, at least one duration of 15, 30 or 60 minutes, at least one time window as HH:MM from and to, and a place: phone, or link with an https link_url. |
 | `leitvia_invalid_input` | 422 | `never` | none | Every product needs a unique article number, a name, a net price of 0 or more and one to six terms between 1 and 120 months. |
+| `leitvia_invalid_input` | 422 | `never` | none | Name what to change: name, description, icon or page. |
 | `leitvia_invalid_input` | 422 | `never` | none | No link needs or allows a repair. The report lists external links, internal links that could not be resolved and links that lead nowhere. |
 | `leitvia_invalid_input` | 422 | `never` | set at run time | No post imported here has the address in parent_source, nor does an operation of the open package with this package key. Import the parent first, in the same package or applied, then the child; without that the child would land at the top level. |
 | `leitvia_invalid_input` | 400 | `once` | `leitvia/list-patterns` | Pass pattern slugs, or a post whose sections come from patterns. |
 | `leitvia_invalid_input` | 422 | `once` | none | Send a package key: a migration always goes into a change package. |
+| `leitvia_invalid_input` | 422 | `never` | none | Send at least one product. A product left out goes back to draft. |
 | `leitvia_invalid_input` | 400 | `once` | `leitvia/get-contract` | The contract has no page frame of this type. |
 | `leitvia_invalid_input` | 400 | `once` | `leitvia/get-contract` | The contract has no page frame of this type. |
 | `leitvia_invalid_input` | 422 | `never` | `leitvia/update-content` | The post holds no WPBakery or Impreza shortcodes, ACF blocks or ACF fields. Classic content moves with leitvia/update-content. |
 | `leitvia_invalid_input` | 422 | `never` | none | The value is not valid for this option. |
 | `leitvia_invalid_input` | 422 | `never` | `leitvia/add-building-block` | This site has no documentation yet. Add the building block Documentation from leitvia/list-building-blocks with leitvia/add-building-block first. |
+| `leitvia_invalid_input` | 422 | `never` | `leitvia/add-building-block` | This site has no products yet. Add the building block Products from leitvia/list-building-blocks with leitvia/add-building-block first; with WooCommerce use its products. |
+| `leitvia_invalid_input` | 422 | `never` | `leitvia/add-building-block` | This site has no reviews yet. Add the building block Reviews from leitvia/list-building-blocks with leitvia/add-building-block first. |
 | `leitvia_invalid_input` | 422 | `never` | `leitvia/list-content` | order may only hold documentation pages directly below parent. Take the IDs from leitvia/list-content with post_type docs. |
+| `leitvia_invalid_input` | 422 | `never` | `leitvia/list-content` | page must be a published page, or 0 for none. |
 | `leitvia_invalid_input` | 422 | `never` | none | source must be the http or https address of the post on the old site. |
 | `leitvia_invalid_package` | 400 | `never` | none | Built at run time; read the message. |
 | `leitvia_locked` | 403 | `never` | none | Agents may not change this area. A person can change the autonomy settings. |

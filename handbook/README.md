@@ -1,8 +1,8 @@
 # Leitvia agent handbook
 
-Generated from Leitvia Studio 1.3.52. Do not edit.
+Generated from Leitvia Studio 1.3.53. Do not edit.
 
-What an agent needs on a WordPress site with Leitvia Studio through its 73 abilities. Agents change the site only through them: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages is allowed. Read this file before the first call, with Leitvia Pro also [pro.md](pro.md).
+What an agent needs on a WordPress site with Leitvia Studio through its 74 abilities. Agents change the site only through them: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages is allowed. Read this file before the first call, with Leitvia Pro also [pro.md](pro.md).
 
 ## Access over MCP and REST
 
@@ -12,7 +12,7 @@ Sign in as a WordPress user that may edit posts, with an application password (H
 
 **MCP.** The server `leitvia` answers at `POST /wp-json/leitvia-studio/v1/mcp` when the plugin MCP Adapter 0.7 is active. Send `initialize` first; its response carries the header `Mcp-Session-Id`. Every further request sends that header and `MCP-Protocol-Version` (for example `2025-06-18`), otherwise the server answers with 400. `tools/list` lists the abilities, named with a hyphen for the slash (`leitvia-get-contract`). `tools/call` takes the input of the ability as `arguments`. A rejection comes back as a tool result with `isError` true whose text is JSON with `code`, `message` and `data`.
 
-**REST.** Every ability runs at `/wp-json/wp-abilities/v1/abilities/<name>/run`. The HTTP method follows the annotations: read only abilities take GET, abilities that are destructive and idempotent take DELETE, all others POST. GET and DELETE send the input as query arguments (`?input[post]=12`, lists as `input[upsells][]=4&input[upsells][]=7`), POST sends it as JSON body `{"input": {…}}`. A rejection is an error response with `code`, `message` and `data`; the HTTP status is `data.status`. Without the MCP server `leitvia`: [core REST](core-rest.md).
+**REST.** Every ability runs at `/wp-json/wp-abilities/v1/abilities/<name>/run`. The HTTP method follows the annotations: read only abilities take GET, abilities that are destructive and idempotent take DELETE, all others POST. GET and DELETE send the input as query arguments (`?input[post]=12`, lists as `input[upsells][]=4&input[upsells][]=7`), POST sends it as JSON body `{"input": {…}}`. Long texts make long URLs under DELETE; send them over MCP instead. A rejection is an error response with `code`, `message` and `data`; the HTTP status is `data.status`. Without the MCP server `leitvia`: [core REST](core-rest.md).
 
 **Check the MCP connection.** The MCP server is the whole route `<address of the site>/wp-json/leitvia-studio/v1/mcp`, never the address of the site alone. Its tools must hold `leitvia-get-contract`; call it first. When the client finds no endpoint or gets 404, the URL lacks that path or MCP Adapter is not active: do not retry at the host and do not guess paths. Call `GET <address of the site>/wp-json/wp-abilities/v1/abilities/leitvia/get-contract/run` with the same credentials. When it answers, work over REST and report the broken MCP connection; on 401 or 404 stop and ask.
 
@@ -159,7 +159,8 @@ Content model, design tokens, style variation, template parts, navigation and re
 | [`leitvia/set-permalinks`](abilities/leitvia-set-permalinks.md) | POST | Sets the permalink structure of posts and the bases of category and tag addresses, as in Settings, Permalinks, for a migration that keeps the addresses of the old site: structure such as /news/%postname%/ or /%postname%/, category_base and tag_base such as topic. |
 | [`leitvia/set-posts-page`](abilities/leitvia-set-posts-page.md) | POST | Makes an existing page the posts page of the reading settings, the address that lists all posts; 0 clears it. |
 | [`leitvia/set-privacy-page`](abilities/leitvia-set-privacy-page.md) | POST | Makes an existing page the privacy policy page of the site; 0 clears it. |
-| [`leitvia/set-redirects`](abilities/leitvia-set-redirects.md) | POST | Sets the permanent redirects of moved addresses, for a migration or a new structure. |
+| [`leitvia/set-redirects`](abilities/leitvia-set-redirects.md) | POST | Sets the redirects of moved and removed addresses, for a migration or a new structure. |
+| [`leitvia/set-seo-titles`](abilities/leitvia-set-seo-titles.md) | DELETE | Sets whether titles in search results end with " \| " and the site name, without an SEO plugin. |
 | [`leitvia/set-site-identity`](abilities/leitvia-set-site-identity.md) | POST | Sets the site title, the tagline, the logo and the site icon. |
 | [`leitvia/set-variation`](abilities/leitvia-set-variation.md) | POST | Applies a style variation of the contract to the global styles of the active theme: a full variation replaces them, a colors or typography variation replaces only its part. |
 | [`leitvia/update-navigation`](abilities/leitvia-update-navigation.md) | POST | Replaces the links of a navigation menu, by default the one published last, which headers without a chosen menu show. |

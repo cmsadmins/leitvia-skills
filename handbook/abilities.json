@@ -1,5 +1,5 @@
 {
-	"studio": "1.3.52",
+	"studio": "1.3.53",
 	"abilities": [
 		{
 			"name": "leitvia/activate-token-set",
@@ -1994,6 +1994,11 @@
 						"maxLength": 100,
 						"description": "Name of an author without an account here, for example from a migration: the post shows it as its author name and in its structured data (Person), and no user is created. Empty removes it, then the post shows its user again."
 					},
+					"author_page": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "ID of a published page about the author of author_name, such as an about or team page: the author name links to it and the structured data (Person) names it as url, which Google News asks for. 0 removes it."
+					},
 					"terms": {
 						"type": "object",
 						"description": "Terms by taxonomy, such as {\"category\": [\"News\"], \"post_tag\": [\"events\", 12]}: IDs as numbers, names or slugs as text. They replace the terms of that taxonomy.",
@@ -3800,7 +3805,7 @@
 		{
 			"name": "leitvia/get-seo",
 			"label": "Get SEO data",
-			"description": "Returns the SEO data of posts, pages and entries from the active SEO plugin. Supported are Yoast SEO, Rank Math, SEOPress and The SEO Framework. Per item: title, meta description, canonical, noindex, nofollow, Open Graph title, description and image, focus keyword and schema type. schema_type is the article type Leitvia Studio prints for a post (NewsArticle or BlogPosting), null where it prints none; structure holds the page frame, hub and service of a page (leitvia/set-page-structure). indexable says whether the site is open to search engines, news_sitemap is the address of the news sitemap of Leitvia Studio or null, organization holds the details of leitvia/set-organization: type, name, url, address, phone, email, founding date, founder, start year and holder of the copyright line, area served, opening hours, profiles and aggregate_rating. redirects lists the rows of leitvia/set-redirects, llms whether llms.txt was asked for (requested) and is served (enabled), held_back why a requested file is not served (site closed to search engines, SEO plugin), its address, summary, extra pages and whether AI crawlers may crawl (leitvia/set-llms). An empty value means the plugin falls back to its template. defaults holds what WordPress itself would print and a description suggested from the excerpt; without an SEO plugin plugin names Leitvia Studio, with an unsupported one seo is null, and notice says why. hash is the base_hash of leitvia/update-seo. IDs that are no readable content come back under skipped.",
+			"description": "Returns the SEO data of posts, pages and entries from the active SEO plugin. Supported are Yoast SEO, Rank Math, SEOPress and The SEO Framework. Per item: title, meta description, canonical, noindex, nofollow, Open Graph title, description and image, focus keyword and schema type. schema_type is the article type Leitvia Studio prints for a post (NewsArticle or BlogPosting), null where it prints none; structure holds the page frame, hub, service and offerings of a page (leitvia/set-page-structure). indexable says whether the site is open to search engines, news_sitemap is the address of the news sitemap of Leitvia Studio or null, organization holds the details of leitvia/set-organization: type, name, url, address, phone, email, founding date, founder, start year and holder of the copyright line, area served, opening hours, profiles and aggregate_rating. redirects lists the rows of leitvia/set-redirects, llms whether llms.txt was asked for (requested) and is served (enabled), held_back why a requested file is not served (site closed to search engines, SEO plugin), its address, summary, extra pages and whether AI crawlers may crawl (leitvia/set-llms). An empty value means the plugin falls back to its template. defaults holds what WordPress itself would print and a description suggested from the excerpt; without an SEO plugin plugin names Leitvia Studio, with an unsupported one seo is null, and notice says why. hash is the base_hash of leitvia/update-seo. IDs that are no readable content come back under skipped.",
 			"category": "leitvia",
 			"group": "read",
 			"input_schema": {
@@ -4205,6 +4210,11 @@
 						"minLength": 1,
 						"maxLength": 100,
 						"description": "Name of an author of the old site who has no account here, as the old site showed it: the post shows it as its author name and in its structured data (Person), and no user is created. Written on every import, so a second one can add or correct it; leitvia/update-content takes it too."
+					},
+					"author_page": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "ID of a published page about the author of author_name, such as an about or team page: the author name links to it and the structured data (Person) names it as url, which Google News asks for. 0 removes it."
 					},
 					"parent": {
 						"type": "integer",
@@ -8026,7 +8036,7 @@
 		{
 			"name": "leitvia/set-page-structure",
 			"label": "Set page structure",
-			"description": "Sets what a page is within the site, for breadcrumbs, structured data, llms.txt and the composition check. frame is the type of a page frame of the contract (hub for the overview of a topic, audience, service), so check-composition counts the sections that frame requires or recommends; compose-page sets it too. hub is the ID of the overview page the page belongs to: pages keep flat addresses, and the breadcrumbs (block and BreadcrumbList) show Home, the hub of the hub, the hub and the page; the hub wins over a parent page, and a page without a hub keeps the trail of its parents. service is what the page offers: name, description, price as a number, currency (EUR), vat_included (false for a net price) and unit (per month); with a price Leitvia Studio prints a Service with an Offer and a UnitPriceSpecification, without an SEO plugin. max_price makes the price a range (from price up to max_price, an AggregateOffer); offers lists the packages of the service, each with name, price and optional max_price (its price is a range), description and unit (up to 10), printed as one Offer per package in an AggregateOffer with the lowest price and the highest of all prices and ranges, and price may then stay empty. Use only what the page itself says. An empty string, 0 or null clears a field. Read the page with leitvia/get-page-outline first and send its hash as base_hash; autonomy and change packages work as for leitvia/update-content.",
+			"description": "Sets what a page is within the site, for breadcrumbs, structured data, llms.txt and the composition check. frame is the type of a page frame of the contract (hub for the overview of a topic, audience, service), so check-composition counts the sections that frame requires or recommends; compose-page sets it too. hub is the ID of the overview page the page belongs to: pages keep flat addresses, and the breadcrumbs (block and BreadcrumbList) show Home, the hub of the hub, the hub and the page; the hub wins over a parent page, and a page without a hub keeps the trail of its parents. service is what the page offers: name, description, price as a number, currency (EUR), vat_included (false for a net price) and unit (per month); with a price Leitvia Studio prints a Service with an Offer and a UnitPriceSpecification, without an SEO plugin. max_price makes the price a range (from price up to max_price, an AggregateOffer); offers lists the packages of the service, each with name, price and optional max_price (its price is a range), description and unit (up to 10), printed as one Offer per package in an AggregateOffer with the lowest price and the highest of all prices and ranges, and price may then stay empty. offerings links the page to offerings an add-on keeps (line: slug of a line, skus: article numbers); such an add-on shows them on the page and takes the service of the page from them. Use only what the page itself says. An empty string, 0 or null clears a field. Read the page with leitvia/get-page-outline first and send its hash as base_hash; autonomy and change packages work as for leitvia/update-content.",
 			"category": "leitvia",
 			"group": "maintain",
 			"input_schema": {
@@ -8036,6 +8046,40 @@
 						"minimum": 1,
 						"description": "ID of a page from leitvia/list-content."
 					},
+					"news": {
+						"type": [
+							"object",
+							"null"
+						],
+						"description": "Topic of the news of a page: categories and tags by ID or slug, as posts carry them (terms in leitvia/list-content). The pattern Related news on the page lists the latest posts with any of them, the latest posts when none has one. null clears it.",
+						"properties": {
+							"categories": {
+								"type": "array",
+								"maxItems": 5,
+								"uniqueItems": true,
+								"items": {
+									"type": [
+										"integer",
+										"string"
+									],
+									"maxLength": 200
+								}
+							},
+							"tags": {
+								"type": "array",
+								"maxItems": 5,
+								"uniqueItems": true,
+								"items": {
+									"type": [
+										"integer",
+										"string"
+									],
+									"maxLength": 200
+								}
+							}
+						},
+						"additionalProperties": false
+					},
 					"frame": {
 						"type": "string",
 						"maxLength": 40,
@@ -8044,7 +8088,12 @@
 					"hub": {
 						"type": "integer",
 						"minimum": 0,
-						"description": "ID of the published overview page above this page; 0 clears it."
+						"description": "ID of the published overview page above this page; 0 clears it. For a post: the page of the service the post is about, shown beside the post."
+					},
+					"icon": {
+						"type": "string",
+						"maxLength": 40,
+						"description": "Lead symbol of a hub: the name of an icon from leitvia/list-blocks (Lucide), shown by icon blocks bound to leitvia/page-symbol, such as the panel of the pattern hero-symbol; empty clears it."
 					},
 					"service": {
 						"type": [
@@ -8135,6 +8184,30 @@
 						"required": [
 							"name"
 						],
+						"additionalProperties": false
+					},
+					"offerings": {
+						"type": [
+							"object",
+							"null"
+						],
+						"description": "Offerings an add-on keeps that this page presents: line is the slug of a line of offerings, skus lists article numbers of single offerings (they win over line). Leitvia Studio stores the link; an add-on that keeps offerings shows them on the page and gives the page its service from them. null clears it.",
+						"properties": {
+							"line": {
+								"type": "string",
+								"maxLength": 200,
+								"pattern": "^[a-z0-9-]*$"
+							},
+							"skus": {
+								"type": "array",
+								"maxItems": 20,
+								"uniqueItems": true,
+								"items": {
+									"type": "string",
+									"pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,39}$"
+								}
+							}
+						},
 						"additionalProperties": false
 					},
 					"base_hash": {
@@ -8591,14 +8664,14 @@
 		{
 			"name": "leitvia/set-redirects",
 			"label": "Set redirects",
-			"description": "Sets the permanent redirects (301) of moved addresses, for a migration or a new structure. Rows of from, a path of this site such as /old-page/, and to, a path of this site or an https address. The list replaces the saved one (at most 500 rows, read the current one with leitvia/get-seo); an empty list removes all. A request of a from path goes to its target before the page loads; query strings and a trailing slash do not matter. Rows that lead back to a path they passed (a loop) are refused, as are the start page as from and a target equal to its from. Inactive while an SEO plugin is active, which brings its own redirects. base_hash is empty. Like every setting it waits in a change package for a person.",
+			"description": "Sets the redirects of moved and removed addresses, for a migration or a new structure. Rows of from, a path of this site such as /old-page/, status and to. A from with a query, such as /?p=45 or /?attachment_id=123 of an old site, matches only that query (in any order of its parameters) and comes before the row of its bare path; a from without a query matches its path with any query. status 301 (the default) moves for good, 302 for a while; both need to, a path of this site or an https address. status 410 says the page is gone for good (search engines drop it faster than a 404) and takes no to; the visitor sees the 404 page of the theme. The list replaces the saved one (at most 1000 rows, read the current one with leitvia/get-seo); an empty list removes all. A request of a from path gets its answer before the page loads; a trailing slash and the case do not matter. Rows that lead back to a path they passed (a loop) are refused, as are the start page as from, a target equal to its from and a 410 with a target. Inactive while an SEO plugin is active, which brings its own redirects. base_hash is empty. Like every setting it waits in a change package for a person.",
 			"category": "leitvia",
 			"group": "setup",
 			"input_schema": {
 				"properties": {
 					"redirects": {
 						"type": "array",
-						"maxItems": 500,
+						"maxItems": 1000,
 						"description": "Every redirect of the site; the list replaces the saved one.",
 						"items": {
 							"type": "object",
@@ -8607,18 +8680,27 @@
 									"type": "string",
 									"pattern": "^/",
 									"maxLength": 300,
-									"description": "Old path of this site, for example /old-page/."
+									"description": "Old path of this site, for example /old-page/, with a query when the old address had one, for example /?p=45."
 								},
 								"to": {
 									"type": "string",
 									"pattern": "^(/|https://)",
 									"maxLength": 500,
-									"description": "New path of this site or an https address."
+									"description": "New path of this site or an https address; needed for 301 and 302, left out for 410."
+								},
+								"status": {
+									"type": "integer",
+									"enum": [
+										301,
+										302,
+										410
+									],
+									"default": 301,
+									"description": "301 moved for good, 302 moved for a while, 410 gone for good."
 								}
 							},
 							"required": [
-								"from",
-								"to"
+								"from"
 							],
 							"additionalProperties": false
 						}
@@ -8720,6 +8802,118 @@
 				"readonly": false,
 				"destructive": true,
 				"idempotent": false,
+				"openWorldHint": false
+			}
+		},
+		{
+			"name": "leitvia/set-seo-titles",
+			"label": "Set SEO titles",
+			"description": "Sets whether titles in search results end with \" | \" and the site name, without an SEO plugin. site_name true (the default) adds it to the titles of pages, posts, entries and archives, stored with leitvia/update-seo or built by WordPress, as long as the whole title keeps to 60 characters and does not name the site already; the front page keeps its title. false leaves a stored title as written and the others as WordPress builds them. base_hash is empty. Like every setting it waits in a change package for a person.",
+			"category": "leitvia",
+			"group": "setup",
+			"input_schema": {
+				"type": "object",
+				"properties": {
+					"site_name": {
+						"type": "boolean",
+						"description": "true adds the site name where it fits, false leaves titles without it."
+					},
+					"base_hash": {
+						"type": "string",
+						"description": "Hash of the target as last read; empty for a new object."
+					},
+					"package": {
+						"type": "string",
+						"maxLength": 64,
+						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
+					}
+				},
+				"required": [
+					"site_name",
+					"base_hash"
+				],
+				"additionalProperties": false
+			},
+			"output_schema": {
+				"type": "object",
+				"required": [
+					"mode"
+				],
+				"properties": {
+					"mode": {
+						"type": "string",
+						"enum": [
+							"live",
+							"draft",
+							"package",
+							"unchanged"
+						],
+						"description": "What happened: live (written and visible), draft (written as a draft), package (nothing written yet: the change waits in a change package until a person applies it in the inbox; leitvia/get-package shows it), unchanged (the target already had this state)."
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"locked",
+							"suggest",
+							"draft",
+							"autonomous"
+						],
+						"description": "Autonomy level of the area that decided the mode."
+					},
+					"kinds": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"target": {
+						"type": "object"
+					},
+					"hash": {
+						"type": "string",
+						"description": "Hash of the target after the call, the base_hash of the next change on it. A change that waits in a package writes nothing, so the hash is the one the target already had, and the next change of the same package sends it too; empty only for a new post that waits in a package."
+					},
+					"package": {
+						"type": "integer",
+						"description": "ID of the change package the change waits in, or that leitvia/rollback undoes a live write with; 0 for none."
+					},
+					"snapshot": {
+						"type": "integer",
+						"description": "ID of the snapshot of the state before the write; 0 for none."
+					},
+					"findings": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						}
+					},
+					"report": {
+						"type": "object"
+					},
+					"notice": {
+						"type": "string"
+					},
+					"slug_changed": {
+						"type": "object",
+						"description": "The slug asked for (requested) is taken or reserved, so the address uses slug instead, on publishing at the latest."
+					},
+					"applied": {
+						"type": "integer",
+						"description": "For a list of items: the package that holds what went live, for leitvia/rollback; 0 for none."
+					},
+					"items": {
+						"type": "array",
+						"items": {
+							"type": "object"
+						},
+						"description": "For a list of items: the result per item in their order, or code, message, reason and target of its rejection."
+					}
+				}
+			},
+			"annotations": {
+				"readonly": false,
+				"destructive": true,
+				"idempotent": true,
 				"openWorldHint": false
 			}
 		},
@@ -9468,6 +9662,11 @@
 						"type": "string",
 						"maxLength": 100,
 						"description": "Name of an author without an account here, for example from a migration: the post shows it as its author name and in its structured data (Person), and no user is created. Empty removes it, then the post shows its user again."
+					},
+					"author_page": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "ID of a published page about the author of author_name, such as an about or team page: the author name links to it and the structured data (Person) names it as url, which Google News asks for. 0 removes it."
 					},
 					"terms": {
 						"type": "object",
@@ -10431,7 +10630,7 @@
 		{
 			"name": "leitvia/update-seo",
 			"label": "Update SEO data",
-			"description": "Writes SEO title, meta description and robots of one post through the active SEO plugin. The heading of the page stays. It covers posts, pages and entries in Yoast SEO, Rank Math, SEOPress or The SEO Framework; without an SEO plugin Leitvia Studio stores them and prints them in the head, the title as written, without the site name; with another SEO plugin it is rejected with leitvia_no_seo_plugin. Read the post with leitvia/get-seo first and send its hash as base_hash. A title has at most 60 characters, a description 50 to 160; an empty string hands the field back to the template of the plugin, without a plugin to what WordPress prints. Say only what the page says: every number in title or description must appear in the title, excerpt or content of the post. A star rating (a number beside a star sign or written as 4.8/5) needs the confirmed aggregate_rating of leitvia/set-organization and must equal its value; its count of reviews counts as said. Autonomy and change packages work as for leitvia/update-content; a live write gets a change package for leitvia/rollback.",
+			"description": "Writes SEO title, meta description and robots of one post through the active SEO plugin. The heading of the page stays. It covers posts, pages and entries in Yoast SEO, Rank Math, SEOPress or The SEO Framework; without an SEO plugin Leitvia Studio stores them and prints them in the head, the title as written, followed by \" | \" and the site name where it fits (leitvia/set-seo-titles); with another SEO plugin it is rejected with leitvia_no_seo_plugin. Read the post with leitvia/get-seo first and send its hash as base_hash. A title has at most 60 characters, a description 50 to 160; an empty string hands the field back to the template of the plugin, without a plugin to what WordPress prints. Say only what the page says: every number in title or description must appear in the title, excerpt or content of the post. A star rating (a number beside a star sign or written as 4.8/5) needs the confirmed aggregate_rating of leitvia/set-organization and must equal its value; its count of reviews counts as said. Autonomy and change packages work as for leitvia/update-content; a live write gets a change package for leitvia/rollback.",
 			"category": "leitvia",
 			"group": "maintain",
 			"input_schema": {
@@ -12445,6 +12644,16 @@
 			{
 				"code": "leitvia_invalid_input",
 				"status": 422,
+				"reason": "reviews",
+				"message": null,
+				"next_ability": [
+					"leitvia/list-content"
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_invalid_input",
+				"status": 422,
 				"reason": "provider",
 				"message": "Coordinates are off on this site. Ask a person to choose a service under Sync, Coordinates; until then leave latitude and longitude empty.",
 				"next_ability": [
@@ -12455,8 +12664,38 @@
 			{
 				"code": "leitvia_invalid_input",
 				"status": 422,
+				"reason": "groups",
+				"message": "Every form key needs lower case letters, digits or hyphens and a group name of 1 to 160 characters.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_invalid_input",
+				"status": 422,
+				"reason": "types",
+				"message": "Every kind needs a key of lower case letters, digits or hyphens, a name, at least one duration of 15, 30 or 60 minutes, at least one time window as HH:MM from and to, and a place: phone, or link with an https link_url.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_invalid_input",
+				"status": 422,
 				"reason": "products",
 				"message": "Every product needs a unique article number, a name, a net price of 0 or more and one to six terms between 1 and 120 months.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_invalid_input",
+				"status": 422,
+				"reason": "change",
+				"message": "Name what to change: name, description, icon or page.",
 				"next_ability": [
 					""
 				],
@@ -12499,6 +12738,16 @@
 					""
 				],
 				"retry": "once"
+			},
+			{
+				"code": "leitvia_invalid_input",
+				"status": 422,
+				"reason": "products",
+				"message": "Send at least one product. A product left out goes back to draft.",
+				"next_ability": [
+					""
+				],
+				"retry": "never"
 			},
 			{
 				"code": "leitvia_invalid_input",
@@ -12553,8 +12802,38 @@
 			{
 				"code": "leitvia_invalid_input",
 				"status": 422,
+				"reason": "offerings",
+				"message": "This site has no products yet. Add the building block Products from leitvia/list-building-blocks with leitvia/add-building-block first; with WooCommerce use its products.",
+				"next_ability": [
+					"leitvia/add-building-block"
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_invalid_input",
+				"status": 422,
+				"reason": "reviews",
+				"message": "This site has no reviews yet. Add the building block Reviews from leitvia/list-building-blocks with leitvia/add-building-block first.",
+				"next_ability": [
+					"leitvia/add-building-block"
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_invalid_input",
+				"status": 422,
 				"reason": "order",
 				"message": "order may only hold documentation pages directly below parent. Take the IDs from leitvia/list-content with post_type docs.",
+				"next_ability": [
+					"leitvia/list-content"
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_invalid_input",
+				"status": 422,
+				"reason": "page",
+				"message": "page must be a published page, or 0 for none.",
 				"next_ability": [
 					"leitvia/list-content"
 				],
