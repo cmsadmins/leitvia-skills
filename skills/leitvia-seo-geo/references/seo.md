@@ -68,7 +68,7 @@ Google decides which sites appear in Google News; the person applies in the Goog
 
 ## llms.txt
 
-`llms.txt` is a proposed plain text file at the root of a site (`/llms.txt`) that tells language models what the site is and which pages matter. Not every AI service reads it; it costs little and harms nothing. Leitvia Studio does not write it; the person or the host puts the file on the server, or uses a plugin that serves it.
+`llms.txt` is a proposed plain text file at the root of a site (`/llms.txt`) that tells language models what the site is and which pages matter. Not every AI service reads it; it costs little and harms nothing. Without an SEO plugin Leitvia Studio serves it on each request (no file): `# site name`, `> summary` (setting of `leitvia/set-llms`, else the tagline), then `## Topics` (pages with the page frame hub), `## Services and prices` (pages with a service and price of `leitvia/set-page-structure`) and `## Pages` (the `pages` of `leitvia/set-llms`), each a link with its excerpt. Keep the excerpts of these pages one quotable sentence. With an SEO plugin draft the file as below for the person, who puts it on the server or uses the plugin.
 
 Draft from pages you read, in Markdown:
 

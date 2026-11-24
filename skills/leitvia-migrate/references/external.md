@@ -2,6 +2,8 @@
 
 Details for `leitvia-migrate` when the content comes from another site: another WordPress, a site builder such as Wix or Squarespace, or static HTML. The target already runs Leitvia and Leitvia Studio; there is no theme switch. You read the source only as a visitor would: its public pages over HTTPS, no login, no export, no API of the source.
 
+A WordPress source (WPBakery, Impreza or plain HTML) goes faster with one call per post: [import a post](import-post.md).
+
 ## 1. Inventory of the source
 
 - Start at the address the person named. Read `/sitemap.xml` (and the sitemaps it lists) when the source has one; otherwise follow the links of the main navigation and of the footer, on the same host only.

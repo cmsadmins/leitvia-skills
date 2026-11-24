@@ -59,11 +59,11 @@ For each page that needs it, write a title (at most 60 characters) and a descrip
 
 ### 5. Structure for search and AI answers
 
-AI answers quote passages that stand on their own. Suggest, per page, what would make it clearer: a first paragraph that answers the main question, headings that name their section, lists for steps, the date and author on articles: [structure](references/seo.md#structure-for-ai-answers). Text changes go through `leitvia/update-content` in the same package, only with facts from the page or the person (checkpoint **New text**). Structured data comes from the SEO plugin or Leitvia Studio; you do not write JSON-LD. Organization data, job postings and the anchors of a one-pager: [local business and jobs](references/local-business.md).
+AI answers quote passages that stand on their own. Suggest, per page, what would make it clearer: a first paragraph that answers the main question, headings that name their section, lists for steps, the date and author on articles: [structure](references/seo.md#structure-for-ai-answers). Text changes go through `leitvia/update-content` in the same package, only with facts from the page or the person (checkpoint **New text**). Structured data comes from the SEO plugin or Leitvia Studio; you do not write JSON-LD. Without an SEO plugin Studio prints the organization once (front page), a BreadcrumbList on every page, FAQPage only for visible questions (the FAQ block and FAQ patterns that provide `faq`), the article with its author (also a page with the frame `article`, which compose-page gives the template `page-article` with byline and author box), and per page what `leitvia/set-page-structure` sets: the hub of the page (breadcrumbs Home, hub of the hub, hub, page; the hub wins over a parent page) and a service with its price as Service and Offer (net with `vat_included` false); a range with `max_price`, packages with `offers` (one Offer each in an AggregateOffer), a package whose price is a range with its own `max_price`; `highPrice` is the top of all of them. Set them only as the page states them. A rating goes in only through `aggregate_rating` of `leitvia/set-organization` with the source address, and `confirmed` true only after the person compared value and count with the source (checkpoint **Rating**); a star in a title must equal that value. Organization data, job postings and the anchors of a one-pager: [local business and jobs](references/local-business.md).
 
 ### 6. llms.txt and AI crawlers
 
-Leitvia Studio writes no files. Draft an `llms.txt` from the pages you read ([llms.txt](references/seo.md#llmstxt)) and put it in the report for the person to publish. Whether AI crawlers may read the site (`robots.txt`) is the person's decision (checkpoint **AI crawlers**); report what `robots.txt` says today.
+Without an SEO plugin Leitvia Studio serves `/llms.txt` itself, built on each request from the site name, a summary (else the tagline), the hubs, the pages with a service and price and extra pages: [llms.txt](references/seo.md#llmstxt). Read `llms` of `leitvia/get-seo`, open `/llms.txt`, and propose `summary` and `pages` with `leitvia/set-llms` in your package. `requested` is what is saved, `enabled` what takes effect; `held_back` says why a requested file is not served (a site closed to search engines answers 404 until it opens, an SEO plugin serves its own). Report it, do not retry. robots.txt lets AI crawlers in by default; whether they may read the site is the person's decision (checkpoint **AI crawlers**): `ai_crawlers` false only on the person's word. Report what `robots.txt` says today.
 
 ## Verification
 
@@ -75,6 +75,7 @@ Every code with its retry rule: [rejections](../../handbook/rejections.md).
 
 - `leitvia_invalid_input`, reason `unsupported_fact`: the title or description names a number the post does not hold; write it from the page.
 - `leitvia_no_seo_plugin`: no plugin Studio can write to; list what you would write.
+- `unsupported_fact` with a star rating: the title names a rating that is not the confirmed `aggregate_rating`; leave the star out or ask the person (checkpoint **Rating**).
 - `leitvia_stale_hash`: the SEO data changed since `leitvia/get-seo`; read it again and repeat once.
 
 ## Report
@@ -96,6 +97,7 @@ Stop and ask the person at these checkpoints, then continue with the answer:
 - **Indexing:** any change of `noindex` or `nofollow`, and a site hidden from search engines.
 - **New text:** a text change beyond title and description that needs facts the page does not hold.
 - **AI crawlers:** whether AI crawlers may read the site.
+- **Rating:** value, count and source of a rating, before `aggregate_rating` with `confirmed` true.
 - **Package applied:** the person reviews and applies the package in the inbox.
 - **Second rejection** of the same call, or a rejection with `retry: never`.
 
@@ -109,5 +111,6 @@ When no person answers (a scheduled or hosted run), do not wait at a checkpoint.
 | Indexing | Change nothing; list pages whose indexing looks wrong. A hidden live site goes first in the report, high, with the step of the person. |
 | New text | Only titles and descriptions; list text suggestions in the report. |
 | AI crawlers | Change nothing; report what robots.txt says. |
+| Rating | No rating and no star; list the rating with its source as an open question. |
 | Package applied | Stop after step 6; the check after belongs to the next run. |
 | Second rejection | Stop that page; report code and message. |

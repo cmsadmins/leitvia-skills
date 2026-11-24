@@ -13,7 +13,7 @@ Details for `leitvia-design`. Read "Format" before you change a `$value`, "Contr
 | `focus` | Keyboard focus ring |
 | `success`, `warning`, `danger` | Status colors |
 
-A dark set (`surface` darker than `ink`) keeps inverse bands dark, also on a light variation.
+A dark set (`surface` darker than `ink`) keeps inverse bands dark, also on a light variation. There inverse lies on `surface-alt`, so prices, check marks and eyebrows keep the accent and muted text its color; on light palettes they take the band text color.
 
 ## Button and band colors
 
@@ -26,6 +26,8 @@ By default the primary button and the dark bands (Inverse block style) take `ink
 | `band` | `ink` | Background of dark bands in a light set; `ink` stays the text color |
 | `band-button` | `accent` | Fill and border of the primary button on dark bands |
 | `on-band-button` | `on-accent` | Label on `band-button` |
+| `button-hover` | `accent` | Fill and border of the primary button on hover |
+| `on-button-hover` | `on-accent` | Label on `button-hover` |
 
 Add each one as a color token next to `ink`, in the same value format:
 
@@ -36,13 +38,21 @@ Add each one as a color token next to `ink`, in the same value format:
 Example: a brand with mid blue buttons and white labels, near black blue text, deep blue bands and white buttons on them sets `ink` `#0b1b33`, `button` `#1f5fbf`, `on-button` `#ffffff`, `band` `#0b2a5b`, `band-button` `#ffffff` and `on-band-button` `#0b2a5b`.
 
 - The set is then also checked against `optionalPairs`: the label on its button (4.5:1, here 6.1:1 and 14.0:1), and `surface`, `stroke` and the focus ring on `band`. A role you left out counts with its fallback, so `button` alone still needs `surface` to read on it.
-- Hover stays `accent` with `on-accent` for every button; a `button` equal to `accent` has no visible hover change, so keep them apart.
+- Hover is `button-hover` on `on-button-hover`, else `accent`. A `button` equal to `accent` needs a `button-hover` shade, or hover shows no change.
 - `band` applies to the Inverse block style in a light set. A dark set keeps `surface-alt`, and a plain `ink` background stays `ink`.
 - Outline buttons, form buttons of Gravity Forms and the token editor of Leitvia Studio do not know these roles yet: outline and form buttons keep `ink`, the editor keeps the roles when it saves but has no fields for them. Change them through `leitvia/create-token-set`.
 
+## Font weights
+
+Optional group `fontWeight`, numbers from 100 to 900: `heading` sets h1, h2, h4, h5 and h6 (such as 300), `heading-s` sets h3 and the titles of cards and features (without it h3 takes `heading`), `eyebrow` the block style Eyebrow (without it 500). Without the group the theme (400) or the style variation decides. Studio 1.3.52 and theme 1.2.57 or later.
+
+```json
+"fontWeight": { "heading": { "$type": "fontWeight", "$value": 300 }, "heading-s": { "$type": "fontWeight", "$value": 600 }, "eyebrow": { "$type": "fontWeight", "$value": 700 } }
+```
+
 ## Format
 
-Copy the `document` of `leitvia/get-tokens` and change only `$value` entries. Keep every slug and add none, except the optional [button and band colors](#button-and-band-colors); see [`radius.media`](media-radius.md).
+Copy the `document` of `leitvia/get-tokens` and change only `$value` entries. Keep every slug and add none, except the optional [button and band colors](#button-and-band-colors) and [font weights](#font-weights); see [`radius.media`](media-radius.md).
 
 Colors as `{"colorSpace": "srgb", "components": [r, g, b], "hex": "#rrggbb"}` with components from 0 to 1; dimensions as `{"value": 1.5, "unit": "rem"}`; `clamp()` values through `$extensions` `com.leitvia` `css`, fluid font sizes through `com.leitvia` `fluid`, as in the document you started from.
 
@@ -79,7 +89,7 @@ A brand font that is not bundled is a step of the person or the operator, no abi
 
 Tell the person; there is no ability for these:
 
-- Font weights per heading level are not part of the token format. A brand that wants bold headings needs a person in the Site Editor. Page widths: [widths](widths.md).
+- Page widths: [widths](widths.md).
 - The logo: setting the site logo is an admin setting, and it needs a raster image. WordPress refuses SVG uploads, for administrators too, `leitvia/add-media` takes JPEG, PNG, GIF, WebP and AVIF, and Leitvia has no SVG sanitizer; do not suggest a plugin that lifts the limit. From an SVG, render a PNG with a transparent background at twice the display width or more: 400 px wide covers the header patterns (`width` up to 200), 960 px the masthead. Add it with `leitvia/add-media`, name it to the person for the site logo, and afterwards check on the front end that the logo image has a width and a height.
 - A light logo for dark bands: on an Inverse band the Site Logo block takes the block style On dark band, which draws a transparent logo in white (the pattern `leitvia/footer-mega` has it). When the brand has its own light file in several colors, add it with `leitvia/add-media` and write a `core/image` block linked to the start page in place of the Site Logo block with `leitvia/update-template-part`.
 - Brand rules about composition, for example "accent never as a section background", are not a contrast question. Pass them on to `leitvia-page` and check the front end for `has-accent-background-color` on sections.

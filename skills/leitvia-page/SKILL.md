@@ -43,13 +43,13 @@ The result of every write says what happened in `mode`: `live`, `draft`, `packag
 
 Collect, before any call: the goal of the page (what should a visitor do), the content points, the audience, the language of the page, the links the buttons should lead to, and the images you may use. Facts you do not have stay open questions. Then read:
 
-- `leitvia/get-contract`: `pageFrames` (frame types, their template and slots), `compositionRules`, `templates`, `roles` and `blockStyles`.
-- `leitvia/list-patterns`: filter by `role`, `tone` or `layout`; each item has `composition`, `images`, `useWhen`, `avoidWhen`, `status` and `replacedBy`. Use only patterns with `status` `approved`: `leitvia/compose-page` refuses a Lab pattern (`block:<ID>`) in draft or review with `leitvia_pattern_not_approved`.
+- `leitvia/get-contract`: `pageFrames` (frame types, their template, slots and the section kinds they require or recommend), `sectionKinds`, `compositionRules`, `templates`, `roles` and `blockStyles`.
+- `leitvia/list-patterns`: filter by `role`, `tone`, `layout` or `provides` (a section kind such as `faq`); each item has `composition`, `images`, `useWhen`, `avoidWhen`, `provides`, `continues`, `status` and `replacedBy`. Use only patterns with `status` `approved`: `leitvia/compose-page` refuses a Lab pattern (`block:<ID>`) in draft or review with `leitvia_pattern_not_approved`.
 - [`leitvia/list-building-blocks`](../../handbook/abilities/leitvia-list-building-blocks.md): a pattern in `patterns` of a block with `installed: false` shows nothing until the block is on the site. Add just that block with [`leitvia/add-building-block`](../../handbook/abilities/leitvia-add-building-block.md) (`name`, your `package` key; sample entries come as drafts) once the person agreed, never a whole recipe: a recipe also replaces design, header and front page.
 
 ### 2. Plan the outline
 
-Call `leitvia/plan-page` with `goal`, `points` and `frame` (`home`, `service`, `about`, `contact`, `article`). Without an AI connector the plan comes from the rules of the contract (`source: rules`) and is the same for the same input; that is normal, not a fault. The rules leave out patterns that need images while the media library has none, post teasers below three posts, and proof or offer patterns, which carry facts of the person; on a shop the home plan uses the shop patterns. Leave `ai` false unless the person wants the goal and points sent to the AI provider the site owner set up.
+Call `leitvia/plan-page` with `goal`, `points` and `frame` (`home`, `service`, `hub`, `audience`, `about`, `contact`, `article`). A hub is the overview of a topic, an audience page is for one group of people; both have sections they require: [page frames with required sections](references/composition.md#page-frames-with-required-sections). Without an AI connector the plan comes from the rules of the contract (`source: rules`) and is the same for the same input; that is normal, not a fault. The rules leave out patterns that need images while the media library has none, post teasers below three posts, and proof or offer patterns, which carry facts of the person; on a shop the home plan uses the shop patterns. Leave `ai` false unless the person wants the goal and points sent to the AI provider the site owner set up.
 
 The plan gives per section the pattern, its role, its slot, text lengths (`length.heading`, `length.text` in characters) and the points it carries. Treat it as a first outline, not as the answer. Replace a planned section when:
 
@@ -62,7 +62,7 @@ Pick the replacement with the same `role` from `leitvia/list-patterns`, and pref
 
 ### 3. Score before you build
 
-Call `leitvia/check-composition` with the pattern slugs in page order and the `template` of the frame. The rules and the scoring: [composition details](references/composition.md#rules). `min_score` (80 by default) is the score below which a write is held for a person.
+Call `leitvia/check-composition` with the pattern slugs in page order, the `template` and the `frame`. The rules and the scoring: [composition details](references/composition.md#rules). `min_score` (80 by default) is the score below which a write is held for a person.
 
 Below `min_score`: revise the outline **once**. Use `suggestions`: each names the section index and up to three patterns of the same role that remove the finding (`replace_with`); take the first one whose needs you can meet (an image, facts). Score the revised outline again. Score two outlines, the first and the revision, not a series of variants in search of a higher score; a revision at or above `min_score` is the outline you show. Still below `min_score`: stop and show the person both outlines with their findings. Never pad a page with sections it does not need to raise the score.
 
@@ -72,7 +72,7 @@ For each section call `leitvia/get-pattern` and read its markup. Write one edit 
 
 ### 5. Build the page
 
-Call `leitvia/compose-page` with `title`, `frame`, `sections` (`pattern` and `edits` each), `base_hash: ""`, an optional `slug`, and `package`. `template` only when the person asked for another page template of the contract (for example `page-docs`); `kind` only for legal, editorial, contact or authors pages. Each section keeps `metadata.patternName`, so the composition can be checked later. Exactly one h1 per page; which template prints the title: [templates and the h1](references/composition.md#templates-and-the-h1).
+Call `leitvia/compose-page` with `title`, `frame`, `sections` (`pattern` and `edits` each), `base_hash: ""`, an optional `slug`, and `package`. A page that exists and should get new sections throughout: the same call with `post` and the `hash` of `leitvia/get-page-outline` as `base_hash` replaces all its sections in one step, and the checks see only the finished page; never rebuild it with many `insert-section` and `remove-section` calls, the state in between (two h1) is refused. `template` only when the person asked for another page template of the contract (for example `page-docs`); `kind` only for legal, editorial, contact or authors pages. Each section keeps `metadata.patternName`, so the composition can be checked later. Exactly one h1 per page; which template prints the title: [templates and the h1](references/composition.md#templates-and-the-h1).
 
 On a rejection follow its `message` and `next_ability` and correct the call **once** (`retry: once`). A second rejection of the same call, or any `retry: never`, is a checkpoint: stop and tell the person the code and message. `leitvia_rate_limited` means wait `after:<seconds>` and repeat.
 

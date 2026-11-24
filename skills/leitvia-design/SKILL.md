@@ -46,7 +46,7 @@ Checkpoint "Brand confirmed".
 
 ### 3. Map brand values to roles
 
-Copy the `document` of `leitvia/get-tokens` and change only `$value` entries, keeping every slug. Roles and the value format: [token details](references/tokens.md#roles). A brand whose buttons or dark bands have another color than its text adds the optional roles `button`, `on-button`, `band`, `band-button` and `on-band-button`: [button and band colors](references/tokens.md#button-and-band-colors). A brand color that fits no role (for example a second orange for print) stays out of the set; mention it in the `$description` of the set.
+Copy the `document` of `leitvia/get-tokens` and change only `$value` entries, keeping every slug. Roles and the value format: [token details](references/tokens.md#roles). A brand whose buttons or dark bands have another color than its text adds the optional roles `button`, `on-button`, `button-hover`, `on-button-hover`, `band`, `band-button` and `on-band-button`: [button and band colors](references/tokens.md#button-and-band-colors). Light or bold headings and eyebrows: [font weights](references/tokens.md#font-weights). A brand color that fits no role (for example a second orange for print) stays out of the set; mention it in the `$description` of the set.
 
 ### 4. Compute every contrast pair before writing
 

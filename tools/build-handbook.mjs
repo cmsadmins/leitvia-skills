@@ -173,7 +173,7 @@ export function handbook( dump ) {
 		'',
 		`Generated from Leitvia Studio ${ dump.studio ?? 'unknown' }. Do not edit.`,
 		'',
-		`Everything an agent needs to work on a WordPress site with Leitvia Studio through its ${ abilities.length } abilities. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call.`,
+		`What an agent needs on a WordPress site with Leitvia Studio through its ${ abilities.length } abilities. Agents change the site only through them: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages is allowed. Read this file before the first call, with Leitvia Pro also [pro.md](pro.md).`,
 		'',
 		'## Access over MCP and REST',
 		'',

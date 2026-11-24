@@ -6,7 +6,7 @@
 	"mode": "package",
 	"unattended": true,
 	"budget": {
-		"tokens": 17550,
+		"tokens": 19150,
 		"files": [
 			"skills/leitvia-page/references/composition.md",
 			"skills/leitvia-page/references/content.md",

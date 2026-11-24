@@ -1,6 +1,6 @@
 # Rejections
 
-Generated from Leitvia Studio 1.3.51. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
+Generated from Leitvia Studio 1.3.52. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
 
 Every rejection of Leitvia Studio with its retry rule and next ability. Messages with `%s` or `%d` get a value at run time; codes with several rows come from several places.
 
@@ -46,12 +46,18 @@ Leitvia uses one code per kind of failure, not one per field as in the error voc
 | `leitvia_invalid_input` | 422 | `once` | set at run time | Built at run time; read the message. |
 | `leitvia_invalid_input` | 422 | `never` | none | Built at run time; read the message. |
 | `leitvia_invalid_input` | 422 | `never` | none | Coordinates are off on this site. Ask a person to choose a service under Sync, Coordinates; until then leave latitude and longitude empty. |
+| `leitvia_invalid_input` | 422 | `never` | none | Every product needs a unique article number, a name, a net price of 0 or more and one to six terms between 1 and 120 months. |
 | `leitvia_invalid_input` | 422 | `never` | none | No link needs or allows a repair. The report lists external links, internal links that could not be resolved and links that lead nowhere. |
+| `leitvia_invalid_input` | 422 | `never` | set at run time | No post imported here has the address in parent_source, nor does an operation of the open package with this package key. Import the parent first, in the same package or applied, then the child; without that the child would land at the top level. |
 | `leitvia_invalid_input` | 400 | `once` | `leitvia/list-patterns` | Pass pattern slugs, or a post whose sections come from patterns. |
 | `leitvia_invalid_input` | 422 | `once` | none | Send a package key: a migration always goes into a change package. |
 | `leitvia_invalid_input` | 400 | `once` | `leitvia/get-contract` | The contract has no page frame of this type. |
+| `leitvia_invalid_input` | 400 | `once` | `leitvia/get-contract` | The contract has no page frame of this type. |
 | `leitvia_invalid_input` | 422 | `never` | `leitvia/update-content` | The post holds no WPBakery or Impreza shortcodes, ACF blocks or ACF fields. Classic content moves with leitvia/update-content. |
 | `leitvia_invalid_input` | 422 | `never` | none | The value is not valid for this option. |
+| `leitvia_invalid_input` | 422 | `never` | `leitvia/add-building-block` | This site has no documentation yet. Add the building block Documentation from leitvia/list-building-blocks with leitvia/add-building-block first. |
+| `leitvia_invalid_input` | 422 | `never` | `leitvia/list-content` | order may only hold documentation pages directly below parent. Take the IDs from leitvia/list-content with post_type docs. |
+| `leitvia_invalid_input` | 422 | `never` | none | source must be the http or https address of the post on the old site. |
 | `leitvia_invalid_package` | 400 | `never` | none | Built at run time; read the message. |
 | `leitvia_locked` | 403 | `never` | none | Agents may not change this area. A person can change the autonomy settings. |
 | `leitvia_media_in_use` | 409 | `never` | `leitvia/update-block` | Published content or the site still uses this file: %s. Replace it there with leitvia/update-block first, or send force to delete it anyway; those places then show no image. |
@@ -73,6 +79,7 @@ Leitvia uses one code per kind of failure, not one per field as in the error voc
 | `leitvia_out_of_scope` | 403 | `once` | none | Agents may not set this status. Use draft, pending or publish. |
 | `leitvia_package_closed` | 409 | `never` | `leitvia/get-package` | The change package is %s; this step is not possible in that state. |
 | `leitvia_page_missing` | 409 | `never` | none | The page this setting points to is not applied yet. Apply the page first. |
+| `leitvia_parent_missing` | 409 | `never` | none | The parent of this post is not applied yet. Apply the parent first. |
 | `leitvia_pattern_not_approved` | 422 | `once` | `leitvia/list-patterns` | The Lab pattern is not approved yet. Use an approved pattern, or ask a person to approve this one in the Lab. |
 | `leitvia_pro_unmapped` | 422 | `once` | set at run time | Some content does not carry over, see unmapped. Show it to the person; send accept_unmapped only when they agree to lose it. |
 | `leitvia_rate_limited` | 429 | `after:<seconds>` | none | Too many calls. Try again in %d seconds. |

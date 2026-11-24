@@ -25,6 +25,21 @@ The page starts at 100 and loses the points in `compositionRules.scoring` per fi
 
 The narrative order of the roles is `hook`, `context`, `proof`, `detail`, `offer`, `close` (`compositionRules.narrative`): open with the promise, explain, prove, go into detail, make the offer, close with the next step. Section padding already follows the density of each pattern; do not change spacing.
 
+## Page frames with required sections
+
+A frame may name `requires` and `recommends`: kinds of `sectionKinds` in the contract (`answer`, `facts`, `packages`, `tiles`, `steps`, `faq`, `related`) or roles (`hook`, `context`, `close`). A section fills the kinds of `provides` of its pattern and the kind of its role; `leitvia/list-patterns` with `provides` lists the patterns of a kind. `leitvia/check-composition` with `frame` (or a page composed with a frame) reports a missing required kind as `missingSection` (10 points) and a missing recommended one as `recommendedSection` (no points); both carry `kind`, the index after the last section, and suggestions with patterns to add (`add`).
+
+| Frame | Requires | Recommends |
+|---|---|---|
+| `hub` (overview of a topic) | hook, answer, facts, packages, tiles, steps, faq, close | |
+| `audience` (one group of people) | hook, context, related, steps, faq, close | |
+| `service` | | answer, facts, faq, related |
+
+- **Answer and facts:** `leitvia/content-answer-facts` right after the hero: the main question as h2, the answer in one or two sentences, three to five facts (label and value) and the date line. Only facts of the person or the page; `remove` a fact you lack, never invent a price or a duration.
+- **Tiles and related:** `teaser-icon-tiles`, `teaser-services`, `teaser-cards-3` or `teaser-pictogram-list`, one tile per page of the topic (hub) or per fitting service (audience), each linked.
+- **After the build:** give every page of the topic its hub with `leitvia/set-page-structure` (`hub`, the ID of the hub page): the breadcrumbs then show Home, hub and page while the addresses stay flat. A service page with a price gets `service` with `name`, `price`, `unit` and `vat_included` there, only as the page states them.
+- **One section of two patterns:** a pattern that names its neighbor in `continues` (Pro: price cards after the row of their parts) counts with it as one section, so the pair is no `noAdjacentRepeat`.
+
 ## Patterns that need facts
 
 Replace a planned section when it needs facts nobody gave you: prices (`leitvia/offer-pricing-3`, `leitvia/content-price-list`), figures (`leitvia/content-stats`), customer quotes and testimonials (`leitvia/content-quote`, `leitvia/proof-testimonial`), logos, team members, files to download (`leitvia/content-downloads`, [files to download](content.md#files-to-download)), videos (`leitvia/content-video`, [videos](content.md#videos)).
@@ -56,6 +71,6 @@ Edits address blocks by path ID: `p:0` is the root block of the pattern, `p:0.1`
 
 ## After the page exists
 
-Later changes go through `leitvia/update-content` (texts, title and links of several blocks; per block `text`, `url` and `link_text` as in compose-page, `add_link` and `caption`; `status` publishes a draft), `leitvia/update-block` (attributes, one image) and `leitvia/set-alt-text`, each with the `hash` of `leitvia/get-page-outline` as `base_hash`. A new section on a page that exists: `leitvia/insert-section` with `sections` (patterns and edits as in compose-page) and its place, `after` or `before` a top-level ID of the outline or `position` `start` or `end`. The same ability moves a section (`move` with its ID and the place), `leitvia/remove-section` takes one out. Never send the whole content again to add, move or drop a section. After it, run `leitvia/check-composition` on the new order of patterns. Another page template for a page that exists, for example `page-landing` once a hero carries the h1: `template` of `leitvia/update-content`, a page template of the contract; the page needs exactly one h1 with the new template ([templates and the h1](#templates-and-the-h1)). New section designs belong to the skill `leitvia-pattern`.
+Later changes go through `leitvia/update-content` (texts, title and links of several blocks; per block `text`, `url` and `link_text` as in compose-page, `add_link` and `caption`; `status` publishes a draft), `leitvia/update-block` (attributes, one image) and `leitvia/set-alt-text`, each with the `hash` of `leitvia/get-page-outline` as `base_hash`. All sections of a page that exists, new from patterns: `leitvia/compose-page` with `post` (one step, checked on the finished page). A new section on a page that exists: `leitvia/insert-section` with `sections` (patterns and edits as in compose-page) and its place, `after` or `before` a top-level ID of the outline or `position` `start` or `end`. The same ability moves a section (`move` with its ID and the place), `leitvia/remove-section` takes one out. Never send the whole content again to add, move or drop a section. After it, run `leitvia/check-composition` on the new order of patterns. Another page template for a page that exists, for example `page-landing` once a hero carries the h1: `template` of `leitvia/update-content`, a page template of the contract; the page needs exactly one h1 with the new template ([templates and the h1](#templates-and-the-h1)). New section designs belong to the skill `leitvia-pattern`.
 
 New links on words of a text, captions, status, text attributes of static blocks, posts per page of a list, captions of a video, another pattern for a section, the parent page and removing a page: [block edits](block-edits.md).

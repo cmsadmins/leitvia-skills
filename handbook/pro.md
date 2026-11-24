@@ -1,0 +1,9 @@
+# Free and Leitvia Pro
+
+Free is the theme Leitvia, Leitvia Studio and the skills of this package. Leitvia Pro is a plugin of its own with a license from https://leitvia.com/pricing/. It adds recipes per industry, more patterns, token sets, fonts and blocks; its larger plans add moving page builder content, stage to live, Figma and many sites at once. Pro brings its own abilities and skills.
+
+**Is Pro on the site.** Pro is active when `leitvia/get-site-health` lists the plugin Leitvia Pro with `active` true, or when `tools/list` holds tools that are not in the index of [the handbook](README.md#abilities). A recipe of Pro that the license does not unlock has `available` false and a `reason` in `leitvia/list-recipes`. An ability that needs a larger plan answers `leitvia_forbidden`; do not repeat it, tell the person. Check this once per task, before you choose a skill.
+
+**Skills of Pro.** They are not in this package but in the zip of Leitvia Pro, folder `skills/`. The person copies them next to these skills, with the folder `handbook` beside them; their descriptions say when they come before a skill of this package. When Pro is active and the task needs a Pro skill you do not have, say so and name the folder; never fill the gap from memory.
+
+**Installing Pro.** An agent never installs or activates a plugin and never enters a license key: the area `admin` stays locked. When a task needs Pro and the site lacks it, finish what Free can do and stop at a checkpoint: name what Pro adds for this task and the link above. The person buys the license, uploads the zip under Plugins, Add New Plugin, activates it and enters the key under Leitvia Studio, Pro license. Then check again as above and go on.

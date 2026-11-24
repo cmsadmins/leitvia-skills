@@ -1,8 +1,8 @@
 # Leitvia agent handbook
 
-Generated from Leitvia Studio 1.3.51. Do not edit.
+Generated from Leitvia Studio 1.3.52. Do not edit.
 
-Everything an agent needs to work on a WordPress site with Leitvia Studio through its 68 abilities. Agents change the site only through these abilities: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages of the site is allowed. Read this file before the first call.
+What an agent needs on a WordPress site with Leitvia Studio through its 73 abilities. Agents change the site only through them: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages is allowed. Read this file before the first call, with Leitvia Pro also [pro.md](pro.md).
 
 ## Access over MCP and REST
 
@@ -153,10 +153,13 @@ Content model, design tokens, style variation, template parts, navigation and re
 | [`leitvia/define-content-type`](abilities/leitvia-define-content-type.md) | POST | Adds entries to the content model and keeps the others. |
 | [`leitvia/set-consent-providers`](abilities/leitvia-set-consent-providers.md) | POST | Replaces the providers of embedded content in the privacy settings. |
 | [`leitvia/set-front-page`](abilities/leitvia-set-front-page.md) | POST | Makes an existing page the static front page; 0 shows the latest posts there again. |
+| [`leitvia/set-llms`](abilities/leitvia-set-llms.md) | POST | Sets llms.txt, the file at the root of the site that tells AI assistants what the site is about, and whether robots.txt lets AI crawlers in. |
 | [`leitvia/set-motion`](abilities/leitvia-set-motion.md) | POST | Sets the motion of the whole site: off, subtle or bold. |
-| [`leitvia/set-organization`](abilities/leitvia-set-organization.md) | POST | Sets the details of the organization behind the site: kind of business, address, phone, email, founding date, area served, opening hours and profiles on other sites. |
+| [`leitvia/set-organization`](abilities/leitvia-set-organization.md) | POST | Sets the details of the organization behind the site: kind of business, address, phone, email, founding date, founder or owner, the copyright line of the footer, area served, opening hours, profiles on other sites and the rating on a review site. |
+| [`leitvia/set-permalinks`](abilities/leitvia-set-permalinks.md) | POST | Sets the permalink structure of posts and the bases of category and tag addresses, as in Settings, Permalinks, for a migration that keeps the addresses of the old site: structure such as /news/%postname%/ or /%postname%/, category_base and tag_base such as topic. |
 | [`leitvia/set-posts-page`](abilities/leitvia-set-posts-page.md) | POST | Makes an existing page the posts page of the reading settings, the address that lists all posts; 0 clears it. |
 | [`leitvia/set-privacy-page`](abilities/leitvia-set-privacy-page.md) | POST | Makes an existing page the privacy policy page of the site; 0 clears it. |
+| [`leitvia/set-redirects`](abilities/leitvia-set-redirects.md) | POST | Sets the permanent redirects of moved addresses, for a migration or a new structure. |
 | [`leitvia/set-site-identity`](abilities/leitvia-set-site-identity.md) | POST | Sets the site title, the tagline, the logo and the site icon. |
 | [`leitvia/set-variation`](abilities/leitvia-set-variation.md) | POST | Applies a style variation of the contract to the global styles of the active theme: a full variation replaces them, a colors or typography variation replaces only its part. |
 | [`leitvia/update-navigation`](abilities/leitvia-update-navigation.md) | POST | Replaces the links of a navigation menu, by default the one published last, which headers without a chosen menu show. |
@@ -171,12 +174,13 @@ Pages from patterns, single blocks, Lab patterns and media.
 | Ability | REST | What it does |
 |---|---|---|
 | [`leitvia/add-media`](abilities/leitvia-add-media.md) | POST | Adds an image to the media library from a URL of this site or as Base64 data up to 5 MB, with alt text or marked as decorative. |
-| [`leitvia/compose-page`](abilities/leitvia-compose-page.md) | POST | Creates a page from patterns in the order of a page frame of the contract. |
+| [`leitvia/compose-page`](abilities/leitvia-compose-page.md) | POST | Creates a page from patterns in the order of a page frame of the contract, or rebuilds an existing page. |
 | [`leitvia/create-content`](abilities/leitvia-create-content.md) | POST | Creates a post, a page or an entry of the content model from block markup or patterns; base_hash is empty. |
 | [`leitvia/create-pattern`](abilities/leitvia-create-pattern.md) | POST | Creates a pattern in the Lab as a draft with version 0.1.0 from block markup; base_hash is empty. |
 | [`leitvia/create-product`](abilities/leitvia-create-product.md) | POST | Creates a simple product. |
 | [`leitvia/crop-media`](abilities/leitvia-crop-media.md) | POST | Crops an image of the media library into a new image. |
-| [`leitvia/update-block`](abilities/leitvia-update-block.md) | POST | Changes one block found by its ID or path ID: attributes from the block catalog and the level of a heading, the text of a paragraph, heading, list item or button, the citation of a quote, the summary of a details block, the link of a button or of the one link in a text, or the image of an image or cover block with alt text. |
+| [`leitvia/import-post`](abilities/leitvia-import-post.md) | POST | Imports one post, page or entry of the content model from another site for a migration: source is its old address, content its HTML. |
+| [`leitvia/update-block`](abilities/leitvia-update-block.md) | POST | Changes one block found by its ID or path ID: attributes from the block catalog and the level of a heading, the text of a paragraph, heading, list item or button, the citation of a quote, the summary of a details block, the link of a button or of the one link in a text, the cells of a core/table or leitvia/comparison-table with table, or the image of an image or cover block with alt text. |
 | [`leitvia/vary-pattern`](abilities/leitvia-vary-pattern.md) | POST | Creates a variant of a Lab pattern or a theme pattern as a draft in the Lab, from new markup or from the original with edits at block IDs; base_hash is empty. |
 
 ### Maintain
@@ -195,6 +199,7 @@ Texts, links, alt text, patterns of sections, trash, media deletion, products an
 | [`leitvia/rollback`](abilities/leitvia-rollback.md) | POST | Rolls back the applied operations of a change package from their snapshots. |
 | [`leitvia/set-alt-text`](abilities/leitvia-set-alt-text.md) | POST | Sets the alt text of an image: without post and block on the attachment in the media library, with post and block on one image or cover block that shows it. |
 | [`leitvia/set-merchandising`](abilities/leitvia-set-merchandising.md) | POST | Sets the featured flag, the upsells, the cross-sells and the sort order of one product. |
+| [`leitvia/set-page-structure`](abilities/leitvia-set-page-structure.md) | POST | Sets what a page is within the site, for breadcrumbs, structured data, llms.txt and the composition check. |
 | [`leitvia/trash-content`](abilities/leitvia-trash-content.md) | POST | Moves a post, page or entry to the trash. |
 | [`leitvia/update-content`](abilities/leitvia-update-content.md) | POST | Updates title, excerpt, slug, date, status, author, terms, fields, rows of repeaters, featured image, comment status and the texts and button links of several blocks of one post in one operation, blocks found by their ID from the outline. |
 | [`leitvia/update-product`](abilities/leitvia-update-product.md) | POST | Updates texts, status, images, categories and tags of one product or variation, and its prices, tax and shipping class. |
