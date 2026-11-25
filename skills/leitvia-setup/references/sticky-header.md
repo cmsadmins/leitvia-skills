@@ -22,3 +22,20 @@ A logo with a line of small text (a name with a subline) is hard to read at the 
 ## Navigation in the header
 
 Menu items change with `leitvia/update-navigation`, which leaves the header as it is. When you send a header part as `content`, keep the `core/navigation` block of the theme pattern with all its attributes, above all `"submenuVisibility":"click"`, `overlay` and `ariaLabel`; change only the items. `leitvia/update-template-part` puts back these settings where the new navigation lacks them, but a value you send stays.
+
+## Mega menu
+
+For a main item with many sub pages (services in four groups, a shop with lines), build a mega menu instead of a long submenu, in two steps and the same `package` key:
+
+1. Panel: `leitvia/update-template-part` with `part` `mega-menu-<name>` (for example `mega-menu-services`) and a pattern of `megaMenu.patterns` from `leitvia/get-contract`: `leitvia-studio/mega-menu-columns` (three columns, each headed by an icon and a title linked to the overview of its topic, entries of a link and one sentence, a line of links below) or `leitvia-studio/mega-menu-columns-card` (the same with a card in an accent frame for the offer that stands out). Change texts, links and icons with `edits` at the block IDs of `leitvia/get-pattern`; `remove` or `repeat` a column for two to four. Add-ons may register further panel patterns; they appear in `megaMenu.patterns`.
+2. Item: `leitvia/update-navigation` with an item `{ "label": "Services", "url": "/services/", "type": "mega", "panel": "mega-menu-services" }`. `url` is required: the overview page is the link of the item without JavaScript and for search engines. The panel needs to exist first; `megaMenu.panels` lists them with their hash.
+
+The item is a link with a button beside it (`aria-expanded`), Escape closes the panel and returns focus, hover opens it only after a pause. Without JavaScript the panel links stay in the page and open with the focus. In the mobile overlay the panel is an accordion and each column head its second level. `leitvia/audit-site` reports a panel without links, links to `#`, an item whose panel is gone or that has no `url`, and the findings add-ons add for a panel.
+
+## Icons in the menu
+
+`icon` puts an icon of the icon set (the `enum` of the attribute `icon` of `leitvia/icon` in `leitvia/list-blocks`) before the text of an item or sub item of `leitvia/update-navigation`, and of a mega menu item. It is decorative and hidden from screen readers, so the text still names the target; it takes the accent color and the line width of the token `iconStroke`. At most one icon per item, and only where every item of the row can have one, for example the three audiences of a company; column heads of a panel carry their icon in the pattern. Check at 1024 px that the row still fits on one line, else leave the icons out.
+
+## Service bar over the stage
+
+`header-utility` (service bar above logo and menu) works with every sticky style and with `is-style-overlay-header`: the bar keeps its dark ground, the row below lies over the cover.

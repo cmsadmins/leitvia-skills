@@ -1,6 +1,6 @@
 # Leitvia agent handbook
 
-Generated from Leitvia Studio 1.3.57. Do not edit.
+Generated from Leitvia Studio 1.3.58. Do not edit.
 
 What an agent needs on a WordPress site with Leitvia Studio through its 74 abilities. Agents change the site only through them: no SQL, no REST routes of WordPress core (not even to read), no WP-CLI. Reading public pages is allowed. Read this file before the first call, with Leitvia Pro also [pro.md](pro.md).
 
@@ -130,7 +130,7 @@ Read abilities change nothing. Call them first: they return the IDs, block IDs a
 | [`leitvia/list-blocks`](abilities/leitvia-list-blocks.md) | GET | Returns the block catalog of Leitvia Studio and its add-ons with attribute schema and usage rules, and the registered block styles of every block, core blocks included, by block name; a style is set as the class is-style-\<name>. |
 | [`leitvia/list-building-blocks`](abilities/leitvia-list-building-blocks.md) | GET | Lists the building blocks of add-ons: name, title, description, whether the site has them, their post types and taxonomies, the patterns that show them and the number of sample entries. |
 | [`leitvia/list-content`](abilities/leitvia-list-content.md) | GET | Lists posts, pages and entries of the content model, newest first, with hash, terms and the open package that waits for each. |
-| [`leitvia/list-media`](abilities/leitvia-list-media.md) | GET | Lists the media library, newest first: ID, URL, file name, MIME type, file size in bytes, alt text, width, height and hash. |
+| [`leitvia/list-media`](abilities/leitvia-list-media.md) | GET | Lists the media library, newest first: ID, URL, file name, MIME type, file size in bytes, alt text, whether it was made with AI, width, height and hash. |
 | [`leitvia/list-packages`](abilities/leitvia-list-packages.md) | GET | Lists your change packages, newest first: ID, title, key, state, operations per status and a preview link. |
 | [`leitvia/list-patterns`](abilities/leitvia-list-patterns.md) | GET | Lists the patterns of the theme, of Leitvia Studio and of its add-ons with composition metadata, image slots, when to use and avoid them, lab status and the replacement of deprecated ones, followed by the Lab patterns with their lab status, version and document hash, and the composition of the theme pattern they vary. |
 | [`leitvia/list-product-attributes`](abilities/leitvia-list-product-attributes.md) | GET | Lists the global product attributes with their values and hash. |

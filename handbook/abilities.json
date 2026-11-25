@@ -1,5 +1,5 @@
 {
-	"studio": "1.3.57",
+	"studio": "1.3.58",
 	"abilities": [
 		{
 			"name": "leitvia/activate-token-set",
@@ -247,6 +247,10 @@
 						"type": "string",
 						"maxLength": 2000,
 						"description": "Video only: what the video shows, in plain text, as caption of the file in the media library. A video without speech needs this text on the page as well."
+					},
+					"ai_generated": {
+						"type": "boolean",
+						"description": "Image or video only: the file was made or changed with AI. Stored on the file (leitvia/list-media returns it, leitvia/set-alt-text changes it later); a site may show a short note at such images."
 					},
 					"base_hash": {
 						"type": "string",
@@ -624,7 +628,7 @@
 		{
 			"name": "leitvia/check-composition",
 			"label": "Check composition",
-			"description": "Scores a page against the composition rules of the contract: pass pattern slugs in page order (block:<ID> for a Lab pattern; only approved ones count as known), or a post ID to read the sections of a saved page from metadata.patternName. A saved page counts as built: the ground each section sets (backgroundColor, block style Inverse) instead of the tone of its pattern, and the side of its media (block style Media right). With slugs, name both yourself: tones for the sections an edit will give another ground, mirrored for those it will give the block style Media right, each by 0-based index. Text, lists, images, galleries and accordions between the sections are running text and no finding. A section with a video, a gallery or a wide image is a break and stands outside the density run. With frame (or the frame a saved page was composed for) the page also needs a section of every kind the page frame requires (missingSection, 10 points) and is told about the kinds it recommends (recommendedSection, no points); both carry the kind and the index after the last section, and their suggestions name patterns to add. Returns the findings (rule, 0-based section index, for a post the block ID, and what to do), the score from 100 down, the minimum score for autonomous writes and per finding up to three patterns that would fix it. For a post also unregistered: block types that render nothing, and the finding newsTopic (no points) when the page has the pattern Related news without a topic of its news.",
+			"description": "Scores a page against the composition rules of the contract: pass pattern slugs in page order (block:<ID> for a Lab pattern; only approved ones count as known), or a post ID to read the sections of a saved page from metadata.patternName. A saved page counts as built: the ground each section sets (backgroundColor, block style Inverse) instead of the tone of its pattern, and the side of its media (block style Media right). With slugs, name both yourself: tones for the sections an edit will give another ground, mirrored for those it will give the block style Media right, each by 0-based index. Text, lists, images, galleries and accordions between the sections are running text and no finding. A section with a video, a gallery or a wide image is a break and stands outside the density run. With frame (or the frame a saved page was composed for) the page also needs a section of every kind the page frame requires (missingSection, 10 points) and is told about the kinds it recommends (recommendedSection, no points); both carry the kind and the index after the last section, and their suggestions name patterns to add. Returns the findings (rule, 0-based section index, for a post the block ID, and what to do), the score from 100 down, the minimum score for autonomous writes and per finding up to three patterns that would fix it. For a post also unregistered: block types that render nothing, the finding newsTopic (no points) when the page has the pattern Related news without a topic of its news, and the finding firstScreen (no points) when the heading or the text before the first button of the stage is longer than its pattern allows, so the button may fall below the first screen.",
 			"category": "leitvia",
 			"group": "read",
 			"input_schema": {
@@ -1256,7 +1260,7 @@
 											},
 											"attributes": {
 												"type": "object",
-												"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label (its file, poster, controls and preload come from the field video); for a leitvia/timeline-item date (YYYY, YYYY-MM or YYYY-MM-DD, empty for a free label), dateLabel and heading; leitviaAnimation and leitviaMotion on every block that lists them, also next to other attributes (null removes either); className (is-style-<name>, null removes the style and keeps other classes; up to three styles that combine space separated, such as is-style-sticky-header-desktop is-style-overlay-header) on every core block with registered block styles; textColor (ink, ink-muted or accent) and fontSize on a core/heading or core/paragraph; fontSize on a core/quote, so the quotes of a row match (null for the size of the theme); textColor with a color role and fontSize on a block of Studio or an add-on whose supports in leitvia/list-blocks name color.text or typography.fontSize, such as leitvia/icon and leitvia/icon-list (null removes either); on a core/cover minHeight in vh, 30 to 100; align on every block whose supports.align in leitvia/list-blocks names the value (null removes it); on core/image also width, height, aspectRatio, scale, sizeSlug, linkDestination, href, lightbox (null removes one). null for an attribute the block does not have changes nothing."
+												"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label (its file, poster, controls and preload come from the field video); for a leitvia/timeline-item date (YYYY, YYYY-MM or YYYY-MM-DD, empty for a free label), dateLabel and heading; leitviaAnimation and leitviaMotion on every block that lists them, also next to other attributes (null removes either); className (is-style-<name>, null removes the style and keeps other classes; up to three styles that combine space separated, such as is-style-sticky-header-desktop is-style-overlay-header) on every core block with registered block styles; textColor (ink, ink-muted or accent) and fontSize on a core/heading or core/paragraph; fontSize on a core/quote, so the quotes of a row match (null for the size of the theme); textColor with a color role and fontSize on a block of Studio or an add-on whose supports in leitvia/list-blocks name color.text or typography.fontSize, such as leitvia/icon and leitvia/icon-list (null removes either); on a core/cover minHeight in vh, 30 to 100, and focalPoint, x and y from 0 to 1, the part of the photo that stays in view where the cover crops it, as on phones (null for the middle); align on every block whose supports.align in leitvia/list-blocks names the value (null removes it); on core/image also width, height, aspectRatio, scale, sizeSlug, linkDestination, href, lightbox (null removes one). null for an attribute the block does not have changes nothing."
 											}
 										},
 										"required": [
@@ -1932,7 +1936,7 @@
 											},
 											"attributes": {
 												"type": "object",
-												"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label (its file, poster, controls and preload come from the field video); for a leitvia/timeline-item date (YYYY, YYYY-MM or YYYY-MM-DD, empty for a free label), dateLabel and heading; leitviaAnimation and leitviaMotion on every block that lists them, also next to other attributes (null removes either); className (is-style-<name>, null removes the style and keeps other classes; up to three styles that combine space separated, such as is-style-sticky-header-desktop is-style-overlay-header) on every core block with registered block styles; textColor (ink, ink-muted or accent) and fontSize on a core/heading or core/paragraph; fontSize on a core/quote, so the quotes of a row match (null for the size of the theme); textColor with a color role and fontSize on a block of Studio or an add-on whose supports in leitvia/list-blocks name color.text or typography.fontSize, such as leitvia/icon and leitvia/icon-list (null removes either); on a core/cover minHeight in vh, 30 to 100; align on every block whose supports.align in leitvia/list-blocks names the value (null removes it); on core/image also width, height, aspectRatio, scale, sizeSlug, linkDestination, href, lightbox (null removes one). null for an attribute the block does not have changes nothing."
+												"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label (its file, poster, controls and preload come from the field video); for a leitvia/timeline-item date (YYYY, YYYY-MM or YYYY-MM-DD, empty for a free label), dateLabel and heading; leitviaAnimation and leitviaMotion on every block that lists them, also next to other attributes (null removes either); className (is-style-<name>, null removes the style and keeps other classes; up to three styles that combine space separated, such as is-style-sticky-header-desktop is-style-overlay-header) on every core block with registered block styles; textColor (ink, ink-muted or accent) and fontSize on a core/heading or core/paragraph; fontSize on a core/quote, so the quotes of a row match (null for the size of the theme); textColor with a color role and fontSize on a block of Studio or an add-on whose supports in leitvia/list-blocks name color.text or typography.fontSize, such as leitvia/icon and leitvia/icon-list (null removes either); on a core/cover minHeight in vh, 30 to 100, and focalPoint, x and y from 0 to 1, the part of the photo that stays in view where the cover crops it, as on phones (null for the middle); align on every block whose supports.align in leitvia/list-blocks names the value (null removes it); on core/image also width, height, aspectRatio, scale, sizeSlug, linkDestination, href, lightbox (null removes one). null for an attribute the block does not have changes nothing."
 											}
 										},
 										"required": [
@@ -3480,9 +3484,27 @@
 							}
 						}
 					},
+					"megaMenu": {
+						"type": "object",
+						"description": "Mega menus: panels lists the template parts in the area Mega menu (part, title, hash for leitvia/update-template-part, empty while only a file of the theme exists); patterns lists the patterns made for a panel (name, title, description). A new panel is a part named mega-menu-<name>: fill it with leitvia/update-template-part (pattern and edits; remove or repeat a column for two to four columns), then add an item with type mega and panel through leitvia/update-navigation.",
+						"properties": {
+							"panels": {
+								"type": "array",
+								"items": {
+									"type": "object"
+								}
+							},
+							"patterns": {
+								"type": "array",
+								"items": {
+									"type": "object"
+								}
+							}
+						}
+					},
 					"hashes": {
 						"type": "object",
-						"description": "Base hashes: templateParts and templates by name and slug for leitvia/update-template-part and leitvia/update-template (empty while only the file of the theme exists), navigation with id and hash per published menu, newest first, for leitvia/update-navigation.",
+						"description": "Base hashes: templateParts and templates by name and slug for leitvia/update-template-part and leitvia/update-template (empty while only the file of the theme exists; mega menu panels are among the template parts), navigation with id and hash per published menu, newest first, for leitvia/update-navigation.",
 						"properties": {
 							"templateParts": {
 								"type": "object"
@@ -4912,7 +4934,7 @@
 											},
 											"attributes": {
 												"type": "object",
-												"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label (its file, poster, controls and preload come from the field video); for a leitvia/timeline-item date (YYYY, YYYY-MM or YYYY-MM-DD, empty for a free label), dateLabel and heading; leitviaAnimation and leitviaMotion on every block that lists them, also next to other attributes (null removes either); className (is-style-<name>, null removes the style and keeps other classes; up to three styles that combine space separated, such as is-style-sticky-header-desktop is-style-overlay-header) on every core block with registered block styles; textColor (ink, ink-muted or accent) and fontSize on a core/heading or core/paragraph; fontSize on a core/quote, so the quotes of a row match (null for the size of the theme); textColor with a color role and fontSize on a block of Studio or an add-on whose supports in leitvia/list-blocks name color.text or typography.fontSize, such as leitvia/icon and leitvia/icon-list (null removes either); on a core/cover minHeight in vh, 30 to 100; align on every block whose supports.align in leitvia/list-blocks names the value (null removes it); on core/image also width, height, aspectRatio, scale, sizeSlug, linkDestination, href, lightbox (null removes one). null for an attribute the block does not have changes nothing."
+												"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label (its file, poster, controls and preload come from the field video); for a leitvia/timeline-item date (YYYY, YYYY-MM or YYYY-MM-DD, empty for a free label), dateLabel and heading; leitviaAnimation and leitviaMotion on every block that lists them, also next to other attributes (null removes either); className (is-style-<name>, null removes the style and keeps other classes; up to three styles that combine space separated, such as is-style-sticky-header-desktop is-style-overlay-header) on every core block with registered block styles; textColor (ink, ink-muted or accent) and fontSize on a core/heading or core/paragraph; fontSize on a core/quote, so the quotes of a row match (null for the size of the theme); textColor with a color role and fontSize on a block of Studio or an add-on whose supports in leitvia/list-blocks name color.text or typography.fontSize, such as leitvia/icon and leitvia/icon-list (null removes either); on a core/cover minHeight in vh, 30 to 100, and focalPoint, x and y from 0 to 1, the part of the photo that stays in view where the cover crops it, as on phones (null for the middle); align on every block whose supports.align in leitvia/list-blocks names the value (null removes it); on core/image also width, height, aspectRatio, scale, sizeSlug, linkDestination, href, lightbox (null removes one). null for an attribute the block does not have changes nothing."
 											}
 										},
 										"required": [
@@ -5416,7 +5438,7 @@
 		{
 			"name": "leitvia/list-media",
 			"label": "List media",
-			"description": "Lists the media library, newest first: ID, URL, file name, MIME type, file size in bytes, alt text, width, height and hash (the base_hash for leitvia/set-alt-text). Filter by IDs (include, in their order, for example the images of a gallery), by search text in title, caption and file name, MIME type (image, image/png or application/pdf) and uploaded after a date.",
+			"description": "Lists the media library, newest first: ID, URL, file name, MIME type, file size in bytes, alt text, whether it was made with AI (ai, see ai_generated of leitvia/add-media), width, height and hash (the base_hash for leitvia/set-alt-text). Filter by IDs (include, in their order, for example the images of a gallery), by search text in title, caption and file name, MIME type (image, image/png or application/pdf) and uploaded after a date.",
 			"category": "leitvia",
 			"group": "read",
 			"input_schema": {
@@ -6306,7 +6328,7 @@
 		{
 			"name": "leitvia/replace-pattern",
 			"label": "Replace pattern",
-			"description": "Replaces top-level sections of one post with another pattern. Without pattern the sections that use a deprecated pattern (metadata.patternName) get the replacement the contract names, all of them or the one given by block; leitvia/audit-site reports such posts, and a section without replacement is rejected with leitvia_no_replacement. With pattern the one section given by block gets that pattern, any approved one of leitvia/list-patterns, with edits at block IDs of its outline as in leitvia/compose-page (text, link, image, caption, catalog attributes such as the level of a heading, anchor, columns of a grid, remove, repeat and insert): so a section of an existing page changes its pattern. Texts and button links of the old section move over in order per block type (carry false keeps the texts of the pattern), then the edits apply and win; the HTML anchor of the old section does not move over, set it again with an anchor edit. The base hash is the hash of the post from leitvia/get-page-outline.",
+			"description": "Replaces top-level sections of one post with another pattern. Without pattern the sections that use a deprecated pattern (metadata.patternName) get the replacement the contract names, all of them or the one given by block; leitvia/audit-site reports such posts, and a section without replacement is rejected with leitvia_no_replacement. With pattern the one section given by block gets that pattern, any approved one of leitvia/list-patterns, with edits at block IDs of its outline as in leitvia/compose-page (text, link, image, caption, catalog attributes such as the level of a heading, anchor, columns of a grid, remove, repeat and insert; they apply in order, and after a remove the later blocks of the same parent move up one place): so a section of an existing page changes its pattern. Texts and button links of the old section move over in order per block type (carry false keeps the texts of the pattern), then the edits apply and win; the HTML anchor of the old section does not move over, set it again with an anchor edit. The base hash is the hash of the post from leitvia/get-page-outline.",
 			"category": "leitvia",
 			"group": "maintain",
 			"input_schema": {
@@ -6816,7 +6838,7 @@
 								},
 								"attributes": {
 									"type": "object",
-									"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label (its file, poster, controls and preload come from the field video); for a leitvia/timeline-item date (YYYY, YYYY-MM or YYYY-MM-DD, empty for a free label), dateLabel and heading; leitviaAnimation and leitviaMotion on every block that lists them, also next to other attributes (null removes either); className (is-style-<name>, null removes the style and keeps other classes; up to three styles that combine space separated, such as is-style-sticky-header-desktop is-style-overlay-header) on every core block with registered block styles; textColor (ink, ink-muted or accent) and fontSize on a core/heading or core/paragraph; fontSize on a core/quote, so the quotes of a row match (null for the size of the theme); textColor with a color role and fontSize on a block of Studio or an add-on whose supports in leitvia/list-blocks name color.text or typography.fontSize, such as leitvia/icon and leitvia/icon-list (null removes either); on a core/cover minHeight in vh, 30 to 100; align on every block whose supports.align in leitvia/list-blocks names the value (null removes it); on core/image also width, height, aspectRatio, scale, sizeSlug, linkDestination, href, lightbox (null removes one). null for an attribute the block does not have changes nothing."
+									"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label (its file, poster, controls and preload come from the field video); for a leitvia/timeline-item date (YYYY, YYYY-MM or YYYY-MM-DD, empty for a free label), dateLabel and heading; leitviaAnimation and leitviaMotion on every block that lists them, also next to other attributes (null removes either); className (is-style-<name>, null removes the style and keeps other classes; up to three styles that combine space separated, such as is-style-sticky-header-desktop is-style-overlay-header) on every core block with registered block styles; textColor (ink, ink-muted or accent) and fontSize on a core/heading or core/paragraph; fontSize on a core/quote, so the quotes of a row match (null for the size of the theme); textColor with a color role and fontSize on a block of Studio or an add-on whose supports in leitvia/list-blocks name color.text or typography.fontSize, such as leitvia/icon and leitvia/icon-list (null removes either); on a core/cover minHeight in vh, 30 to 100, and focalPoint, x and y from 0 to 1, the part of the photo that stays in view where the cover crops it, as on phones (null for the middle); align on every block whose supports.align in leitvia/list-blocks names the value (null removes it); on core/image also width, height, aspectRatio, scale, sizeSlug, linkDestination, href, lightbox (null removes one). null for an attribute the block does not have changes nothing."
 								}
 							},
 							"required": [
@@ -7009,7 +7031,7 @@
 		{
 			"name": "leitvia/set-alt-text",
 			"label": "Set alt text",
-			"description": "Sets the alt text of an image: without post and block on the attachment in the media library (base_hash of the attachment), with post and block on one image or cover block that shows it (base_hash of the post). leitvia/get-page-outline returns both hashes, for the attachment with its ID as post. Many images: items, one call and package. The alt text check applies.",
+			"description": "Sets the alt text of an image: without post and block on the attachment in the media library (base_hash of the attachment), with post and block on one image or cover block that shows it (base_hash of the post). leitvia/get-page-outline returns both hashes, for the attachment with its ID as post. Many images: items, one call and package. The alt text check applies. ai_generated marks the image in the media library as made with AI, or takes the mark off with false.",
 			"category": "leitvia",
 			"group": "maintain",
 			"input_schema": {
@@ -7035,6 +7057,10 @@
 						"minLength": 1,
 						"maxLength": 200,
 						"description": "Block ID or path ID of the image or cover block from the outline."
+					},
+					"ai_generated": {
+						"type": "boolean",
+						"description": "Without post and block only: true marks the image as made with AI (as ai_generated of leitvia/add-media), false takes the mark off; left out, the mark stays."
 					},
 					"items": {
 						"type": "array",
@@ -9485,7 +9511,7 @@
 					},
 					"attributes": {
 						"type": "object",
-						"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label (its file, poster, controls and preload come from the field video); for a leitvia/timeline-item date (YYYY, YYYY-MM or YYYY-MM-DD, empty for a free label), dateLabel and heading; leitviaAnimation and leitviaMotion on every block that lists them, also next to other attributes (null removes either); className (is-style-<name>, null removes the style and keeps other classes; up to three styles that combine space separated, such as is-style-sticky-header-desktop is-style-overlay-header) on every core block with registered block styles; textColor (ink, ink-muted or accent) and fontSize on a core/heading or core/paragraph; fontSize on a core/quote, so the quotes of a row match (null for the size of the theme); textColor with a color role and fontSize on a block of Studio or an add-on whose supports in leitvia/list-blocks name color.text or typography.fontSize, such as leitvia/icon and leitvia/icon-list (null removes either); on a core/cover minHeight in vh, 30 to 100; align on every block whose supports.align in leitvia/list-blocks names the value (null removes it); on core/image also width, height, aspectRatio, scale, sizeSlug, linkDestination, href, lightbox (null removes one). null for an attribute the block does not have changes nothing."
+						"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label (its file, poster, controls and preload come from the field video); for a leitvia/timeline-item date (YYYY, YYYY-MM or YYYY-MM-DD, empty for a free label), dateLabel and heading; leitviaAnimation and leitviaMotion on every block that lists them, also next to other attributes (null removes either); className (is-style-<name>, null removes the style and keeps other classes; up to three styles that combine space separated, such as is-style-sticky-header-desktop is-style-overlay-header) on every core block with registered block styles; textColor (ink, ink-muted or accent) and fontSize on a core/heading or core/paragraph; fontSize on a core/quote, so the quotes of a row match (null for the size of the theme); textColor with a color role and fontSize on a block of Studio or an add-on whose supports in leitvia/list-blocks name color.text or typography.fontSize, such as leitvia/icon and leitvia/icon-list (null removes either); on a core/cover minHeight in vh, 30 to 100, and focalPoint, x and y from 0 to 1, the part of the photo that stays in view where the cover crops it, as on phones (null for the middle); align on every block whose supports.align in leitvia/list-blocks names the value (null removes it); on core/image also width, height, aspectRatio, scale, sizeSlug, linkDestination, href, lightbox (null removes one). null for an attribute the block does not have changes nothing."
 					},
 					"post": {
 						"type": "integer",
@@ -9883,7 +9909,7 @@
 		{
 			"name": "leitvia/update-navigation",
 			"label": "Update navigation",
-			"description": "Replaces the links of a navigation menu, by default the one published last, which headers without a chosen menu show. Send items (with one level of sub items) or block markup of navigation links, submenus, page lists and mega menus. Links point to this site, use https, mailto: or tel:, and need a text that names their target. The change publishes the menu, a draft one too, since core shows no draft menu. The base hash is the hash of the menu, empty when the site has none. leitvia/get-contract returns it per published menu under hashes.navigation.",
+			"description": "Replaces the links of a navigation menu, by default the one published last, which headers without a chosen menu show. Send items (with one level of sub items) or block markup of navigation links, submenus, page lists and mega menus. Links point to this site, use https, mailto: or tel:, and need a text that names their target. An item with type mega and panel is a mega menu: a link to the overview page in url and a button that opens the panel, a template part in the area Mega menu that leitvia/update-template-part fills first (part mega-menu-<name>, pattern and edits). icon puts an icon of the icon set (enum of the attribute icon of leitvia/icon in leitvia/list-blocks) before the text of an item or sub item. The change publishes the menu, a draft one too, since core shows no draft menu. The base hash is the hash of the menu, empty when the site has none. leitvia/get-contract returns it per published menu under hashes.navigation.",
 			"category": "leitvia",
 			"group": "setup",
 			"input_schema": {
@@ -9909,7 +9935,31 @@
 									"type": "string",
 									"minLength": 1,
 									"maxLength": 2000,
-									"description": "Address of this site, https, mailto: or tel:. An item with sub items may leave it out: it then only opens its submenu."
+									"description": "Address of this site, https, mailto: or tel:. An item with sub items may leave it out: it then only opens its submenu. A mega menu needs it: the overview page of its topic, the link without JavaScript."
+								},
+								"type": {
+									"type": "string",
+									"enum": [
+										"link",
+										"mega"
+									],
+									"description": "link (the default): a link, or a submenu with items. mega: a mega menu item, a link to url with a button beside it that opens the template part panel; fill the panel first with leitvia/update-template-part."
+								},
+								"panel": {
+									"type": "string",
+									"pattern": "^[a-z0-9-]+$",
+									"description": "Only with type mega: name of the panel, a template part in the area Mega menu, such as mega-menu-services; leitvia/get-contract lists them under megaMenu.panels."
+								},
+								"description": {
+									"type": "string",
+									"maxLength": 200,
+									"description": "Only with type mega: a short text below the label, left out by most menus."
+								},
+								"icon": {
+									"type": "string",
+									"pattern": "^[a-z][a-z0-9-]*$",
+									"maxLength": 60,
+									"description": "Name of an icon from the icon set (enum of the attribute icon of leitvia/icon in leitvia/list-blocks), shown before the text in the accent color and hidden from screen readers; at most one per item, the text still names the target. Leave it out for none."
 								},
 								"items": {
 									"type": "array",
@@ -9928,6 +9978,12 @@
 												"minLength": 1,
 												"maxLength": 2000,
 												"description": "Address of this site, https, mailto: or tel:."
+											},
+											"icon": {
+												"type": "string",
+												"pattern": "^[a-z][a-z0-9-]*$",
+												"maxLength": 60,
+												"description": "Name of an icon from the icon set (enum of the attribute icon of leitvia/icon in leitvia/list-blocks), shown before the text in the accent color and hidden from screen readers; at most one per item, the text still names the target. Leave it out for none."
 											}
 										},
 										"required": [
@@ -11052,7 +11108,7 @@
 		{
 			"name": "leitvia/update-template-part",
 			"label": "Update template part",
-			"description": "Replaces a template part of the contract, such as header, footer or sidebar, with a pattern made for its area or with changed block markup. Part names come from leitvia/get-contract; with Polylang <part>-<language> (header-de) is the part the theme shows for that language and is created in the area of its part. Patterns come from leitvia/list-patterns; edits change the pattern at block IDs of leitvia/get-pattern first, as the sections of leitvia/compose-page do, so a footer or header needs no markup of its own. The change publishes the part, a draft one too: core shows no draft part, so where the area level is draft it waits in a change package. The base hash is the hash of the template part. leitvia/get-contract returns it per part under hashes.templateParts.",
+			"description": "Replaces a template part of the contract, such as header, footer or sidebar, with a pattern made for its area or with changed block markup. Part names come from leitvia/get-contract; with Polylang <part>-<language> (header-de) is the part the theme shows for that language and is created in the area of its part. A panel of a mega menu is a part named mega-menu-<name> (or one listed under megaMenu.panels of leitvia/get-contract), created in the area Mega menu on the first write; fill it with a pattern of megaMenu.patterns and edits, then link it with leitvia/update-navigation (type mega, panel). Patterns come from leitvia/list-patterns; edits change the pattern at block IDs of leitvia/get-pattern first, as the sections of leitvia/compose-page do, so a footer or header needs no markup of its own. The change publishes the part, a draft one too: core shows no draft part, so where the area level is draft it waits in a change package. The base hash is the hash of the template part. leitvia/get-contract returns it per part under hashes.templateParts.",
 			"category": "leitvia",
 			"group": "setup",
 			"input_schema": {
@@ -11060,7 +11116,7 @@
 					"part": {
 						"type": "string",
 						"pattern": "^[a-z0-9-]+$",
-						"description": "Name of a template part from leitvia/get-contract, such as header or footer."
+						"description": "Name of a template part from leitvia/get-contract, such as header or footer, or of a mega menu panel, such as mega-menu-services."
 					},
 					"pattern": {
 						"type": "string"
@@ -11555,7 +11611,7 @@
 								},
 								"attributes": {
 									"type": "object",
-									"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label (its file, poster, controls and preload come from the field video); for a leitvia/timeline-item date (YYYY, YYYY-MM or YYYY-MM-DD, empty for a free label), dateLabel and heading; leitviaAnimation and leitviaMotion on every block that lists them, also next to other attributes (null removes either); className (is-style-<name>, null removes the style and keeps other classes; up to three styles that combine space separated, such as is-style-sticky-header-desktop is-style-overlay-header) on every core block with registered block styles; textColor (ink, ink-muted or accent) and fontSize on a core/heading or core/paragraph; fontSize on a core/quote, so the quotes of a row match (null for the size of the theme); textColor with a color role and fontSize on a block of Studio or an add-on whose supports in leitvia/list-blocks name color.text or typography.fontSize, such as leitvia/icon and leitvia/icon-list (null removes either); on a core/cover minHeight in vh, 30 to 100; align on every block whose supports.align in leitvia/list-blocks names the value (null removes it); on core/image also width, height, aspectRatio, scale, sizeSlug, linkDestination, href, lightbox (null removes one). null for an attribute the block does not have changes nothing."
+									"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label (its file, poster, controls and preload come from the field video); for a leitvia/timeline-item date (YYYY, YYYY-MM or YYYY-MM-DD, empty for a free label), dateLabel and heading; leitviaAnimation and leitviaMotion on every block that lists them, also next to other attributes (null removes either); className (is-style-<name>, null removes the style and keeps other classes; up to three styles that combine space separated, such as is-style-sticky-header-desktop is-style-overlay-header) on every core block with registered block styles; textColor (ink, ink-muted or accent) and fontSize on a core/heading or core/paragraph; fontSize on a core/quote, so the quotes of a row match (null for the size of the theme); textColor with a color role and fontSize on a block of Studio or an add-on whose supports in leitvia/list-blocks name color.text or typography.fontSize, such as leitvia/icon and leitvia/icon-list (null removes either); on a core/cover minHeight in vh, 30 to 100, and focalPoint, x and y from 0 to 1, the part of the photo that stays in view where the cover crops it, as on phones (null for the middle); align on every block whose supports.align in leitvia/list-blocks names the value (null removes it); on core/image also width, height, aspectRatio, scale, sizeSlug, linkDestination, href, lightbox (null removes one). null for an attribute the block does not have changes nothing."
 								}
 							},
 							"required": [
@@ -12177,7 +12233,7 @@
 								},
 								"attributes": {
 									"type": "object",
-									"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label (its file, poster, controls and preload come from the field video); for a leitvia/timeline-item date (YYYY, YYYY-MM or YYYY-MM-DD, empty for a free label), dateLabel and heading; leitviaAnimation and leitviaMotion on every block that lists them, also next to other attributes (null removes either); className (is-style-<name>, null removes the style and keeps other classes; up to three styles that combine space separated, such as is-style-sticky-header-desktop is-style-overlay-header) on every core block with registered block styles; textColor (ink, ink-muted or accent) and fontSize on a core/heading or core/paragraph; fontSize on a core/quote, so the quotes of a row match (null for the size of the theme); textColor with a color role and fontSize on a block of Studio or an add-on whose supports in leitvia/list-blocks name color.text or typography.fontSize, such as leitvia/icon and leitvia/icon-list (null removes either); on a core/cover minHeight in vh, 30 to 100; align on every block whose supports.align in leitvia/list-blocks names the value (null removes it); on core/image also width, height, aspectRatio, scale, sizeSlug, linkDestination, href, lightbox (null removes one). null for an attribute the block does not have changes nothing."
+									"description": "Attributes from leitvia/list-blocks; for a core/heading its level, 1 to 6; for a core/query query with perPage, pages, offset, postType, order, orderBy, sticky and inherit (perPage counts with inherit false); for a core/video tracks, each with id, kind, srclang and label (its file, poster, controls and preload come from the field video); for a leitvia/timeline-item date (YYYY, YYYY-MM or YYYY-MM-DD, empty for a free label), dateLabel and heading; leitviaAnimation and leitviaMotion on every block that lists them, also next to other attributes (null removes either); className (is-style-<name>, null removes the style and keeps other classes; up to three styles that combine space separated, such as is-style-sticky-header-desktop is-style-overlay-header) on every core block with registered block styles; textColor (ink, ink-muted or accent) and fontSize on a core/heading or core/paragraph; fontSize on a core/quote, so the quotes of a row match (null for the size of the theme); textColor with a color role and fontSize on a block of Studio or an add-on whose supports in leitvia/list-blocks name color.text or typography.fontSize, such as leitvia/icon and leitvia/icon-list (null removes either); on a core/cover minHeight in vh, 30 to 100, and focalPoint, x and y from 0 to 1, the part of the photo that stays in view where the cover crops it, as on phones (null for the middle); align on every block whose supports.align in leitvia/list-blocks names the value (null removes it); on core/image also width, height, aspectRatio, scale, sizeSlug, linkDestination, href, lightbox (null removes one). null for an attribute the block does not have changes nothing."
 								}
 							},
 							"required": [
@@ -13260,6 +13316,16 @@
 					"leitvia/list-packages"
 				],
 				"retry": "never"
+			},
+			{
+				"code": "leitvia_unknown_pattern",
+				"status": 404,
+				"reason": "pattern",
+				"message": "There is no pattern with this name for a mega menu panel. Use one of the patterns the rejection lists in patterns.",
+				"next_ability": [
+					"leitvia/get-contract"
+				],
+				"retry": "once"
 			},
 			{
 				"code": "leitvia_unknown_pattern",

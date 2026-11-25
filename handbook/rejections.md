@@ -1,6 +1,6 @@
 # Rejections
 
-Generated from Leitvia Studio 1.3.57. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
+Generated from Leitvia Studio 1.3.58. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
 
 Every rejection of Leitvia Studio with its retry rule and next ability. Messages with `%s` or `%d` get a value at run time; codes with several rows come from several places.
 
@@ -102,6 +102,7 @@ Leitvia uses one code per kind of failure, not one per field as in the error voc
 | `leitvia_too_large` | 413 | `once` | none | The change is too large to compare (more than %d KB). Split it into smaller changes. |
 | `leitvia_unknown_building_block` | 404 | `never` | none | There is no building block with this name. |
 | `leitvia_unknown_package` | 404 | `never` | `leitvia/list-packages` | There is no change package with this ID. List the packages and use one of them. |
+| `leitvia_unknown_pattern` | 404 | `once` | `leitvia/get-contract` | There is no pattern with this name for a mega menu panel. Use one of the patterns the rejection lists in patterns. |
 | `leitvia_unknown_pattern` | 404 | `once` | `leitvia/list-patterns` | There is no pattern with this name for this template part. List the patterns of its area and use one of them. |
 | `leitvia_unknown_pattern` | 404 | `once` | none | There is no pattern with this name for this template. Use one of the patterns the rejection lists in patterns. |
 | `leitvia_unknown_pattern` | 404 | `once` | `leitvia/list-patterns` | There is no pattern with this name. List the patterns and use one of them. |
