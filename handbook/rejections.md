@@ -1,6 +1,6 @@
 # Rejections
 
-Generated from Leitvia Studio 1.3.54. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
+Generated from Leitvia Studio 1.3.55. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
 
 Every rejection of Leitvia Studio with its retry rule and next ability. Messages with `%s` or `%d` get a value at run time; codes with several rows come from several places.
 
@@ -75,6 +75,7 @@ Leitvia uses one code per kind of failure, not one per field as in the error voc
 | `leitvia_no_contract` | 409 | `never` | none | The active theme has no valid Leitvia contract. Activate the Leitvia theme or fix its contract file. |
 | `leitvia_no_replacement` | 422 | `never` | `leitvia/list-patterns` | There is no deprecated pattern with an available replacement here. Choose a pattern and change the section by hand or with leitvia/compose-page. |
 | `leitvia_no_seo_plugin` | 422 | `never` | `leitvia/update-content` | No SEO plugin Leitvia Studio can write to is active (Yoast SEO, Rank Math, SEOPress or The SEO Framework). Change the excerpt with leitvia/update-content instead, or ask a person to install one. |
+| `leitvia_no_seo_plugin` | 422 | `never` | none | The SEO plugin keeps the titles of archives in its own settings; report the wish to the person. |
 | `leitvia_not_found` | 404 | `once` | `leitvia/get-page-outline` | The page has no block with this ID. Read the page outline for the current IDs. |
 | `leitvia_not_found` | 404 | `once` | `leitvia/get-page-outline` | There is no block with this ID. Read the outline for the current IDs. |
 | `leitvia_not_found` | 404 | `once` | `leitvia/list-media` | There is no file with this ID in the media library. List the media for the current IDs. |

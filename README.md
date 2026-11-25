@@ -21,7 +21,7 @@ Each `SKILL.md` is built like the skills of [WordPress/agent-skills](https://git
 ## 1. Prepare the site
 
 - WordPress 7.1 or later and PHP 8.2 or later, with HTTPS. Application passwords of WordPress work only over HTTPS (or on a local development site).
-- The theme **Leitvia** and the plugin **Leitvia Studio**. The theme passed the WordPress.org theme review on 18.11.2026 and appears in the directory once the themes team publishes it; Leitvia Studio is submitted. Until they are listed, install the zips from the releases of [cmsadmins/leitvia](https://github.com/cmsadmins/leitvia/releases) and [cmsadmins/leitvia-studio](https://github.com/cmsadmins/leitvia-studio/releases) under **Appearance, Themes, Add New, Upload Theme** and **Plugins, Add New, Upload Plugin**. Once listed, search for them on the same screens.
+- The theme **Leitvia** and the plugin **Leitvia Studio**, both free on WordPress.org: search for them under **Appearance, Themes, Add New Theme** and **Plugins, Add New Plugin**, or see [Leitvia on WordPress.org](https://wordpress.org/themes/leitvia/) and [Leitvia Studio on WordPress.org](https://wordpress.org/plugins/leitvia-studio/). The zips of every version are also in the releases of [cmsadmins/leitvia](https://github.com/cmsadmins/leitvia/releases) and [cmsadmins/leitvia-studio](https://github.com/cmsadmins/leitvia-studio/releases).
 - For MCP: the plugin **MCP Adapter** 0.7 from WordPress.org. Without it the agent uses the REST API, see step 2.
 
 With WP-CLI on the server, the bootstrap in [workflows/new-site.md](workflows/new-site.md#bootstrap-the-operator-or-the-runner-before-the-agent) does this step and creates the agent user of step 2. For a test site on your own machine the same section starts WordPress Playground from a blueprint, without a server.
@@ -37,8 +37,8 @@ For a test or demo run on your own machine, without a server, the Playground CLI
 	"constants": { "WP_ENVIRONMENT_TYPE": "local" },
 	"siteOptions": { "permalink_structure": "/%postname%/" },
 	"steps": [
-		{ "step": "installTheme", "themeData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia/releases/download/1.2.59/leitvia-1.2.59.zip" }, "options": { "activate": true } },
-		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.54/leitvia-studio-1.3.54.zip" }, "options": { "activate": true } },
+		{ "step": "installTheme", "themeData": { "resource": "wordpress.org/themes", "slug": "leitvia" }, "options": { "activate": true } },
+		{ "step": "installPlugin", "pluginData": { "resource": "wordpress.org/plugins", "slug": "leitvia-studio" }, "options": { "activate": true } },
 		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://downloads.wordpress.org/plugin/mcp-adapter.0.7.1.zip" }, "options": { "activate": true } },
 		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://downloads.wordpress.org/plugin/woocommerce.11.2.1.zip" }, "options": { "activate": true } },
 		{ "step": "runPHP", "code": "<?php require_once '/wordpress/wp-load.php'; $id = wp_insert_user( array( 'user_login' => 'leitvia-agent', 'display_name' => 'Leitvia agent', 'user_email' => 'agent@example.org', 'user_pass' => wp_generate_password( 32 ), 'role' => 'leitvia_agent' ) ); $created = is_wp_error( $id ) ? $id : WP_Application_Passwords::create_new_application_password( $id, array( 'name' => 'leitvia agent' ) ); if ( is_wp_error( $created ) ) { throw new Exception( $created->get_error_message() ); } wp_mkdir_p( '/leitvia-run' ); file_put_contents( '/leitvia-run/agent-password.txt', $created[0] . \"\n\" );" }

@@ -1,5 +1,5 @@
 {
-	"studio": "1.3.54",
+	"studio": "1.3.55",
 	"abilities": [
 		{
 			"name": "leitvia/activate-token-set",
@@ -10648,6 +10648,11 @@
 						"minimum": 1,
 						"description": "Post ID from leitvia/list-content."
 					},
+					"archive": {
+						"type": "string",
+						"maxLength": 20,
+						"description": "In place of post: the key of a content type whose archive (the overview at its address, such as /docs/) takes the title and description, without an SEO plugin only. base_hash is empty then; like every setting it waits in a change package for a person."
+					},
 					"title": {
 						"type": "string",
 						"maxLength": 200
@@ -10674,12 +10679,11 @@
 						"description": "Key of the task: a write with a key always goes into the change package of that key, even where the autonomy would allow it live, and operations with the same key share that package."
 					}
 				},
-				"required": [
-					"post",
-					"base_hash"
-				],
 				"additionalProperties": false,
-				"type": "object"
+				"type": "object",
+				"required": [
+					"base_hash"
+				]
 			},
 			"output_schema": {
 				"type": "object",
@@ -12944,6 +12948,16 @@
 				"message": "No SEO plugin Leitvia Studio can write to is active (Yoast SEO, Rank Math, SEOPress or The SEO Framework). Change the excerpt with leitvia/update-content instead, or ask a person to install one.",
 				"next_ability": [
 					"leitvia/update-content"
+				],
+				"retry": "never"
+			},
+			{
+				"code": "leitvia_no_seo_plugin",
+				"status": 422,
+				"reason": "seo_plugin",
+				"message": "The SEO plugin keeps the titles of archives in its own settings; report the wish to the person.",
+				"next_ability": [
+					""
 				],
 				"retry": "never"
 			},

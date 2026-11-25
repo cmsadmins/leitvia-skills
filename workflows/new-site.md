@@ -9,14 +9,14 @@ Chain: [leitvia-setup](../skills/leitvia-setup/SKILL.md), then [leitvia-design](
 An empty WordPress installation has neither the theme nor Leitvia Studio, and installing them is no ability: the area `admin` stays locked for agents. The operator, or the script that starts an unattended run, prepares the site once with WP-CLI on the server (WordPress 7.1 or later, PHP 8.2 or later, HTTPS):
 
 ```sh
-wp theme install https://github.com/cmsadmins/leitvia/releases/download/1.2.59/leitvia-1.2.59.zip --activate
-wp plugin install https://github.com/cmsadmins/leitvia-studio/releases/download/1.3.54/leitvia-studio-1.3.54.zip --activate
+wp theme install leitvia --activate
+wp plugin install leitvia-studio --activate
 wp plugin install https://downloads.wordpress.org/plugin/mcp-adapter.0.7.1.zip --activate
 wp user create leitvia-agent agent@example.org --role=leitvia_agent --display_name="Leitvia agent"
 wp user application-password create leitvia-agent "leitvia agent" --porcelain
 ```
 
-Once the theme and Leitvia Studio are listed on WordPress.org, `wp theme install leitvia --activate` and `wp plugin install leitvia-studio --activate` replace the first two lines. Keep MCP Adapter at 0.7, the version Leitvia Studio supports. Leave the experiment MCP Access of the AI plugin off on this site: it installs the newest MCP Adapter from WordPress.org. The last command prints the application password once; store it as `LEITVIA_AUTH` (Base64 of `leitvia-agent:<password>`) for the agent, never in a file you commit. For a shop also `wp plugin install woocommerce --activate` before the run. The agent itself never runs WP-CLI; its first call is `leitvia/get-contract`, which proves the bootstrap worked. Zips, server check: [operator steps](new-site-operator.md).
+Theme and Leitvia Studio come from WordPress.org; a fixed version comes from the zips in the releases of cmsadmins/leitvia and cmsadmins/leitvia-studio. Keep MCP Adapter at 0.7, the version Leitvia Studio supports. Leave the experiment MCP Access of the AI plugin off on this site: it installs the newest MCP Adapter from WordPress.org. The last command prints the application password once; store it as `LEITVIA_AUTH` (Base64 of `leitvia-agent:<password>`) for the agent, never in a file you commit. For a shop also `wp plugin install woocommerce --activate` before the run. The agent itself never runs WP-CLI; its first call is `leitvia/get-contract`, which proves the bootstrap worked. Zips, server check: [operator steps](new-site-operator.md).
 
 Without a server, for a test or demo run on your own machine: [WordPress Playground](../README.md#test-site-with-wordpress-playground) from a blueprint.
 
