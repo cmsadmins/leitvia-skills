@@ -1,5 +1,5 @@
 {
-	"studio": "1.3.58",
+	"studio": "1.3.59",
 	"abilities": [
 		{
 			"name": "leitvia/activate-token-set",
@@ -628,7 +628,7 @@
 		{
 			"name": "leitvia/check-composition",
 			"label": "Check composition",
-			"description": "Scores a page against the composition rules of the contract: pass pattern slugs in page order (block:<ID> for a Lab pattern; only approved ones count as known), or a post ID to read the sections of a saved page from metadata.patternName. A saved page counts as built: the ground each section sets (backgroundColor, block style Inverse) instead of the tone of its pattern, and the side of its media (block style Media right). With slugs, name both yourself: tones for the sections an edit will give another ground, mirrored for those it will give the block style Media right, each by 0-based index. Text, lists, images, galleries and accordions between the sections are running text and no finding. A section with a video, a gallery or a wide image is a break and stands outside the density run. With frame (or the frame a saved page was composed for) the page also needs a section of every kind the page frame requires (missingSection, 10 points) and is told about the kinds it recommends (recommendedSection, no points); both carry the kind and the index after the last section, and their suggestions name patterns to add. Returns the findings (rule, 0-based section index, for a post the block ID, and what to do), the score from 100 down, the minimum score for autonomous writes and per finding up to three patterns that would fix it. For a post also unregistered: block types that render nothing, the finding newsTopic (no points) when the page has the pattern Related news without a topic of its news, and the finding firstScreen (no points) when the heading or the text before the first button of the stage is longer than its pattern allows, so the button may fall below the first screen.",
+			"description": "Scores a page against the composition rules of the contract: pass pattern slugs in page order (block:<ID> for a Lab pattern; only approved ones count as known), or a post ID to read the sections of a saved page from metadata.patternName. A saved page counts as built: the ground each section sets (backgroundColor, block style Inverse) instead of the tone of its pattern, and the side of its media (block style Media right). With slugs, name both yourself: tones for the sections an edit will give another ground, mirrored for those it will give the block style Media right, each by 0-based index. Text, lists, images, galleries and accordions between the sections are running text and no finding. A section with a video, a gallery or a wide image is a break and stands outside the density run. With frame (or the frame a saved page was composed for) the page also needs a section of every kind the page frame requires (missingSection, 10 points) and is told about the kinds it recommends (recommendedSection, no points); both carry the kind and the index after the last section, and their suggestions name patterns to add. Returns the findings (rule, 0-based section index, for a post the block ID, and what to do), the score from 100 down, the minimum score for autonomous writes and per finding up to three patterns that would fix it. For a post also unregistered: block types that render nothing, the finding newsTopic (no points) when the page has the pattern Related news without a topic of its news, and the finding firstScreen (no points) when the first button of the stage ends below the first screen at 1440 x 900 or 390 x 844: estimated from the lines of the heading and the text before it with the measured model of the stage pattern and the service bar of the header, or for a stage without a model from the lengths its pattern allows.",
 			"category": "leitvia",
 			"group": "read",
 			"input_schema": {
@@ -835,6 +835,33 @@
 												"maxLength": 100,
 												"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
 											},
+											"bind": {
+												"type": "object",
+												"maxProperties": 5,
+												"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+												"additionalProperties": {
+													"type": [
+														"object",
+														"null"
+													],
+													"properties": {
+														"source": {
+															"type": "string",
+															"minLength": 1,
+															"maxLength": 100,
+															"description": "Name of a registered binding source."
+														},
+														"args": {
+															"type": "object",
+															"description": "Arguments of the source, such as key."
+														}
+													},
+													"required": [
+														"source"
+													],
+													"additionalProperties": false
+												}
+											},
 											"table": {
 												"type": "object",
 												"description": "All cells of a core/table or leitvia/comparison-table as plain text: head (the column headers), rows (each as long as head) and for core/table foot (a highlighted closing row, such as a total). The table is rebuilt accessibly: column headers with scope col, the first cell of each row as row header with scope row (row_headers false for none). The caption goes in caption of the same edit. On small screens core tables scroll inside a focusable region, the comparison table turns into cards.",
@@ -967,7 +994,7 @@
 													"block": {
 														"type": "string",
 														"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
-														"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator or core/site-logo. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+														"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator, core/site-logo, core/buttons (inner: one or two core/button) or core/button (text and url; className is-style-outline for the second one). Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
 													},
 													"text": {
 														"type": "string",
@@ -1050,6 +1077,33 @@
 														"maxLength": 100,
 														"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
 													},
+													"bind": {
+														"type": "object",
+														"maxProperties": 5,
+														"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+														"additionalProperties": {
+															"type": [
+																"object",
+																"null"
+															],
+															"properties": {
+																"source": {
+																	"type": "string",
+																	"minLength": 1,
+																	"maxLength": 100,
+																	"description": "Name of a registered binding source."
+																},
+																"args": {
+																	"type": "object",
+																	"description": "Arguments of the source, such as key."
+																}
+															},
+															"required": [
+																"source"
+															],
+															"additionalProperties": false
+														}
+													},
 													"inner": {
 														"type": "array",
 														"minItems": 1,
@@ -1061,7 +1115,7 @@
 																"block": {
 																	"type": "string",
 																	"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
-																	"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator or core/site-logo. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+																	"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator, core/site-logo, core/buttons (inner: one or two core/button) or core/button (text and url; className is-style-outline for the second one). Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
 																},
 																"text": {
 																	"type": "string",
@@ -1144,6 +1198,33 @@
 																	"maxLength": 100,
 																	"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
 																},
+																"bind": {
+																	"type": "object",
+																	"maxProperties": 5,
+																	"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+																	"additionalProperties": {
+																		"type": [
+																			"object",
+																			"null"
+																		],
+																		"properties": {
+																			"source": {
+																				"type": "string",
+																				"minLength": 1,
+																				"maxLength": 100,
+																				"description": "Name of a registered binding source."
+																			},
+																			"args": {
+																				"type": "object",
+																				"description": "Arguments of the source, such as key."
+																			}
+																		},
+																		"required": [
+																			"source"
+																		],
+																		"additionalProperties": false
+																	}
+																},
 																"inner": {
 																	"type": "array",
 																	"minItems": 1,
@@ -1155,7 +1236,7 @@
 																			"block": {
 																				"type": "string",
 																				"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
-																				"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator or core/site-logo. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+																				"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator, core/site-logo, core/buttons (inner: one or two core/button) or core/button (text and url; className is-style-outline for the second one). Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
 																			},
 																			"text": {
 																				"type": "string",
@@ -1237,6 +1318,33 @@
 																				],
 																				"maxLength": 100,
 																				"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+																			},
+																			"bind": {
+																				"type": "object",
+																				"maxProperties": 5,
+																				"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+																				"additionalProperties": {
+																					"type": [
+																						"object",
+																						"null"
+																					],
+																					"properties": {
+																						"source": {
+																							"type": "string",
+																							"minLength": 1,
+																							"maxLength": 100,
+																							"description": "Name of a registered binding source."
+																						},
+																						"args": {
+																							"type": "object",
+																							"description": "Arguments of the source, such as key."
+																						}
+																					},
+																					"required": [
+																						"source"
+																					],
+																					"additionalProperties": false
+																				}
 																			}
 																		},
 																		"required": [
@@ -1511,6 +1619,33 @@
 												"maxLength": 100,
 												"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
 											},
+											"bind": {
+												"type": "object",
+												"maxProperties": 5,
+												"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+												"additionalProperties": {
+													"type": [
+														"object",
+														"null"
+													],
+													"properties": {
+														"source": {
+															"type": "string",
+															"minLength": 1,
+															"maxLength": 100,
+															"description": "Name of a registered binding source."
+														},
+														"args": {
+															"type": "object",
+															"description": "Arguments of the source, such as key."
+														}
+													},
+													"required": [
+														"source"
+													],
+													"additionalProperties": false
+												}
+											},
 											"table": {
 												"type": "object",
 												"description": "All cells of a core/table or leitvia/comparison-table as plain text: head (the column headers), rows (each as long as head) and for core/table foot (a highlighted closing row, such as a total). The table is rebuilt accessibly: column headers with scope col, the first cell of each row as row header with scope row (row_headers false for none). The caption goes in caption of the same edit. On small screens core tables scroll inside a focusable region, the comparison table turns into cards.",
@@ -1643,7 +1778,7 @@
 													"block": {
 														"type": "string",
 														"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
-														"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator or core/site-logo. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+														"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator, core/site-logo, core/buttons (inner: one or two core/button) or core/button (text and url; className is-style-outline for the second one). Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
 													},
 													"text": {
 														"type": "string",
@@ -1726,6 +1861,33 @@
 														"maxLength": 100,
 														"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
 													},
+													"bind": {
+														"type": "object",
+														"maxProperties": 5,
+														"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+														"additionalProperties": {
+															"type": [
+																"object",
+																"null"
+															],
+															"properties": {
+																"source": {
+																	"type": "string",
+																	"minLength": 1,
+																	"maxLength": 100,
+																	"description": "Name of a registered binding source."
+																},
+																"args": {
+																	"type": "object",
+																	"description": "Arguments of the source, such as key."
+																}
+															},
+															"required": [
+																"source"
+															],
+															"additionalProperties": false
+														}
+													},
 													"inner": {
 														"type": "array",
 														"minItems": 1,
@@ -1737,7 +1899,7 @@
 																"block": {
 																	"type": "string",
 																	"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
-																	"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator or core/site-logo. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+																	"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator, core/site-logo, core/buttons (inner: one or two core/button) or core/button (text and url; className is-style-outline for the second one). Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
 																},
 																"text": {
 																	"type": "string",
@@ -1820,6 +1982,33 @@
 																	"maxLength": 100,
 																	"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
 																},
+																"bind": {
+																	"type": "object",
+																	"maxProperties": 5,
+																	"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+																	"additionalProperties": {
+																		"type": [
+																			"object",
+																			"null"
+																		],
+																		"properties": {
+																			"source": {
+																				"type": "string",
+																				"minLength": 1,
+																				"maxLength": 100,
+																				"description": "Name of a registered binding source."
+																			},
+																			"args": {
+																				"type": "object",
+																				"description": "Arguments of the source, such as key."
+																			}
+																		},
+																		"required": [
+																			"source"
+																		],
+																		"additionalProperties": false
+																	}
+																},
 																"inner": {
 																	"type": "array",
 																	"minItems": 1,
@@ -1831,7 +2020,7 @@
 																			"block": {
 																				"type": "string",
 																				"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
-																				"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator or core/site-logo. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+																				"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator, core/site-logo, core/buttons (inner: one or two core/button) or core/button (text and url; className is-style-outline for the second one). Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
 																			},
 																			"text": {
 																				"type": "string",
@@ -1913,6 +2102,33 @@
 																				],
 																				"maxLength": 100,
 																				"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+																			},
+																			"bind": {
+																				"type": "object",
+																				"maxProperties": 5,
+																				"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+																				"additionalProperties": {
+																					"type": [
+																						"object",
+																						"null"
+																					],
+																					"properties": {
+																						"source": {
+																							"type": "string",
+																							"minLength": 1,
+																							"maxLength": 100,
+																							"description": "Name of a registered binding source."
+																						},
+																						"args": {
+																							"type": "object",
+																							"description": "Arguments of the source, such as key."
+																						}
+																					},
+																					"required": [
+																						"source"
+																					],
+																					"additionalProperties": false
+																				}
 																			}
 																		},
 																		"required": [
@@ -3588,7 +3804,7 @@
 		{
 			"name": "leitvia/get-page-outline",
 			"label": "Get page outline",
-			"description": "Returns a post as a compact block tree: per block the ID, name, pattern, the first 80 characters of text (with text_hash of the whole text when it is longer), the link targets of the block itself (links, only when it has any), for image and cover blocks the image with attachment ID, alt text and decorative mark, size, hash and children. shortcodes: unhandled shortcodes per block. Blocks without a stable ID have a path ID such as p:0.2.1 until the next save. Use the document hash as base_hash for changes and get-block for full attributes.",
+			"description": "Returns a post as a compact block tree: per block the ID, name, pattern, the first 80 characters of text (when it is longer with text_truncated true, text_length and text_hash of the whole text, which leitvia/get-block returns), the link targets of the block itself (links, only when it has any), for image and cover blocks the image with attachment ID, alt text and decorative mark, size, hash and children. shortcodes: unhandled shortcodes per block. Blocks without a stable ID have a path ID such as p:0.2.1 until the next save. Use the document hash as base_hash for changes and get-block for full attributes.",
 			"category": "leitvia",
 			"group": "read",
 			"input_schema": {
@@ -3634,6 +3850,13 @@
 						"items": {
 							"type": "object",
 							"properties": {
+								"text_truncated": {
+									"type": "boolean",
+									"description": "Only when text was cut: true, and text_length counts the characters of the whole text. Read the whole text with leitvia/get-block before reusing it."
+								},
+								"text_length": {
+									"type": "integer"
+								},
 								"text_hash": {
 									"type": "string",
 									"description": "Only when text was cut: the first 16 hex characters of the SHA-256 of the whole text, tags stripped, entities decoded, white space collapsed to single spaces and trimmed."
@@ -3686,7 +3909,7 @@
 		{
 			"name": "leitvia/get-pattern",
 			"label": "Get pattern",
-			"description": "Returns one pattern of the theme or of Leitvia Studio with its markup, metadata and the first 20 posts and templates that use it (more is true when there are further ones). Template patterns come with their templateTypes.",
+			"description": "Returns one pattern of the theme or of Leitvia Studio with its markup, metadata and the first 20 posts and templates that use it (more is true when there are further ones). Template patterns come with their templateTypes, patterns for a template part area that the list leaves out (such as the panels of a mega menu, megaMenu.patterns of leitvia/get-contract) with their blockTypes; the path IDs of their blocks (p:0.1.2) are those of the edits of leitvia/update-template-part.",
 			"category": "leitvia",
 			"group": "read",
 			"input_schema": {
@@ -4509,6 +4732,33 @@
 												"maxLength": 100,
 												"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
 											},
+											"bind": {
+												"type": "object",
+												"maxProperties": 5,
+												"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+												"additionalProperties": {
+													"type": [
+														"object",
+														"null"
+													],
+													"properties": {
+														"source": {
+															"type": "string",
+															"minLength": 1,
+															"maxLength": 100,
+															"description": "Name of a registered binding source."
+														},
+														"args": {
+															"type": "object",
+															"description": "Arguments of the source, such as key."
+														}
+													},
+													"required": [
+														"source"
+													],
+													"additionalProperties": false
+												}
+											},
 											"table": {
 												"type": "object",
 												"description": "All cells of a core/table or leitvia/comparison-table as plain text: head (the column headers), rows (each as long as head) and for core/table foot (a highlighted closing row, such as a total). The table is rebuilt accessibly: column headers with scope col, the first cell of each row as row header with scope row (row_headers false for none). The caption goes in caption of the same edit. On small screens core tables scroll inside a focusable region, the comparison table turns into cards.",
@@ -4641,7 +4891,7 @@
 													"block": {
 														"type": "string",
 														"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
-														"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator or core/site-logo. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+														"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator, core/site-logo, core/buttons (inner: one or two core/button) or core/button (text and url; className is-style-outline for the second one). Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
 													},
 													"text": {
 														"type": "string",
@@ -4724,6 +4974,33 @@
 														"maxLength": 100,
 														"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
 													},
+													"bind": {
+														"type": "object",
+														"maxProperties": 5,
+														"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+														"additionalProperties": {
+															"type": [
+																"object",
+																"null"
+															],
+															"properties": {
+																"source": {
+																	"type": "string",
+																	"minLength": 1,
+																	"maxLength": 100,
+																	"description": "Name of a registered binding source."
+																},
+																"args": {
+																	"type": "object",
+																	"description": "Arguments of the source, such as key."
+																}
+															},
+															"required": [
+																"source"
+															],
+															"additionalProperties": false
+														}
+													},
 													"inner": {
 														"type": "array",
 														"minItems": 1,
@@ -4735,7 +5012,7 @@
 																"block": {
 																	"type": "string",
 																	"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
-																	"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator or core/site-logo. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+																	"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator, core/site-logo, core/buttons (inner: one or two core/button) or core/button (text and url; className is-style-outline for the second one). Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
 																},
 																"text": {
 																	"type": "string",
@@ -4818,6 +5095,33 @@
 																	"maxLength": 100,
 																	"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
 																},
+																"bind": {
+																	"type": "object",
+																	"maxProperties": 5,
+																	"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+																	"additionalProperties": {
+																		"type": [
+																			"object",
+																			"null"
+																		],
+																		"properties": {
+																			"source": {
+																				"type": "string",
+																				"minLength": 1,
+																				"maxLength": 100,
+																				"description": "Name of a registered binding source."
+																			},
+																			"args": {
+																				"type": "object",
+																				"description": "Arguments of the source, such as key."
+																			}
+																		},
+																		"required": [
+																			"source"
+																		],
+																		"additionalProperties": false
+																	}
+																},
 																"inner": {
 																	"type": "array",
 																	"minItems": 1,
@@ -4829,7 +5133,7 @@
 																			"block": {
 																				"type": "string",
 																				"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
-																				"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator or core/site-logo. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+																				"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator, core/site-logo, core/buttons (inner: one or two core/button) or core/button (text and url; className is-style-outline for the second one). Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
 																			},
 																			"text": {
 																				"type": "string",
@@ -4911,6 +5215,33 @@
 																				],
 																				"maxLength": 100,
 																				"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+																			},
+																			"bind": {
+																				"type": "object",
+																				"maxProperties": 5,
+																				"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+																				"additionalProperties": {
+																					"type": [
+																						"object",
+																						"null"
+																					],
+																					"properties": {
+																						"source": {
+																							"type": "string",
+																							"minLength": 1,
+																							"maxLength": 100,
+																							"description": "Name of a registered binding source."
+																						},
+																						"args": {
+																							"type": "object",
+																							"description": "Arguments of the source, such as key."
+																						}
+																					},
+																					"required": [
+																						"source"
+																					],
+																					"additionalProperties": false
+																				}
 																			}
 																		},
 																		"required": [
@@ -6413,6 +6744,33 @@
 									"maxLength": 100,
 									"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
 								},
+								"bind": {
+									"type": "object",
+									"maxProperties": 5,
+									"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+									"additionalProperties": {
+										"type": [
+											"object",
+											"null"
+										],
+										"properties": {
+											"source": {
+												"type": "string",
+												"minLength": 1,
+												"maxLength": 100,
+												"description": "Name of a registered binding source."
+											},
+											"args": {
+												"type": "object",
+												"description": "Arguments of the source, such as key."
+											}
+										},
+										"required": [
+											"source"
+										],
+										"additionalProperties": false
+									}
+								},
 								"table": {
 									"type": "object",
 									"description": "All cells of a core/table or leitvia/comparison-table as plain text: head (the column headers), rows (each as long as head) and for core/table foot (a highlighted closing row, such as a total). The table is rebuilt accessibly: column headers with scope col, the first cell of each row as row header with scope row (row_headers false for none). The caption goes in caption of the same edit. On small screens core tables scroll inside a focusable region, the comparison table turns into cards.",
@@ -6545,7 +6903,7 @@
 										"block": {
 											"type": "string",
 											"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
-											"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator or core/site-logo. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+											"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator, core/site-logo, core/buttons (inner: one or two core/button) or core/button (text and url; className is-style-outline for the second one). Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
 										},
 										"text": {
 											"type": "string",
@@ -6628,6 +6986,33 @@
 											"maxLength": 100,
 											"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
 										},
+										"bind": {
+											"type": "object",
+											"maxProperties": 5,
+											"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+											"additionalProperties": {
+												"type": [
+													"object",
+													"null"
+												],
+												"properties": {
+													"source": {
+														"type": "string",
+														"minLength": 1,
+														"maxLength": 100,
+														"description": "Name of a registered binding source."
+													},
+													"args": {
+														"type": "object",
+														"description": "Arguments of the source, such as key."
+													}
+												},
+												"required": [
+													"source"
+												],
+												"additionalProperties": false
+											}
+										},
 										"inner": {
 											"type": "array",
 											"minItems": 1,
@@ -6639,7 +7024,7 @@
 													"block": {
 														"type": "string",
 														"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
-														"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator or core/site-logo. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+														"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator, core/site-logo, core/buttons (inner: one or two core/button) or core/button (text and url; className is-style-outline for the second one). Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
 													},
 													"text": {
 														"type": "string",
@@ -6722,6 +7107,33 @@
 														"maxLength": 100,
 														"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
 													},
+													"bind": {
+														"type": "object",
+														"maxProperties": 5,
+														"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+														"additionalProperties": {
+															"type": [
+																"object",
+																"null"
+															],
+															"properties": {
+																"source": {
+																	"type": "string",
+																	"minLength": 1,
+																	"maxLength": 100,
+																	"description": "Name of a registered binding source."
+																},
+																"args": {
+																	"type": "object",
+																	"description": "Arguments of the source, such as key."
+																}
+															},
+															"required": [
+																"source"
+															],
+															"additionalProperties": false
+														}
+													},
 													"inner": {
 														"type": "array",
 														"minItems": 1,
@@ -6733,7 +7145,7 @@
 																"block": {
 																	"type": "string",
 																	"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
-																	"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator or core/site-logo. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+																	"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator, core/site-logo, core/buttons (inner: one or two core/button) or core/button (text and url; className is-style-outline for the second one). Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
 																},
 																"text": {
 																	"type": "string",
@@ -6815,6 +7227,33 @@
 																	],
 																	"maxLength": 100,
 																	"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+																},
+																"bind": {
+																	"type": "object",
+																	"maxProperties": 5,
+																	"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+																	"additionalProperties": {
+																		"type": [
+																			"object",
+																			"null"
+																		],
+																		"properties": {
+																			"source": {
+																				"type": "string",
+																				"minLength": 1,
+																				"maxLength": 100,
+																				"description": "Name of a registered binding source."
+																			},
+																			"args": {
+																				"type": "object",
+																				"description": "Arguments of the source, such as key."
+																			}
+																		},
+																		"required": [
+																			"source"
+																		],
+																		"additionalProperties": false
+																	}
 																}
 															},
 															"required": [
@@ -9408,6 +9847,33 @@
 						"maxLength": 100,
 						"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
 					},
+					"bind": {
+						"type": "object",
+						"maxProperties": 5,
+						"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+						"additionalProperties": {
+							"type": [
+								"object",
+								"null"
+							],
+							"properties": {
+								"source": {
+									"type": "string",
+									"minLength": 1,
+									"maxLength": 100,
+									"description": "Name of a registered binding source."
+								},
+								"args": {
+									"type": "object",
+									"description": "Arguments of the source, such as key."
+								}
+							},
+							"required": [
+								"source"
+							],
+							"additionalProperties": false
+						}
+					},
 					"table": {
 						"type": "object",
 						"description": "All cells of a core/table or leitvia/comparison-table as plain text: head (the column headers), rows (each as long as head) and for core/table foot (a highlighted closing row, such as a total). The table is rebuilt accessibly: column headers with scope col, the first cell of each row as row header with scope row (row_headers false for none). The caption goes in caption of the same edit. On small screens core tables scroll inside a focusable region, the comparison table turns into cards.",
@@ -11108,7 +11574,7 @@
 		{
 			"name": "leitvia/update-template-part",
 			"label": "Update template part",
-			"description": "Replaces a template part of the contract, such as header, footer or sidebar, with a pattern made for its area or with changed block markup. Part names come from leitvia/get-contract; with Polylang <part>-<language> (header-de) is the part the theme shows for that language and is created in the area of its part. A panel of a mega menu is a part named mega-menu-<name> (or one listed under megaMenu.panels of leitvia/get-contract), created in the area Mega menu on the first write; fill it with a pattern of megaMenu.patterns and edits, then link it with leitvia/update-navigation (type mega, panel). Patterns come from leitvia/list-patterns; edits change the pattern at block IDs of leitvia/get-pattern first, as the sections of leitvia/compose-page do, so a footer or header needs no markup of its own. The change publishes the part, a draft one too: core shows no draft part, so where the area level is draft it waits in a change package. The base hash is the hash of the template part. leitvia/get-contract returns it per part under hashes.templateParts.",
+			"description": "Replaces a template part of the contract, such as header, footer or sidebar, with a pattern made for its area or with changed block markup. Part names come from leitvia/get-contract; with Polylang <part>-<language> (header-de) is the part the theme shows for that language and is created in the area of its part. A panel of a mega menu is a part named mega-menu-<name> (or one listed under megaMenu.panels of leitvia/get-contract), created in the area Mega menu on the first write; fill it with a pattern of megaMenu.patterns and edits, then link it with leitvia/update-navigation (type mega, panel); delete true moves a panel no mega menu item opens to the trash. Patterns come from leitvia/list-patterns; edits change the pattern at block IDs of leitvia/get-pattern first, as the sections of leitvia/compose-page do, so a footer or header needs no markup of its own. The change publishes the part, a draft one too: core shows no draft part, so where the area level is draft it waits in a change package. The base hash is the hash of the template part. leitvia/get-contract returns it per part under hashes.templateParts.",
 			"category": "leitvia",
 			"group": "setup",
 			"input_schema": {
@@ -11185,6 +11651,33 @@
 									],
 									"maxLength": 100,
 									"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+								},
+								"bind": {
+									"type": "object",
+									"maxProperties": 5,
+									"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+									"additionalProperties": {
+										"type": [
+											"object",
+											"null"
+										],
+										"properties": {
+											"source": {
+												"type": "string",
+												"minLength": 1,
+												"maxLength": 100,
+												"description": "Name of a registered binding source."
+											},
+											"args": {
+												"type": "object",
+												"description": "Arguments of the source, such as key."
+											}
+										},
+										"required": [
+											"source"
+										],
+										"additionalProperties": false
+									}
 								},
 								"table": {
 									"type": "object",
@@ -11318,7 +11811,7 @@
 										"block": {
 											"type": "string",
 											"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
-											"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator or core/site-logo. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+											"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator, core/site-logo, core/buttons (inner: one or two core/button) or core/button (text and url; className is-style-outline for the second one). Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
 										},
 										"text": {
 											"type": "string",
@@ -11401,6 +11894,33 @@
 											"maxLength": 100,
 											"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
 										},
+										"bind": {
+											"type": "object",
+											"maxProperties": 5,
+											"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+											"additionalProperties": {
+												"type": [
+													"object",
+													"null"
+												],
+												"properties": {
+													"source": {
+														"type": "string",
+														"minLength": 1,
+														"maxLength": 100,
+														"description": "Name of a registered binding source."
+													},
+													"args": {
+														"type": "object",
+														"description": "Arguments of the source, such as key."
+													}
+												},
+												"required": [
+													"source"
+												],
+												"additionalProperties": false
+											}
+										},
 										"inner": {
 											"type": "array",
 											"minItems": 1,
@@ -11412,7 +11932,7 @@
 													"block": {
 														"type": "string",
 														"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
-														"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator or core/site-logo. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+														"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator, core/site-logo, core/buttons (inner: one or two core/button) or core/button (text and url; className is-style-outline for the second one). Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
 													},
 													"text": {
 														"type": "string",
@@ -11495,6 +12015,33 @@
 														"maxLength": 100,
 														"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
 													},
+													"bind": {
+														"type": "object",
+														"maxProperties": 5,
+														"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+														"additionalProperties": {
+															"type": [
+																"object",
+																"null"
+															],
+															"properties": {
+																"source": {
+																	"type": "string",
+																	"minLength": 1,
+																	"maxLength": 100,
+																	"description": "Name of a registered binding source."
+																},
+																"args": {
+																	"type": "object",
+																	"description": "Arguments of the source, such as key."
+																}
+															},
+															"required": [
+																"source"
+															],
+															"additionalProperties": false
+														}
+													},
 													"inner": {
 														"type": "array",
 														"minItems": 1,
@@ -11506,7 +12053,7 @@
 																"block": {
 																	"type": "string",
 																	"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
-																	"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator or core/site-logo. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+																	"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator, core/site-logo, core/buttons (inner: one or two core/button) or core/button (text and url; className is-style-outline for the second one). Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
 																},
 																"text": {
 																	"type": "string",
@@ -11588,6 +12135,33 @@
 																	],
 																	"maxLength": 100,
 																	"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+																},
+																"bind": {
+																	"type": "object",
+																	"maxProperties": 5,
+																	"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+																	"additionalProperties": {
+																		"type": [
+																			"object",
+																			"null"
+																		],
+																		"properties": {
+																			"source": {
+																				"type": "string",
+																				"minLength": 1,
+																				"maxLength": 100,
+																				"description": "Name of a registered binding source."
+																			},
+																			"args": {
+																				"type": "object",
+																				"description": "Arguments of the source, such as key."
+																			}
+																		},
+																		"required": [
+																			"source"
+																		],
+																		"additionalProperties": false
+																	}
 																}
 															},
 															"required": [
@@ -11623,6 +12197,10 @@
 					"content": {
 						"type": "string",
 						"minLength": 1
+					},
+					"delete": {
+						"type": "boolean",
+						"description": "Only for a saved panel of a mega menu (mega-menu-<name>) and without pattern, edits or content: moves the panel to the trash, refused while a mega menu item of a menu, template or template part opens it. A rollback brings it back."
 					},
 					"base_hash": {
 						"type": "string",
@@ -11808,6 +12386,33 @@
 									"maxLength": 100,
 									"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
 								},
+								"bind": {
+									"type": "object",
+									"maxProperties": 5,
+									"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+									"additionalProperties": {
+										"type": [
+											"object",
+											"null"
+										],
+										"properties": {
+											"source": {
+												"type": "string",
+												"minLength": 1,
+												"maxLength": 100,
+												"description": "Name of a registered binding source."
+											},
+											"args": {
+												"type": "object",
+												"description": "Arguments of the source, such as key."
+											}
+										},
+										"required": [
+											"source"
+										],
+										"additionalProperties": false
+									}
+								},
 								"table": {
 									"type": "object",
 									"description": "All cells of a core/table or leitvia/comparison-table as plain text: head (the column headers), rows (each as long as head) and for core/table foot (a highlighted closing row, such as a total). The table is rebuilt accessibly: column headers with scope col, the first cell of each row as row header with scope row (row_headers false for none). The caption goes in caption of the same edit. On small screens core tables scroll inside a focusable region, the comparison table turns into cards.",
@@ -11940,7 +12545,7 @@
 										"block": {
 											"type": "string",
 											"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
-											"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator or core/site-logo. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+											"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator, core/site-logo, core/buttons (inner: one or two core/button) or core/button (text and url; className is-style-outline for the second one). Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
 										},
 										"text": {
 											"type": "string",
@@ -12023,6 +12628,33 @@
 											"maxLength": 100,
 											"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
 										},
+										"bind": {
+											"type": "object",
+											"maxProperties": 5,
+											"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+											"additionalProperties": {
+												"type": [
+													"object",
+													"null"
+												],
+												"properties": {
+													"source": {
+														"type": "string",
+														"minLength": 1,
+														"maxLength": 100,
+														"description": "Name of a registered binding source."
+													},
+													"args": {
+														"type": "object",
+														"description": "Arguments of the source, such as key."
+													}
+												},
+												"required": [
+													"source"
+												],
+												"additionalProperties": false
+											}
+										},
 										"inner": {
 											"type": "array",
 											"minItems": 1,
@@ -12034,7 +12666,7 @@
 													"block": {
 														"type": "string",
 														"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
-														"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator or core/site-logo. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+														"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator, core/site-logo, core/buttons (inner: one or two core/button) or core/button (text and url; className is-style-outline for the second one). Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
 													},
 													"text": {
 														"type": "string",
@@ -12117,6 +12749,33 @@
 														"maxLength": 100,
 														"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
 													},
+													"bind": {
+														"type": "object",
+														"maxProperties": 5,
+														"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+														"additionalProperties": {
+															"type": [
+																"object",
+																"null"
+															],
+															"properties": {
+																"source": {
+																	"type": "string",
+																	"minLength": 1,
+																	"maxLength": 100,
+																	"description": "Name of a registered binding source."
+																},
+																"args": {
+																	"type": "object",
+																	"description": "Arguments of the source, such as key."
+																}
+															},
+															"required": [
+																"source"
+															],
+															"additionalProperties": false
+														}
+													},
 													"inner": {
 														"type": "array",
 														"minItems": 1,
@@ -12128,7 +12787,7 @@
 																"block": {
 																	"type": "string",
 																	"pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
-																	"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator or core/site-logo. Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
+																	"description": "Name of a block from leitvia/list-blocks, such as leitvia/consent-embed, or core/paragraph, core/heading, core/separator, core/site-logo, core/buttons (inner: one or two core/button) or core/button (text and url; className is-style-outline for the second one). Inner blocks may also be other blocks that render on the server, such as gravityforms/form."
 																},
 																"text": {
 																	"type": "string",
@@ -12210,6 +12869,33 @@
 																	],
 																	"maxLength": 100,
 																	"description": "HTML anchor (id) of a block with the support anchor, unique on the page, such as contact-form for links to #contact-form; empty or null removes it."
+																},
+																"bind": {
+																	"type": "object",
+																	"maxProperties": 5,
+																	"description": "Block bindings per attribute, written to metadata.bindings: {\"content\": {\"source\": …, \"args\": {…}}} shows a value of the source in place of the saved text, such as a field, a site setting or, with an add-on, a price; null removes the binding of that attribute. Sources and bindable attributes come from leitvia/get-content-model (bindings). The text of the same edit stays as the saved fallback.",
+																	"additionalProperties": {
+																		"type": [
+																			"object",
+																			"null"
+																		],
+																		"properties": {
+																			"source": {
+																				"type": "string",
+																				"minLength": 1,
+																				"maxLength": 100,
+																				"description": "Name of a registered binding source."
+																			},
+																			"args": {
+																				"type": "object",
+																				"description": "Arguments of the source, such as key."
+																			}
+																		},
+																		"required": [
+																			"source"
+																		],
+																		"additionalProperties": false
+																	}
 																}
 															},
 															"required": [
@@ -12803,7 +13489,7 @@
 				"code": "leitvia_invalid_input",
 				"status": 422,
 				"reason": "change",
-				"message": "Name what to change: name, description, icon or page.",
+				"message": "Name what to change: name, description, icon, page or order.",
 				"next_ability": [
 					""
 				],
@@ -13104,6 +13790,16 @@
 				"message": "There is no post, page or entry with this ID that agents can read. Take the ID from leitvia/list-content; files go with leitvia/delete-media.",
 				"next_ability": [
 					"leitvia/list-content"
+				],
+				"retry": "once"
+			},
+			{
+				"code": "leitvia_not_found",
+				"status": 404,
+				"reason": "part",
+				"message": "There is no saved panel with this name. leitvia/get-contract lists the panels under megaMenu.panels.",
+				"next_ability": [
+					"leitvia/get-contract"
 				],
 				"retry": "once"
 			},

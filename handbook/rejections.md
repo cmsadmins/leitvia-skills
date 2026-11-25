@@ -1,6 +1,6 @@
 # Rejections
 
-Generated from Leitvia Studio 1.3.58. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
+Generated from Leitvia Studio 1.3.59. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).
 
 Every rejection of Leitvia Studio with its retry rule and next ability. Messages with `%s` or `%d` get a value at run time; codes with several rows come from several places.
 
@@ -50,7 +50,7 @@ Leitvia uses one code per kind of failure, not one per field as in the error voc
 | `leitvia_invalid_input` | 422 | `never` | none | Every form key needs lower case letters, digits or hyphens and a group name of 1 to 160 characters. |
 | `leitvia_invalid_input` | 422 | `never` | none | Every kind needs a key of lower case letters, digits or hyphens, a name, at least one duration of 15, 30 or 60 minutes, at least one time window as HH:MM from and to, and a place: phone, or link with an https link_url. |
 | `leitvia_invalid_input` | 422 | `never` | none | Every product needs a unique article number, a name, a net price of 0 or more and one to six terms between 1 and 120 months. |
-| `leitvia_invalid_input` | 422 | `never` | none | Name what to change: name, description, icon or page. |
+| `leitvia_invalid_input` | 422 | `never` | none | Name what to change: name, description, icon, page or order. |
 | `leitvia_invalid_input` | 422 | `never` | none | No link needs or allows a repair. The report lists external links, internal links that could not be resolved and links that lead nowhere. |
 | `leitvia_invalid_input` | 422 | `never` | set at run time | No post imported here has the address in parent_source, nor does an operation of the open package with this package key. Import the parent first, in the same package or applied, then the child; without that the child would land at the top level. |
 | `leitvia_invalid_input` | 400 | `once` | `leitvia/list-patterns` | Pass pattern slugs, or a post whose sections come from patterns. |
@@ -81,6 +81,7 @@ Leitvia uses one code per kind of failure, not one per field as in the error voc
 | `leitvia_not_found` | 404 | `once` | `leitvia/list-media` | There is no file with this ID in the media library. List the media for the current IDs. |
 | `leitvia_not_found` | 404 | `once` | `leitvia/list-patterns` | There is no pattern with this slug. List the patterns for the current slugs. |
 | `leitvia_not_found` | 404 | `once` | `leitvia/list-content` | There is no post, page or entry with this ID that agents can read. Take the ID from leitvia/list-content; files go with leitvia/delete-media. |
+| `leitvia_not_found` | 404 | `once` | `leitvia/get-contract` | There is no saved panel with this name. leitvia/get-contract lists the panels under megaMenu.panels. |
 | `leitvia_not_found` | 404 | `once` | `leitvia/get-page-outline` | There is no top-level section with this ID. Read the outline for the current IDs. |
 | `leitvia_out_of_scope` | 403 | `never` | none | Agents may not change this object. Only published or draft content of the allowed post types is open to them. |
 | `leitvia_out_of_scope` | 403 | `never` | none | Agents may not read this object. Only published or draft content of the allowed post types is open to them. |
