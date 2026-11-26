@@ -7,7 +7,7 @@ Agent skills and workflows for WordPress sites with the theme Leitvia and the pl
 | Folder | Content |
 |---|---|
 | `skills/` | Eleven skills in the Agent Skills format, one folder each with a short `SKILL.md` and, under `references/`, the details it names when they are needed: `leitvia-setup`, `leitvia-design`, `leitvia-page`, `leitvia-pattern`, `leitvia-maintain`, `leitvia-a11y`, `leitvia-migrate`, `leitvia-shop`, `leitvia-news`, `leitvia-seo-geo`, `leitvia-report`. `leitvia-a11y` also brings `scripts/check-pages.mjs`, a [page check](skills/leitvia-a11y/references/page-check.md) of many public pages in one browser (widths 1920 to 320 px, axe, other hosts, squeezed text, words and links against the old site). |
-| `workflows/` | `new-site`, `maintenance-cycle` and `migrate-site`: several skills in a row with fixed checkpoints and a mode chosen at the start. |
+| `workflows/` | `new-site`, `new-site-operator`, `maintenance-cycle` and `migrate-site`: several skills in a row with fixed checkpoints and a mode chosen at the start. |
 | `handbook/` | The agent handbook, generated from Leitvia Studio: `README.md` (rules and an index of all abilities), one page per ability under `abilities/`, every rejection in `rejections.md`, and the abilities with their schemas in `abilities.json`. A skill loads the rules and only the pages of the abilities it calls. |
 | `.claude-plugin/` | The manifests that let Claude Code install the package as a plugin. |
 | `scenarios/`, `tests/`, `tools/` | Test scenarios, their runner and the handbook generator, for development. Agents do not need them. |
@@ -22,7 +22,7 @@ Each `SKILL.md` is built like the skills of [WordPress/agent-skills](https://git
 
 - WordPress 7.1 or later and PHP 8.2 or later, with HTTPS. Application passwords of WordPress work only over HTTPS (or on a local development site).
 - The theme **Leitvia** and the plugin **Leitvia Studio**, both free on WordPress.org: search for them under **Appearance, Themes, Add New Theme** and **Plugins, Add New Plugin**, or see [Leitvia on WordPress.org](https://wordpress.org/themes/leitvia/) and [Leitvia Studio on WordPress.org](https://wordpress.org/plugins/leitvia-studio/). The zips of every version are also in the releases of [cmsadmins/leitvia](https://github.com/cmsadmins/leitvia/releases) and [cmsadmins/leitvia-studio](https://github.com/cmsadmins/leitvia-studio/releases).
-- For MCP nothing else: Leitvia Studio brings its MCP server. The plugin **MCP Adapter** is optional and only needed for its default server.
+- For MCP nothing else: Leitvia Studio brings its MCP server. The plugin **MCP Adapter** is not needed; when active, its default server lists the Leitvia abilities too, with the same checks.
 
 With WP-CLI on the server, the bootstrap in [workflows/new-site.md](workflows/new-site.md#bootstrap-the-operator-or-the-runner-before-the-agent) does this step and creates the agent user of step 2. For a test site on your own machine the same section starts WordPress Playground from a blueprint, without a server.
 
@@ -65,7 +65,7 @@ In the backend open **Leitvia Studio, Agents** (`/wp-admin/admin.php?page=leitvi
 
 1. Create an agent. Studio creates a WordPress user with the role for agents and its first application password.
 2. Copy the password now; it is shown once. You can create a new one or revoke all of them on the same page.
-3. Set how far agents may go on their own in each area (content, corrections, structure, design). Plugins, users and settings stay locked for agents.
+3. Set how far agents may go on their own in each area (content, corrections, structure, design, products). Plugins, users and settings stay locked for agents.
 
 Every call of the agent runs as this user and is logged under its name. Give each agent a user of its own.
 
@@ -85,7 +85,7 @@ A client signs in in one of two ways: with OAuth, where a person agrees in the b
 
 #### Sign in with OAuth
 
-OAuth needs HTTPS and the setting **Connect over OAuth** under **Leitvia Studio, Agents, Connections** (on by default). When you add the server, the client opens the page **Connect agent** of the site. Sign in there as an administrator, choose the agent user the client works as and tick write if it may change the site; reading is always included. You can also choose yourself: then the connection reads only, unless an add-on shows change packages for approval in the chat, where you approve them in its view, never the model. Every connection is listed under **Connections**, where you close it.
+OAuth needs HTTPS and the setting **Connect over OAuth** under **Leitvia Studio, Agents, Connections** (on by default). When you add the server, the client opens the page **Connect agent** of the site. Sign in there as an administrator, choose the agent user the client works as and tick write if it may change the site; reading is always included. You can also choose yourself: then the connection reads only, unless an add-on shows change packages for approval in the chat, where you approve them in its view, never the model. A connection as yourself has no refresh token: after an hour you agree again. Every connection is listed under **Connections**, where you close it.
 
 - **claude.ai and Claude Desktop:** add a custom connector (Customize, Connectors, Add custom connector) with the address of the MCP server.
 - **ChatGPT:** add a custom MCP server with the address and OAuth as authentication. The menus of ChatGPT change often; the help of OpenAI names the current path.
@@ -169,8 +169,8 @@ The tools of the server carry the names of the abilities with a hyphen: `leitvia
 
 #### What the server offers
 
-- **Prompts:** every skill and workflow of this package is a prompt, such as `leitvia-page` (in Claude Code `/mcp__leitvia__leitvia-page`), with the version of the installed Leitvia Studio.
-- **Resources:** the design contract, the tokens, the patterns, the open change packages and the outline of a page, readable without a tool call.
+- **Prompts:** every skill and workflow of this package except `new-site-operator` (steps of a person on the server) is a prompt, such as `leitvia-page` (in Claude Code `/mcp__leitvia__leitvia-page`), with the version of the installed Leitvia Studio.
+- **Resources:** the design contract, the tokens, the patterns (every page in one read), one pattern as `leitvia://pattern/{slug}`, the open change packages and the outline of a page, readable without a tool call.
 - **Questions:** under 2026-07-28, a client with form elicitation asks the person before a tool that deletes, removes, rejects or rolls back changes the site. A yes is no approval; changes that need one still land in a change package.
 - **Tasks:** `leitvia-apply-recipe`, `leitvia-audit-site` and `leitvia-export` run in the background for a client with the tasks extension; others wait for the result.
 - **Views:** an add-on can attach views (MCP Apps) to tools. A client without views gets the same result as text.
@@ -189,7 +189,7 @@ The details for agents are in [handbook/mcp.md](handbook/mcp.md).
 
 ### REST instead of MCP
 
-When your agent has no MCP client, every ability runs over the REST API of WordPress at `/wp-json/wp-abilities/v1/abilities/<name>/run`, with the same user and application password (HTTP Basic auth). Read abilities take GET with the input as query arguments, the others POST with the body `{"input": {...}}`:
+When your agent has no MCP client, every ability runs over the REST API of WordPress at `/wp-json/wp-abilities/v1/abilities/<name>/run`, with the same user and application password (HTTP Basic auth). Read abilities take GET with the input as query arguments, `leitvia/set-seo-titles` DELETE (destructive and idempotent), the others POST with the body `{"input": {...}}`:
 
 ```sh
 curl -H "Authorization: Basic $LEITVIA_AUTH" "https://example.org/wp-json/wp-abilities/v1/abilities/leitvia/get-contract/run"
@@ -199,15 +199,7 @@ The agent handbook explains the method of each ability. Tell the agent to use RE
 
 ### Core REST without the leitvia MCP server
 
-Without the MCP server `leitvia`, for example when an agent works with the WordPress skills alone, every Leitvia ability runs over the REST API of the Abilities API in WordPress core. Sign in as the agent user with its application password (HTTP Basic auth). Checks, autonomy levels, change packages and the rate limit are the same as over MCP.
-
-- **Discovery:** `GET /wp-json/wp-abilities/v1/abilities?category=leitvia` lists the abilities with their input and output schemas and annotations; `GET /wp-json/wp-abilities/v1/abilities/<name>` returns one.
-- **Reads:** read only abilities run with GET at `/wp-json/wp-abilities/v1/abilities/<name>/run`, the input as query arguments: `?input[post]=12`, lists as `input[ids][]=4&input[ids][]=7`.
-- **Writes:** run with POST and the JSON body `{"input": {...}}`; destructive abilities that are idempotent take DELETE with the input as query arguments. The page of each ability names its method.
-- **`mode` `package`:** the write was not carried out. It waits in a change package until a person decides in the inbox of Leitvia Studio. Report the package ID and do not try to get the change through another way.
-- **409:** `leitvia_stale_hash` means the target changed since you read it. Read it again, or take `data.current_hash` when no read ability returns its hash, and repeat the call once.
-- **429:** `leitvia_rate_limited` comes with the header `Retry-After`. Wait that many seconds, then send the same call again.
-- **MCP Adapter:** from Leitvia Studio 1.3.43 its default server lists the Leitvia abilities as well, with the same checks.
+See [handbook/core-rest.md](handbook/core-rest.md).
 
 ## 3. Install the skills
 
@@ -276,7 +268,7 @@ The skills of this package add to the WordPress skills. On a Leitvia site the Le
 
 ## Privacy
 
-Leitvia Studio and these skills send nothing to anyone. The agent reads content of your site (texts, settings, image addresses) and sends it to the provider of the AI model the agent uses, which you choose and configure in the agent. Check that provider's terms before you connect a site with personal data, and give the agent user only the autonomy you want. Images go to an AI service only through the AI plugin of WordPress and after the person agreed at the checkpoint.
+Leitvia Studio and these skills send no site content to anyone. For an OAuth client named by URL (CIMD), Studio fetches that document from the host of the client. The agent reads content of your site (texts, settings, image addresses) and sends it to the provider of the AI model the agent uses, which you choose and configure in the agent. Check that provider's terms before you connect a site with personal data, and give the agent user only the autonomy you want. Images go to an AI service only through the AI plugin of WordPress and after the person agreed at the checkpoint.
 
 ## Limits
 
