@@ -44,6 +44,7 @@ Then decide:
 
 - A pattern fits: use it with the skill `leitvia-page`; no new pattern.
 - A pattern fits except for its texts, links or images: a page edit does that, no new pattern.
+- A pattern fits in structure and only its look differs (a line, a hover, a size between two steps): no new pattern, a site style finding for the child theme: [deviations](../leitvia-page/references/deviations.md).
 - A pattern fits in structure but needs other fixed texts or a different image for reuse: a variant (step 3).
 - Nothing fits: a new pattern (step 2).
 

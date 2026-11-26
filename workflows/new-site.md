@@ -11,12 +11,11 @@ An empty WordPress installation has neither the theme nor Leitvia Studio, and in
 ```sh
 wp theme install leitvia --activate
 wp plugin install leitvia-studio --activate
-wp plugin install https://downloads.wordpress.org/plugin/mcp-adapter.0.7.1.zip --activate
 wp user create leitvia-agent agent@example.org --role=leitvia_agent --display_name="Leitvia agent"
 wp user application-password create leitvia-agent "leitvia agent" --porcelain
 ```
 
-Theme and Leitvia Studio come from WordPress.org; a fixed version comes from the zips in the releases of cmsadmins/leitvia and cmsadmins/leitvia-studio. Keep MCP Adapter at 0.7, the version Leitvia Studio supports. Leave the experiment MCP Access of the AI plugin off on this site: it installs the newest MCP Adapter from WordPress.org. The last command prints the application password once; store it as `LEITVIA_AUTH` (Base64 of `leitvia-agent:<password>`) for the agent, never in a file you commit. For a shop also `wp plugin install woocommerce --activate` before the run. The agent itself never runs WP-CLI; its first call is `leitvia/get-contract`, which proves the bootstrap worked. Zips, server check: [operator steps](new-site-operator.md).
+Theme and Leitvia Studio come from WordPress.org; a fixed version comes from the zips in the releases of cmsadmins/leitvia and cmsadmins/leitvia-studio. The MCP server comes with Leitvia Studio; MCP Adapter is optional (0.7.2 is the tested version, [operator steps](new-site-operator.md#mcp-server)). The last command prints the application password once; store it as `LEITVIA_AUTH` (Base64 of `leitvia-agent:<password>`) for the agent, never in a file you commit. For a shop also `wp plugin install woocommerce --activate` before the run. A site with a design of its own (design file, Figma, brand rules beyond colors and fonts) gets Leitvia Child as its active theme in the same bootstrap, Leitvia only installed, and no update of Leitvia ever carries `--activate`: [child theme from the start](new-site-operator.md#child-theme-from-the-start). The agent itself never runs WP-CLI; its first call is `leitvia/get-contract`, which proves the bootstrap worked. Zips, server check: [operator steps](new-site-operator.md).
 
 Without a server, for a test or demo run on your own machine: [WordPress Playground](../README.md#test-site-with-wordpress-playground) from a blueprint.
 
@@ -42,6 +41,7 @@ Some steps belong to a person by design: the area `admin` is locked for agents, 
 | Brand fonts that are not bundled (warning `font_not_bundled`) | Appearance, Editor, Styles, Typography, Fonts, tab Upload (WOFF2 files, license checked; not the tab with the font catalog), before the token set is activated. Operator: [commands](new-site-operator.md#brand-fonts) | The brand font; without it the site shows the system font |
 | Admin settings | Settings, General: site title and tagline (the agent proposes both from the briefing); logo (a PNG, [no SVG](../skills/leitvia-design/references/tokens.md#limits)) and site icon, avatars off (Gravatar is a third party), the sample post "Hello world!" and the "Sample Page" deleted. No ability changes them. | A finished site: header, footer and the browser tab show the site title |
 | Search visibility | Settings, Reading: untick "Discourage search engines" once the site is live | Being found; without it the report lists it as open, high |
+| Leitvia Child as active theme (design of its own) | Operator, [child theme from the start](new-site-operator.md#child-theme-from-the-start); site style findings go into `assets/css/site.css` of the child theme | Every site style; `theme.slug` of `leitvia/get-site-health` is `leitvia-child` |
 | Publish drafts (mode `direct`) | Pages, Publish | Pages of a run in mode `direct` |
 | Open a content type to other AI tools (`showInAbilities`) | Leitvia Studio, Content Model (`/wp-admin/admin.php?page=leitvia-studio-model`) | Only abilities outside Leitvia; Leitvia's own abilities do not need it |
 
@@ -74,6 +74,7 @@ A briefing that says the site is invented (a demo, a test, a fictional brand) is
 - **Skill:** leitvia-page.
 - **Input:** pages the briefing asks for beyond the recipe, with goal and content points; the page frames and patterns of the contract.
 - **Writes:** `leitvia/compose-page` with the same key. Only approved patterns; a Lab pattern in draft or review is refused with `leitvia_pattern_not_approved`.
+- **Deviations from the design:** an existing pattern restyled by a site style for the child theme before a new pattern; the agent reports site styles as findings and writes no CSS ([deviations](../skills/leitvia-page/references/deviations.md)).
 - **Checkpoint:** "Outline confirmed": "This is the outline of <page>: <sections with pattern and content>. Shall I build it?"
 
 ### 4. Review of the package
@@ -103,9 +104,13 @@ A briefing that says the site is invented (a demo, a test, a fictional brand) is
 - **Writes:** fixes with the same key.
 - **Checkpoint:** "Package applied", only when there is anything to fix.
 
+## Checking pages
+
+At most two passes per round: the changed pages after a step, then every page once at 1440 and 390 px before the report. Check a later fix only where it is, never with another full pass. Screenshots stay out of version control (`shots/` in `.gitignore`).
+
 ## Report
 
-Give the person, in their language: the packages with ID, state and inbox link; the pages with their public addresses; the findings of the accessibility check before and after; what stays open (legal texts, links you could not resolve, tests only a person can do). Never call the site accessible or finished while a legal placeholder is visible.
+Give the person, in their language: the packages with ID, state and inbox link; the pages with their public addresses; the findings of the accessibility check before and after; the site style findings for the child theme; what stays open (legal texts, links you could not resolve, tests only a person can do). Never call the site accessible or finished while a legal placeholder is visible.
 
 ## Checkpoints
 

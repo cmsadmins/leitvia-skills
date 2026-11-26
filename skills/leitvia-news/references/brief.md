@@ -46,10 +46,10 @@ A topic or a source outside the brief is not used. A brief without topics or sou
 Rules of Google News that the post and the site have to meet:
 
 - Date and author are visible on the post page; the theme prints both. Never change the date of an older post to make it look new.
-- A real author with a biographical info in the profile is better than an anonymous team account. When the posts appear under a team account, name it in the report as a step of the person. An author without an account: `author_name` plus `author_page` (ID of a page about them), the url of the Person.
+- A real author with a biographical info in the profile is better than an anonymous team account. When the posts appear under a team account, name it in the report as a step of the person. An author without an account: `author_name` plus `author_page` (ID of a page about them), the url of the Person. As biography the audit counts a published `author_page` or a `people` profile of the same name with `description`.
 - A post about a service of the site: `leitvia/set-page-structure` with `post` and `hub` (the service page) shows a card beside it.
 - One featured image per post is required: at least 1200 px wide, fit for a 16:9 crop, with alt text. Without one the post is written all the same and the image is an open point of the report.
-- The site needs an editorial page (page kind `editorial`) that says who writes, how sources are checked and how corrections work. The author box of a post links it when Studio knows the page; when the public post shows no such link, the report names it as open for `leitvia-page`.
+- The site needs an editorial page (page kind `editorial`) that says who writes, how sources are checked and how corrections work. The author box of a post links it when Studio knows the page (the only page of that kind, or `editorial_page` of `leitvia/set-organization`); when the public post shows no such link, the report names it as open for `leitvia-page`.
 
 ## SEO and GEO
 

@@ -46,7 +46,7 @@ Checkpoint "Brand confirmed".
 
 ### 3. Map brand values to roles
 
-Copy the `document` of `leitvia/get-tokens` and change only `$value` entries, keeping every slug. Roles and the value format: [token details](references/tokens.md#roles). A brand whose buttons or dark bands have another color than its text adds the optional roles `button`, `on-button`, `button-hover`, `on-button-hover`, `band`, `band-button` and `on-band-button`: [button and band colors](references/tokens.md#button-and-band-colors). Light or bold headings and eyebrows: [font weights](references/tokens.md#font-weights). A brand color that fits no role (for example a second orange for print) stays out of the set; mention it in the `$description` of the set.
+Copy the `document` of `leitvia/get-tokens` and change only `$value` entries, keeping every slug. Roles and the value format: [token details](references/tokens.md#roles). A brand whose buttons or dark bands have another color than its text adds the optional roles `button`, `on-button`, `button-hover`, `on-button-hover`, `band`, `band-button` and `on-band-button`: [button and band colors](references/tokens.md#button-and-band-colors); `band-accent` for an accent that reads only on dark bands. Dark inner pages (templates `page-dark`, `page-landing-dark`) and full-height heroes: [dark pages](references/dark-pages.md). Light or bold headings and eyebrows: [font weights](references/tokens.md#font-weights). A brand color that fits no role (for example a second orange for print) stays out of the set; mention it in the `$description` of the set.
 
 ### 4. Compute every contrast pair before writing
 
@@ -78,7 +78,7 @@ When the person chose a set:
 
 When the person wants one of the looks of the theme and no brand of its own, take the slug from the style variations of `leitvia/get-contract` and call `leitvia/set-variation` with `variation`, empty `base_hash` and the `package` key; after `leitvia_stale_hash` repeat it once with `current_hash`. A full variation replaces the global styles, a colors or typography variation only its part. While a token set is active (`source` of `leitvia/get-tokens` is `set`), its colors and fonts win over any variation, so do not set one; tell the person. Then checkpoint "Package applied" and the verification.
 
-Brand fonts that are not bundled wait for an upload by the person or the operator, before the set is activated. Those, heading weights, the logo and composition rules of the brand: [token details](references/tokens.md#fonts). A brand with many photos may widen the text to the image bands: [widths](references/widths.md). Tell the person what the set cannot carry.
+Brand fonts that are not bundled wait for an upload by the person or the operator, before the set is activated. Those, heading weights, the logo and composition rules of the brand: [token details](references/tokens.md#fonts). A brand with many photos may widen the text to the image bands: [widths](references/widths.md). Tell the person what the set cannot carry; a look beyond the roles (a line, a hover, a size between two steps) is a site style finding for the child theme: [deviations](../leitvia-page/references/deviations.md).
 
 ## Verification
 

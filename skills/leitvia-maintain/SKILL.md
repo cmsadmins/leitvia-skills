@@ -51,7 +51,7 @@ Sort the findings by area. `check` holds the name of the check with the prefix `
 | `alt-text` | alt text | `leitvia/set-alt-text` |
 | `link-text` | link texts and `#` links | `leitvia/update-block` (one link), `leitvia/update-content` (several texts) |
 | `empty-link` | links without target outside the content | part: `leitvia/update-template-part`, else report |
-| `deprecated-pattern` | sections | `leitvia/replace-pattern` |
+| `deprecated-pattern`, `successor-pattern` (notice) | sections | `leitvia/replace-pattern` |
 | `headings`, `page-structure` | structure | skill `leitvia-a11y` |
 | `content-tokens`, `token-drift`, `content-contrast` | design | skill `leitvia-design` or a person |
 | `composition` | page composition | skill `leitvia-page` |

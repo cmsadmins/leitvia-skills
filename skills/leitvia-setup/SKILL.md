@@ -17,7 +17,7 @@ Turn a briefing into a working site: recipe, style variation, header, footer, na
 
 - Access as the agent user over MCP or REST: [handbook, Access over MCP and REST](../../handbook/README.md#access-over-mcp-and-rest).
 - The answers of step 1. For a shop, WooCommerce is active.
-- Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of each ability before you first call it (the handbook index links them): `get-contract`, `list-recipes`, `get-content-model`, `define-content-type`, `apply-recipe`, `compose-page`, `get-package`, `get-page-outline`, `update-content`, `audit-site`, `list-packages`, `get-seo`, for a shop `create-product`. Statuses of a recipe run, shop sites and what a recipe does not cover: [recipe details](references/recipe.md). Format of own content types: [content model](references/content-model.md).
+- Read before the first call: the [agent handbook](../../handbook/README.md) (access, hashes, autonomy, packages, rejections, index of all abilities). Read the page of each ability before you first call it (the handbook index links them): `get-contract`, `list-recipes`, `get-content-model`, `define-content-type`, `apply-recipe`, `compose-page`, `get-package`, `get-page-outline`, `update-content`, `audit-site`, `list-packages`, `get-seo`, for a shop `create-product`. Statuses of a recipe run, shop sites and what a recipe does not cover: [recipe details](references/recipe.md). Format of own content types: [content model](references/content-model.md). Header and footer in grid cells and the menu overlay: [grid header](references/grid-header.md).
 
 ## Ground rules
 
@@ -41,6 +41,7 @@ Before any call that writes, collect the answers to these questions. Ask only wh
 4. Is the site live (mode `package`) or a fresh install nobody visits yet (mode `direct`)?
 5. Which kind of site: company, shop, blog, publication or documentation? A shop needs WooCommerce active before you start.
 6. Du or Sie? Sie: `leitvia/set-organization` with `address` `formal`.
+7. Does the site have a design of its own (design file, Figma, brand rules beyond colors and fonts), or will it differ from the patterns? Then the child theme Leitvia Child is the active theme from the start, set up by the operator before your first write ([child theme from the start](../../workflows/new-site-operator.md#child-theme-from-the-start)).
 
 When the operator has legal pages elsewhere, fetch them, copy the facts verbatim and compare the facts of the pages with each other (name, address, contact on imprint versus privacy policy). Report every contradiction to the person; never decide which one is right.
 
@@ -95,6 +96,7 @@ Checkpoint "Legal texts supplied by the human".
 ## Verification
 
 - Step 5 reports `package: 0`.
+- Design of its own (question 7): `leitvia/get-site-health` reports `theme.slug` `leitvia-child` and `theme.parent` `Leitvia`. `leitvia` instead: list the child theme as a step of the person.
 - `leitvia/audit-site` (pass `next` as `after` until `next` is null): every item without findings, except `legal-placeholder` on legal pages whose texts the person has not supplied yet (list them as open).
 - Fetch the public URL of every page the recipe created and the front page: status 200 and exactly one `h1`. A 404 often means the page waits in a package or stayed a draft.
 - `leitvia/list-packages` with `state` `open`: empty when the person applied everything.

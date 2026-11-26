@@ -2,6 +2,18 @@
 
 Details for the operator of [new-site](new-site.md): what happens on the server with WP-CLI, which the agent never does.
 
+## MCP server
+
+The MCP server `leitvia` (`/wp-json/leitvia-studio/v1/mcp`) comes with Leitvia Studio; there is nothing to install. `leitvia/get-site-health` shows it under `mcp`: the address in `url`, the revisions in `protocols` and, with MCP Adapter active, its version in `version`. When a client cannot connect, the agent works over the REST API at `/wp-json/wp-abilities/v1/abilities/<name>/run` with the same application password, which does everything MCP does.
+
+Optional: for agents that use the default server of the plugin MCP Adapter, install it in the tested version:
+
+```sh
+wp plugin install https://downloads.wordpress.org/plugin/mcp-adapter.0.7.2.zip --activate
+```
+
+Leave the experiment MCP Access of the AI plugin off on such a site: it installs the newest MCP Adapter from WordPress.org.
+
 ## JSON error answers of the REST API
 
 Every rejection of an ability is an answer with a 4xx status and a JSON body (`code`, `message`, `data`). A web server that replaces it with an error page of its own hides every rejection from the agent, which then sees only HTML. nginx does this with `fastcgi_intercept_errors on`, which ISPConfig sets when "Own error pages" is on for the website (`errordocs=1`): turn that option off for the site, or set `fastcgi_intercept_errors off;` for `/wp-json/`. Check it before the first run:
@@ -28,6 +40,25 @@ curl -u '<admin>:<password>' https://<site>/wp-json/wp/v2/font-families/<id>/fon
 ```
 
 A variable font is one file with `"fontWeight":"100 900"`. Check the license before you upload.
+
+## Child theme from the start
+
+A site with a design of its own (design file, Figma, brand rules beyond colors and fonts), or one that will differ from the patterns, runs on Leitvia Child from the first day, so site styles have their place and no switch comes later. In the bootstrap of [new-site](new-site.md), in place of `wp theme install leitvia --activate`:
+
+```sh
+wp theme install leitvia
+wp theme install leitvia-child.zip --activate
+```
+
+`leitvia-child.zip` is the zip of the latest release of cmsadmins/leitvia-child; Leitvia stays installed as its parent. Then Leitvia Studio and the rest of the bootstrap as usual. Check it before the first run: `leitvia/get-site-health` reports `theme.slug` `leitvia-child` and `theme.parent` `Leitvia`.
+
+A site that already runs on Leitvia switches once Leitvia Studio is active (Appearance, Themes, or `wp theme activate leitvia-child`). Studio copies global styles with the active token set, edited templates and edited template parts to the child theme when it has none of its own; nothing in the target is overwritten, and the originals stay with Leitvia.
+
+Updates never activate the parent: `wp theme update leitvia`, or for a fixed version `wp theme install leitvia.zip --force` without `--activate`. `--activate` on Leitvia replaces the child theme as the active theme, and templates and parts edited from then on land in the other theme, so the site has them split over two. Leitvia Child is updated the same way, with `--force` and without `--activate` while it is active. After every update `theme.slug` of `leitvia/get-site-health` is still `leitvia-child`.
+
+## Site styles in the child theme
+
+Some findings of an agent are only a matter of look: a line, a hover color, a size between two steps, on a pattern that already fits. The agent writes them as findings of the type site style, with selector, effect and role values ([deviations](../skills/leitvia-page/references/deviations.md)); it writes no CSS. Before a new pattern is built, the operator restyles the existing one for this site in `assets/css/site.css` of Leitvia Child, which loads after the styles of Leitvia, on the front end and in the editor, once it holds a rule. Rules: role custom properties only (`var(--wp--preset--color--accent)`), no hex, no `!important`, nothing from another host, select by block style or block class, never by generated ids, motion only under `prefers-reduced-motion: no-preference`. A rule every site would want is a finding for Leitvia, not a site style. The file survives updates of Leitvia; keep a copy of it with the site (in its repository or backup), since an update of Leitvia Child with `--force` replaces it.
 
 ## A second language (Polylang)
 

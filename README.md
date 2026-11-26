@@ -22,7 +22,7 @@ Each `SKILL.md` is built like the skills of [WordPress/agent-skills](https://git
 
 - WordPress 7.1 or later and PHP 8.2 or later, with HTTPS. Application passwords of WordPress work only over HTTPS (or on a local development site).
 - The theme **Leitvia** and the plugin **Leitvia Studio**, both free on WordPress.org: search for them under **Appearance, Themes, Add New Theme** and **Plugins, Add New Plugin**, or see [Leitvia on WordPress.org](https://wordpress.org/themes/leitvia/) and [Leitvia Studio on WordPress.org](https://wordpress.org/plugins/leitvia-studio/). The zips of every version are also in the releases of [cmsadmins/leitvia](https://github.com/cmsadmins/leitvia/releases) and [cmsadmins/leitvia-studio](https://github.com/cmsadmins/leitvia-studio/releases).
-- For MCP: the plugin **MCP Adapter** 0.7 from WordPress.org. Without it the agent uses the REST API, see step 2.
+- For MCP nothing else: Leitvia Studio brings its MCP server. The plugin **MCP Adapter** is optional and only needed for its default server.
 
 With WP-CLI on the server, the bootstrap in [workflows/new-site.md](workflows/new-site.md#bootstrap-the-operator-or-the-runner-before-the-agent) does this step and creates the agent user of step 2. For a test site on your own machine the same section starts WordPress Playground from a blueprint, without a server.
 
@@ -39,14 +39,13 @@ For a test or demo run on your own machine, without a server, the Playground CLI
 	"steps": [
 		{ "step": "installTheme", "themeData": { "resource": "wordpress.org/themes", "slug": "leitvia" }, "options": { "activate": true } },
 		{ "step": "installPlugin", "pluginData": { "resource": "wordpress.org/plugins", "slug": "leitvia-studio" }, "options": { "activate": true } },
-		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://downloads.wordpress.org/plugin/mcp-adapter.0.7.1.zip" }, "options": { "activate": true } },
 		{ "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://downloads.wordpress.org/plugin/woocommerce.11.2.1.zip" }, "options": { "activate": true } },
 		{ "step": "runPHP", "code": "<?php require_once '/wordpress/wp-load.php'; $id = wp_insert_user( array( 'user_login' => 'leitvia-agent', 'display_name' => 'Leitvia agent', 'user_email' => 'agent@example.org', 'user_pass' => wp_generate_password( 32 ), 'role' => 'leitvia_agent' ) ); $created = is_wp_error( $id ) ? $id : WP_Application_Passwords::create_new_application_password( $id, array( 'name' => 'leitvia agent' ) ); if ( is_wp_error( $created ) ) { throw new Exception( $created->get_error_message() ); } wp_mkdir_p( '/leitvia-run' ); file_put_contents( '/leitvia-run/agent-password.txt', $created[0] . \"\n\" );" }
 	]
 }
 ```
 
-The versions of WordPress, PHP, MCP Adapter and WooCommerce are the ones Leitvia is tested with. Leave out the WooCommerce step for a site without a shop. If the agent user cannot be created, the run stops with the error instead of starting a site without a password. Then start the server with an empty folder `run` next to the blueprint; the application password lands in `run/agent-password.txt`:
+The versions of WordPress, PHP and WooCommerce are the ones Leitvia is tested with. Leave out the WooCommerce step for a site without a shop. If the agent user cannot be created, the run stops with the error instead of starting a site without a password. Then start the server with an empty folder `run` next to the blueprint; the application password lands in `run/agent-password.txt`:
 
 ```sh
 npx @wp-playground/cli@latest server --port=9481 --blueprint=blueprint.json --mount-dir ./run /leitvia-run --login
@@ -80,7 +79,33 @@ Keep the password out of files you commit and out of chats.
 
 ### MCP server
 
-With MCP Adapter active, Leitvia Studio runs the MCP server `leitvia` at `https://example.org/wp-json/leitvia-studio/v1/mcp` (transport: streamable HTTP). On a site of a multisite network in a subdirectory the path starts at the site: `https://example.org/club/wp-json/leitvia-studio/v1/mcp`. Replace `example.org` with your site in each example.
+Leitvia Studio runs the MCP server `leitvia` at `https://example.org/wp-json/leitvia-studio/v1/mcp` (streamable HTTP, revisions 2026-07-28 and 2025-11-25); no other plugin is needed. On a site of a multisite network in a subdirectory the path starts at the site: `https://example.org/club/wp-json/leitvia-studio/v1/mcp`. Replace `example.org` with your site in each example.
+
+A client signs in in one of two ways: with OAuth, where a person agrees in the browser, or with the application password of the agent user as a header.
+
+#### Sign in with OAuth
+
+OAuth needs HTTPS and the setting **Connect over OAuth** under **Leitvia Studio, Agents, Connections** (on by default). When you add the server, the client opens the page **Connect agent** of the site. Sign in there as an administrator, choose the agent user the client works as and tick write if it may change the site; reading is always included. You can also choose yourself: then the connection reads only, unless an add-on shows change packages for approval in the chat, where you approve them in its view, never the model. Every connection is listed under **Connections**, where you close it.
+
+- **claude.ai and Claude Desktop:** add a custom connector (Customize, Connectors, Add custom connector) with the address of the MCP server.
+- **ChatGPT:** add a custom MCP server with the address and OAuth as authentication. The menus of ChatGPT change often; the help of OpenAI names the current path.
+- **VS Code**, in `.vscode/mcp.json`; VS Code asks you to sign in when the server starts:
+
+```json
+{
+	"servers": {
+		"leitvia": { "type": "http", "url": "https://example.org/wp-json/leitvia-studio/v1/mcp" }
+	}
+}
+```
+
+- **Claude Code without a header:** add the server without `--header`, then run `/mcp` in the session and sign in:
+
+```sh
+claude mcp add --transport http leitvia https://example.org/wp-json/leitvia-studio/v1/mcp
+```
+
+#### Sign in with a header
 
 **Claude Code**, from the project folder:
 
@@ -110,7 +135,7 @@ url = "https://example.org/wp-json/leitvia-studio/v1/mcp"
 env_http_headers = { "Authorization" = "LEITVIA_AUTH_HEADER" }
 ```
 
-with `export LEITVIA_AUTH_HEADER="Basic $LEITVIA_AUTH"`.
+with `export LEITVIA_AUTH_HEADER="Basic $LEITVIA_AUTH"`. Codex starts with `initialize`, which the server answers under 2025-11-25 or the older revision Codex asks for.
 
 **Gemini CLI**, in `~/.gemini/settings.json` or `.gemini/settings.json` of the project:
 
@@ -138,13 +163,33 @@ with `export LEITVIA_AUTH_HEADER="Basic $LEITVIA_AUTH"`.
 }
 ```
 
-Other agents take the same URL and header in their own MCP configuration.
+Other agents take the same URL and header in their own MCP configuration. With a paid plan, the account page Fleet on leitvia.com writes this configuration for every site of your team, without storing any access.
 
 The tools of the server carry the names of the abilities with a hyphen: `leitvia-get-contract` for `leitvia/get-contract`. Ask the agent to call it first; the answer names the site (`site.url`), so you see the connection works and points to the right site.
 
+#### What the server offers
+
+- **Prompts:** every skill and workflow of this package is a prompt, such as `leitvia-page` (in Claude Code `/mcp__leitvia__leitvia-page`), with the version of the installed Leitvia Studio.
+- **Resources:** the design contract, the tokens, the patterns, the open change packages and the outline of a page, readable without a tool call.
+- **Questions:** under 2026-07-28, a client with form elicitation asks the person before a tool that deletes, removes, rejects or rolls back changes the site. A yes is no approval; changes that need one still land in a change package.
+- **Tasks:** `leitvia-apply-recipe`, `leitvia-audit-site` and `leitvia-export` run in the background for a client with the tasks extension; others wait for the result.
+- **Views:** an add-on can attach views (MCP Apps) to tools. A client without views gets the same result as text.
+
+The details for agents are in [handbook/mcp.md](handbook/mcp.md).
+
+#### Troubleshooting
+
+- **401 although the password is right:** the host drops the `Authorization` header. Add `CGIPassAuth On` (Apache 2.4.13 or later) or `SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1` to `.htaccess` above the rules of WordPress.
+- **The client hangs, or gets everything at once at the end of a stream:** a proxy buffers. nginx follows the header `X-Accel-Buffering: no`, which the server sends. For Apache with PHP-FPM, flush the FastCGI proxy (`flushpackets=on`), turn off `mod_deflate` for the route (`SetEnvIf Request_URI "/wp-json/leitvia-studio/v1/mcp" no-gzip=1`) and `zlib.output_compression`.
+- **A task stays `working`:** WP-Cron does not reach the site (loopback blocked or `DISABLE_WP_CRON`). Run the system cron, for example `* * * * * wp cron event run --due-now --path=/path/to/wordpress`, or activate Action Scheduler (it comes with WooCommerce).
+- **Claude Code fails under 2026-07-28:** start it once with `MCP_PROTOCOL_NEGOTIATION=legacy claude` to use 2025-11-25, and report the error.
+- **`-32022`:** the client asks for a revision the server does not speak; `data.supported` lists the ones it does.
+- **The client offers no OAuth sign-in:** the site needs HTTPS, the setting Connect over OAuth must be on, and the connector URL must be the whole path of the MCP server.
+- **403 `insufficient_scope`:** the connection may only read. Connect again and allow writing, or give the task to an agent user.
+
 ### REST instead of MCP
 
-Without MCP Adapter, or when your agent has no MCP client, every ability runs over the REST API of WordPress at `/wp-json/wp-abilities/v1/abilities/<name>/run`, with the same user and application password (HTTP Basic auth). Read abilities take GET with the input as query arguments, the others POST with the body `{"input": {...}}`:
+When your agent has no MCP client, every ability runs over the REST API of WordPress at `/wp-json/wp-abilities/v1/abilities/<name>/run`, with the same user and application password (HTTP Basic auth). Read abilities take GET with the input as query arguments, the others POST with the body `{"input": {...}}`:
 
 ```sh
 curl -H "Authorization: Basic $LEITVIA_AUTH" "https://example.org/wp-json/wp-abilities/v1/abilities/leitvia/get-contract/run"

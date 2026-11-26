@@ -26,6 +26,7 @@ By default the primary button and the dark bands (Inverse block style) take `ink
 | `band` | `ink` | Background of dark bands in a light set; `ink` stays the text color |
 | `band-button` | `accent` | Fill and border of the primary button on dark bands |
 | `on-band-button` | `on-accent` | Label on `band-button` |
+| `band-accent` | `surface` | Accent text on dark grounds ([dark pages](dark-pages.md)) |
 | `button-hover` | `accent` | Fill and border of the primary button on hover |
 | `on-button-hover` | `on-accent` | Label on `button-hover` |
 

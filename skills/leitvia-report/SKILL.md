@@ -42,7 +42,7 @@ Ask who reads the report and what for (checkpoint **Reader**): an owner without 
 - `leitvia/audit-site` with `limit: 20`, paging with `after` set to `next` until `next` is `null`: findings per page with `check` and `severity`.
 - `leitvia/list-content` with `status: publish`, all pages of it, then `leitvia/get-seo` with up to 50 IDs per call: the SEO plugin, per page title, description, `noindex` and `schema_type`, and for the site `indexable` and `news_sitemap`. Open `/robots.txt`, `/wp-sitemap.xml` and, with news, `/news.xml`.
 - `leitvia/get-tokens`: `contrast` lists color pairs of the palette that miss their minimum.
-- `leitvia/list-packages` with `state: open`: changes that wait for a person.
+- `leitvia/list-packages` with `state: open`: changes that wait for a person (`total` counts all; fetch `page` 2 and on while `page` is below `pages`). `audit-site` names packages open for more than a day (`leitvia/stale-package`).
 - Public pages: the home page and the pages the person named; note whether they load, the `<title>` and anything plainly broken.
 
 ### 3. Weigh

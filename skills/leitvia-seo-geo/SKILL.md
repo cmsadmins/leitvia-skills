@@ -63,7 +63,7 @@ AI answers quote passages that stand on their own. Suggest, per page, what would
 
 ### 6. llms.txt and AI crawlers
 
-Without an SEO plugin Leitvia Studio serves `/llms.txt` itself, built on each request from the site name, a summary (else the tagline), the hubs, the pages with a service and price and extra pages: [llms.txt](references/seo.md#llmstxt). Read `llms` of `leitvia/get-seo`, open `/llms.txt`, and propose `summary` and `pages` with `leitvia/set-llms` in your package. `requested` is what is saved, `enabled` what takes effect; `held_back` says why a requested file is not served (a site closed to search engines answers 404 until it opens, an SEO plugin serves its own). Report it, do not retry. robots.txt lets AI crawlers in by default; whether they may read the site is the person's decision (checkpoint **AI crawlers**): `ai_crawlers` false only on the person's word. Report what `robots.txt` says today.
+Without an SEO plugin Leitvia Studio serves `/llms.txt` itself, built on each request from the site name, a summary (else the tagline), the hubs, the pages with a service and price and extra pages: [llms.txt](references/seo.md#llmstxt). Read `llms` of `leitvia/get-seo`, open `/llms.txt`, and propose `summary`, `pages` and `news` (latest posts) with `leitvia/set-llms` in your package. `requested` is what is saved, `enabled` what takes effect; `held_back` says why a requested file is not served (a site closed to search engines answers 404 until it opens, an SEO plugin serves its own). Report it, do not retry. robots.txt lets AI crawlers in by default; whether they may read the site is the person's decision (checkpoint **AI crawlers**): `ai_crawlers` false only on the person's word. Report what `robots.txt` says today.
 
 ## Verification
 
