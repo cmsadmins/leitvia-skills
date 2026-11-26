@@ -12,7 +12,7 @@ Agent skills and workflows for WordPress sites with the theme Leitvia and the pl
 | `.claude-plugin/` | The manifests that let Claude Code install the package as a plugin. |
 | `scenarios/`, `tests/`, `tools/` | Test scenarios, their runner and the handbook generator, for development. Agents do not need them. |
 
-Each skill stops at checkpoints and asks the person: before the first write, before anything goes live, for facts only the person knows (legal texts, prices, organization data), and after a rejection it could not fix in one attempt. When no person answers (a scheduled or hosted run), the section Unattended of each skill gives every checkpoint its answer: writes only into a change package, facts only from a named source, open questions in the report, nothing live.
+Each skill stops at checkpoints and asks the person: before the first write, before anything goes live, for facts only the person knows (legal texts, prices, organization data), and after a rejection it could not fix in one attempt. When no person answers (a scheduled or hosted run), the section Unattended of each skill gives every checkpoint its answer, and the rules for every task in the [agent handbook](handbook/README.md#rules-for-every-task) hold the rest: writes only into a change package, facts only from a named source, open questions in the report, nothing live.
 
 ## Skill format
 
@@ -195,11 +195,7 @@ When your agent has no MCP client, every ability runs over the REST API of WordP
 curl -H "Authorization: Basic $LEITVIA_AUTH" "https://example.org/wp-json/wp-abilities/v1/abilities/leitvia/get-contract/run"
 ```
 
-The agent handbook explains the method of each ability. Tell the agent to use REST when it has no MCP server `leitvia`; the skills describe both ways.
-
-### Core REST without the leitvia MCP server
-
-See [handbook/core-rest.md](handbook/core-rest.md).
+`GET /wp-json/wp-abilities/v1/abilities?category=leitvia` lists the abilities with their schemas. The agent handbook explains the method of each ability. Tell the agent to use REST when it has no MCP server `leitvia`; the skills describe both ways.
 
 ## 3. Install the skills
 
@@ -262,7 +258,7 @@ Each workflow asks for the mode at the start:
 
 ## WordPress standards
 
-Leitvia supports the standards WordPress sets for AI agents and will keep supporting them: the skills of [WordPress/agent-skills](https://github.com/WordPress/agent-skills), the Abilities API with its REST routes under `/wp-json/wp-abilities/v1` and the default server of the MCP Adapter. An agent that only has the WordPress skills works on a Leitvia site through these, see [Core REST without the leitvia MCP server](#core-rest-without-the-leitvia-mcp-server). The [developer guide](https://leitvia.com/docs/developers/) on leitvia.com shows these calls with real answers.
+Leitvia supports the standards WordPress sets for AI agents and will keep supporting them: the skills of [WordPress/agent-skills](https://github.com/WordPress/agent-skills), the Abilities API with its REST routes under `/wp-json/wp-abilities/v1` and the default server of the MCP Adapter. An agent that only has the WordPress skills works on a Leitvia site through these, see [REST instead of MCP](#rest-instead-of-mcp). The [developer guide](https://leitvia.com/docs/developers/) on leitvia.com shows these calls with real answers.
 
 The skills of this package add to the WordPress skills. On a Leitvia site the Leitvia abilities come before the WordPress skills `wp-patterns`, `wp-block-themes`, `wp-wpcli-and-ops` and the coming `wp-custom-fields`, and the agent never writes files in the theme `leitvia`; every skill here says so. Files that no ability can replace (workflows of `wp-block-themes` and `wp-patterns`, work of a developer) go only into the child theme `leitvia-child`, whose patterns follow the contract. A person switches to it, and Leitvia Studio carries over Global Styles and customized templates. A custom block goes into a plugin of its own, built from [Leitvia Block Starter](https://github.com/cmsadmins/leitvia-block-starter), never into the theme or the child theme; agents build it with the WordPress skill `wp-block-development`. Post types, fields, relations and settings come from `leitvia/define-content-type`, never from `register_post_meta()` in code: [coming from the WordPress skills](skills/leitvia-setup/references/content-model.md#coming-from-the-wordpress-skills). Core preset slugs that agents know from the default themes, such as the colors `base` and `contrast` or spacing `50`, are mapped to the roles of the Leitvia design contract. The table is in `design.md` of the theme and in `coreAliases` of its `leitvia-contract.json`.
 

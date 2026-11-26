@@ -95,9 +95,7 @@ process.exit( failed ? 1 : 0 );
  * @return {string[]} Sorted absolute paths.
  */
 function select( filters ) {
-	const walk = ( path ) => ( statSync( path ).isDirectory()
-		? readdirSync( path ).flatMap( ( entry ) => walk( join( path, entry ) ) )
-		: [ path ] );
+	const walk = ( path ) => ( statSync( path ).isDirectory() ? readdirSync( path, { recursive: true } ).map( ( entry ) => join( path, entry ) ) : [ path ] );
 	const all = ( filters.length ? filters : [ scenarios ] ).flatMap( ( filter ) => {
 		const path = [ resolve( filter ), resolve( scenarios, filter ), resolve( root, filter ) ].find( existsSync );
 		if ( ! path ) {

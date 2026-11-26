@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 /**
  * Builds the agent handbook from handbook/abilities.json, the dump of the abilities of Leitvia Studio (npm run
- * playground -- --dump): handbook/README.md (rules and the index of all abilities), handbook/rejections.md,
- * handbook/core-rest.md (the abilities over core REST without the MCP server leitvia) and one page per ability under
- * handbook/abilities/, so a skill loads only the abilities it calls. Texts of abilities and
+ * playground -- --dump): handbook/README.md (rules and the index of all abilities), handbook/mcp.md,
+ * handbook/rejections.md and one page per ability under handbook/abilities/, so a skill loads only the abilities it calls. Texts of abilities and
  * inputs come from Studio; change them there.
  *
  *   node packages/leitvia-skills/tools/build-handbook.mjs           writes the handbook
@@ -13,20 +12,7 @@ import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// The README of the package links handbook/core-rest.md in its section "Core REST without the leitvia MCP server".
-export const CORE_REST = [
-	'Without the MCP server `leitvia`, for example when an agent works with the WordPress skills alone, every Leitvia ability runs over the REST API of the Abilities API in WordPress core. Sign in as the agent user with its application password (HTTP Basic auth). Checks, autonomy levels, change packages and the rate limit are the same as over MCP.',
-	'',
-	'- **Discovery:** `GET /wp-json/wp-abilities/v1/abilities?category=leitvia` lists the abilities with their input and output schemas and annotations; `GET /wp-json/wp-abilities/v1/abilities/<name>` returns one.',
-	'- **Reads:** read only abilities run with GET at `/wp-json/wp-abilities/v1/abilities/<name>/run`, the input as query arguments: `?input[post]=12`, lists as `input[ids][]=4&input[ids][]=7`.',
-	'- **Writes:** run with POST and the JSON body `{"input": {...}}`; destructive abilities that are idempotent take DELETE with the input as query arguments. The page of each ability names its method.',
-	'- **`mode` `package`:** the write was not carried out. It waits in a change package until a person decides in the inbox of Leitvia Studio. Report the package ID and do not try to get the change through another way.',
-	'- **409:** `leitvia_stale_hash` means the target changed since you read it. Read it again, or take `data.current_hash` when no read ability returns its hash, and repeat the call once.',
-	'- **429:** `leitvia_rate_limited` comes with the header `Retry-After`. Wait that many seconds, then send the same call again.',
-	'- **MCP Adapter:** not needed; when active, its default server lists the Leitvia abilities as well, with the same checks.',
-];
-
-const GROUPS = {
+export const GROUPS = {
 	read: [ 'Read', 'Read abilities change nothing.' ],
 	setup: [ 'Set up', 'Content model, design tokens, style variation, template parts, navigation and recipes.' ],
 	build: [ 'Build', 'Pages from patterns, single blocks, Lab patterns and media.' ],
@@ -168,10 +154,11 @@ export function handbook( dump ) {
 		return properties.length ? properties.map( ( [ key, value ] ) => `\`${ key }\` ${ type( value ) }` ).join( '; ' ) : type( schema );
 	};
 
+	const generated = `Generated from Leitvia Studio ${ dump.studio }. Do not edit.`;
 	const lines = [
 		'# Leitvia agent handbook',
 		'',
-		`Generated from Leitvia Studio ${ dump.studio ?? 'unknown' }. Do not edit.`,
+		generated,
 		'',
 		`What an agent needs on a WordPress site with Leitvia Studio through its ${ abilities.length } abilities. Read this file before the first call, with Leitvia Pro also [pro.md](pro.md).`,
 		'',
@@ -180,8 +167,10 @@ export function handbook( dump ) {
 		'- **Site check:** call `leitvia/get-contract` first and compare `site.url` with the address of your task; when they differ, write nothing and ask the person.',
 		'- **Abilities only:** no SQL, no WP-CLI, no REST routes of WordPress core (`/wp-json/wp/v2/...`), not even to read; public pages are fine. On a Leitvia site the abilities come before the WordPress skills `wp-patterns`, `wp-block-themes` and `wp-wpcli-and-ops`. Never write files in the theme `leitvia`; files no ability can replace go only into the child theme `leitvia-child`, whose patterns follow the contract; a person switches to it (Studio carries the design over).',
 		'- **WP-Cron:** the checks after a write (links, contrast) run as a WP-Cron event. Where WP-Cron does not run by itself (WordPress Playground), call `GET /wp-cron.php` after writes.',
-		'- **Retry:** follow the [retry rule](#rejections) of every rejection.',
-		'- **Approval:** what waits for a person is applied or rolled back by a person, in the inbox or, with Leitvia Pro, in a chat view as themselves ([pro.md](pro.md)). The agent applies or rolls back only `autonomous` operations and discards only its own package with `leitvia/reject-package`. Over MCP a call that deletes, removes, rejects or rolls back without a `package` key may first ask the person; a no ends with `leitvia_cancelled`: stop and ask.',
+		'- **Retry:** follow the [retry rule](#rejections) of every rejection. A second rejection of the same call, or `retry: never`, stops that part of the task (a page, post, fix or source): report code and message, and ask the person when one is present.',
+		'- **Facts are never guessed.** Organization data, prices, legal texts, figures, quotes and people come only from a source you can name: the person (in an unattended run the briefing), a page of the site or a read ability, with the source in your report. Without one, stop at a checkpoint; never write a placeholder that looks like a fact.',
+		'- **Unattended:** when no person answers (a scheduled or hosted run), do not wait at a checkpoint; the section Unattended of the skill answers each one. Send the `package` key on every write, even when the briefing says nobody visits the site (mode `direct` needs a person who is present); never apply, roll back or publish anything. A fact without a source stays out and becomes an open question. End with the package ID, what it holds and the open questions; a skill that writes nothing ends with its report.',
+		'- **Approval:** what waits for a person is applied or rolled back by a person, in the inbox or, with Leitvia Pro, in a chat view as themselves ([pro.md](pro.md)). The agent applies (`leitvia/apply-package`) or rolls back (`leitvia/rollback`) only `autonomous` operations, everything else is `leitvia_needs_human`, and discards only its own package with `leitvia/reject-package`. Over MCP a call that deletes, removes, rejects or rolls back without a `package` key may first ask the person; a no ends with `leitvia_cancelled`: stop and ask.',
 		'',
 		'## Access over MCP and REST',
 		'',
@@ -189,11 +178,9 @@ export function handbook( dump ) {
 		'',
 		'**Which site.** Every path starts at the address of the site, not at the host: on the network site `https://example.org/club/` the MCP server is `https://example.org/club/wp-json/leitvia-studio/v1/mcp`; `/wp-json/` straight after the host reaches another site. `site.url` of `leitvia/get-contract` is the site of the connection, `site.rest` its REST base. An application password Studio created in a network works on its own site only (401 elsewhere).',
 		'',
-		'**MCP.** The server `leitvia` of Leitvia Studio answers at `POST /wp-json/leitvia-studio/v1/mcp`, revisions `2026-07-28` and `2025-11-25`. `tools/list` lists the abilities, named with a hyphen for the slash (`leitvia-get-contract`). `tools/call` takes the input of the ability as `arguments`. A rejection comes back as a tool result with `isError` true whose text is JSON with `code`, `message` and `data`. `leitvia-apply-recipe`, `leitvia-audit-site` and `leitvia-export` may answer `resultType` `task`: poll `tasks/get` until `status` is no longer `working`; the last state holds the result. Details: [mcp.md](mcp.md).',
+		'**MCP.** The server `leitvia` of Leitvia Studio answers at `POST /wp-json/leitvia-studio/v1/mcp`, revisions `2026-07-28` and `2025-11-25`. `tools/list` lists the abilities, named with a hyphen for the slash (`leitvia-get-contract`). `tools/call` takes the input of the ability as `arguments`. A rejection comes back as a tool result with `isError` true whose text is JSON with `code`, `message` and `data`. Tasks, questions and the connection check: [mcp.md](mcp.md).',
 		'',
-		'**REST.** Every ability runs at `/wp-json/wp-abilities/v1/abilities/<name>/run`. The HTTP method follows the annotations: read only abilities take GET, abilities that are destructive and idempotent take DELETE, all others POST. GET and DELETE send the input as query arguments (`?input[post]=12`, lists as `input[upsells][]=4&input[upsells][]=7`), POST sends it as JSON body `{"input": {…}}`.' + ( abilities.some( ( ability ) => 'DELETE' === method( ability.annotations ) ) ? ' Long texts make long URLs under DELETE; send them over MCP instead.' : '' ) + ' A rejection is an error response with `code`, `message` and `data`; the HTTP status is `data.status`. Without the MCP server `leitvia`: [core REST](core-rest.md).',
-		'',
-		'**Check the MCP connection.** The server is the whole route `<address of the site>/wp-json/leitvia-studio/v1/mcp`, and its tools hold `leitvia-get-contract`. No endpoint or 404: the path is missing or Leitvia Studio is not active; do not retry at the host or guess paths. 401 with `WWW-Authenticate: Bearer` (sign-in expired) or 403 `insufficient_scope` (reads only): ask the person. With an application password, when `GET <address of the site>/wp-json/wp-abilities/v1/abilities/leitvia/get-contract/run` answers, work over REST and report the broken MCP connection; otherwise stop and ask. Files go over MCP with `leitvia-add-media`, over REST only with the application password.',
+		'**REST.** Every ability runs at `/wp-json/wp-abilities/v1/abilities/<name>/run`. The HTTP method follows the annotations: read only abilities take GET, abilities that are destructive and idempotent take DELETE, all others POST. GET and DELETE send the input as query arguments (`?input[post]=12`, lists as `input[upsells][]=4&input[upsells][]=7`), POST sends it as JSON body `{"input": {…}}`. Long texts make long URLs under DELETE; send them over MCP instead. A rejection is an error response with `code`, `message` and `data`; the HTTP status is `data.status`. `GET /wp-json/wp-abilities/v1/abilities?category=leitvia` lists the abilities with their schemas and annotations, also without the MCP server `leitvia`.',
 		'',
 		'## Read before write',
 		'',
@@ -254,9 +241,9 @@ export function handbook( dump ) {
 		'',
 		'## Mode package',
 		'',
-		'Every write ability takes `package`, a key of the task (up to 64 characters). A write with a key always lands in the change package of that key, even where its level would let it go live; the result returns the package ID, and a person applies it in the inbox of Leitvia Studio. Send the same key on every write of one task, for example `homepage-2026-10`, so the person gets one package. Without a key the levels decide, and every write they hold back gets a package of its own. The same change sent twice is stored once. Writes of one task to the same target build on each other (send the hash you read) and are applied in order.',
+		'Every write ability takes `package`, a key of the task (up to 64 characters). A write with a key always lands in the change package of that key, even where its level would let it go live; the result returns the package ID, and a person applies it in the inbox of Leitvia Studio. Send the same key on every write of one task, for example `homepage-2026-10`, so the person gets one package. In mode `direct` send no key. Without a key the levels decide, and every write they hold back gets a package of its own. The same change sent twice is stored once. Writes of one task to the same target build on each other (send the hash you read) and are applied in order.',
 		'',
-		'`leitvia/list-packages` lists your packages, `leitvia/get-package` shows the diff per operation. Agents may apply (`leitvia/apply-package`) and roll back (`leitvia/rollback`) only operations whose level is `autonomous`; everything else is `leitvia_needs_human` and waits for a person.',
+		'`leitvia/list-packages` lists your packages, `leitvia/get-package` shows the diff per operation.',
 		'',
 		'## Rejections',
 		'',
@@ -279,20 +266,16 @@ export function handbook( dump ) {
 	];
 
 	const files = {
-		'core-rest.md': [
-			'# Core REST without the leitvia MCP server',
-			'',
-			`Generated from Leitvia Studio ${ dump.studio ?? 'unknown' }. Do not edit. Hashes, autonomy and rejections: [agent handbook](README.md).`,
-			'',
-			...CORE_REST,
-			'',
-		].join( '\n' ),
 		'mcp.md': [
 			'# MCP server leitvia',
 			'',
-			`Generated from Leitvia Studio ${ dump.studio ?? 'unknown' }. Do not edit. Hashes, autonomy and rejections: [agent handbook](README.md).`,
+			`${ generated } Hashes, autonomy and rejections: [agent handbook](README.md).`,
 			'',
 			'The MCP server `leitvia` is part of Leitvia Studio. It answers at `POST <address of the site>/wp-json/leitvia-studio/v1/mcp` over streamable HTTP and speaks the revisions `2026-07-28` and `2025-11-25` of MCP. Its tools are the abilities of the [handbook](README.md#abilities), with the same checks, autonomy levels and change packages as over REST.',
+			'',
+			'## Check the connection',
+			'',
+			'The server is the whole route `<address of the site>/wp-json/leitvia-studio/v1/mcp`, and its tools hold `leitvia-get-contract`. No endpoint or 404: the path is missing or Leitvia Studio is not active; do not retry at the host or guess paths. 401 with `WWW-Authenticate: Bearer` (sign-in expired) or 403 `insufficient_scope` (reads only): ask the person. With an application password, when `GET <address of the site>/wp-json/wp-abilities/v1/abilities/leitvia/get-contract/run` answers, work over REST and report the broken MCP connection; otherwise stop and ask. Files go over MCP with `leitvia-add-media`, over REST only with the application password.',
 			'',
 			'## Revisions',
 			'',
@@ -347,7 +330,7 @@ export function handbook( dump ) {
 		'rejections.md': [
 			'# Rejections',
 			'',
-			`Generated from Leitvia Studio ${ dump.studio ?? 'unknown' }. Do not edit. What a retry rule means: [agent handbook](README.md#rejections).`,
+			`${ generated } What a retry rule means: [agent handbook](README.md#rejections).`,
 			'',
 			'Every rejection of Leitvia Studio with its retry rule and next ability. Messages with `%s` or `%d` get a value at run time; codes with several rows come from several places.',
 			'',
@@ -355,7 +338,7 @@ export function handbook( dump ) {
 			'',
 			'| Code | HTTP | Retry | Next ability | Message |',
 			'|---|---|---|---|---|',
-			...( rejections.cases ?? [] ).map( ( item ) => `| \`${ item.code }\` | ${ item.status ?? 'varies' } | ${ item.retry ? `\`${ item.retry }\`` : 'varies' } | ${ item.next_ability.length ? item.next_ability.map( ( name ) => ( name ? `\`${ name }\`` : 'none' ) ).join( ' or ' ) : 'set at run time' } | ${ cell( item.message ?? 'Built at run time; read the message.' ) } |` ),
+			...rejections.cases.map( ( item ) => `| \`${ item.code }\` | ${ item.status } | \`${ item.retry }\` | ${ item.next_ability.length ? item.next_ability.map( ( name ) => ( name ? `\`${ name }\`` : 'none' ) ).join( ' or ' ) : 'set at run time' } | ${ cell( item.message ?? 'Built at run time; read the message.' ) } |` ),
 			'',
 			'## Codes of other plugins',
 			'',
@@ -381,7 +364,7 @@ export function handbook( dump ) {
 			const text = [
 				`# ${ ability.name }`,
 				'',
-				`Generated from Leitvia Studio ${ dump.studio ?? 'unknown' }. Do not edit. Group: ${ title }. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).`,
+				`${ generated } Group: ${ title }. How to call abilities, hashes, autonomy and rejections: [agent handbook](../README.md).`,
 				'',
 				`**${ escape( ability.label ) }.** ${ escape( ability.description ) }`,
 				'',
